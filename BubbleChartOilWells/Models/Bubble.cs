@@ -18,8 +18,8 @@ namespace BubbleChartOilWells.Models
 {
     public class Bubble : INotifyPropertyChanged
     {
-        public static double _min_oil_value = 100000;
-        public static double _max_oil_value = 0;
+        public static double MIN_oil_value = 100000;
+        public static double MAX_oil_value = 0;
 
         private Point _coordinates;
         private double _radius;
@@ -40,8 +40,8 @@ namespace BubbleChartOilWells.Models
         public void Update()
         {
             _coordinates = new Point(data.X, data.Y);
-            _radius = 100 / _max_oil_value * (data.Oil_Production + data.Liquid_Production);
-            double angle_in_rad = Math.PI / 180 * (360 / (data.Oil_Production + data.Liquid_Production)) * data.Liquid_Production;
+            _radius = 100 / MAX_oil_value * (data.oil_prod + data.liquid_prod);
+            double angle_in_rad = Math.PI / 180 * (360 / (data.oil_prod + data.liquid_prod)) * data.liquid_prod;
 
 
 

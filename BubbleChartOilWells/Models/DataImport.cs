@@ -13,44 +13,11 @@ namespace BubbleChartOilWells.Models
     class DataImport
     {
         public string file_path { get; private set; }
+        public List<Bubble> data_list { get; private set; } = new List<Bubble>();
+        public Dictionary<OilWell, Bubble> data_dict_OB { get; private set; } = new Dictionary<OilWell, Bubble>();
+        public Dictionary<Bubble, OilWell> data_dict_BO { get; private set; } = new Dictionary<Bubble, OilWell>();
 
-        public DataImport(List<Bubble> bubbles)
-        {
-
-            //-----------------------------------------------------------------
-            // open file
-            //file_path = GetFileName();    
-
-            // DELETE BEFORE RELEASE
-            file_path = "C:\\Users\\timzl\\Documents\\test.xlsx";
-            //--------------------------------------------------------------------
-
-
-            // excel data parsing           
-            List<OilWell> oil_wells = GetExcelData(file_path);
-
-            foreach (var oil in oil_wells)
-                bubbles.Add(new Bubble(oil));
-        }
-        public DataImport(Dictionary<OilWell, Bubble> Oil_Well)
-        {
-
-            //-----------------------------------------------------------------
-            // open file
-            //file_path = GetFileName();    
-
-            // DELETE BEFORE RELEASE
-            file_path = "C:\\Users\\timzl\\Documents\\test.xlsx";
-            //--------------------------------------------------------------------
-
-
-            // excel data parsing           
-            List<OilWell> oil_wells = GetExcelData(file_path);
-
-            foreach (var oil in oil_wells)
-                Oil_Well[oil] = new Bubble(oil); // writing data in List
-        }
-        public DataImport(Dictionary<Bubble, OilWell> Oil_Well)
+        public DataImport()
         {
             //-----------------------------------------------------------------
             // open file
@@ -65,8 +32,11 @@ namespace BubbleChartOilWells.Models
             List<OilWell> oil_wells = GetExcelData(file_path);
 
             foreach (var oil in oil_wells)
-
-                Oil_Well[new Bubble(oil)] = oil; // writing data in List
+            {
+                data_list.Add(new Bubble(oil));
+                data_dict_OB[oil] = new Bubble(oil); // writing data in List
+                data_dict_BO[new Bubble(oil)] = oil; // writing data in List
+            }
         }
 
         private string GetFileName()
@@ -112,17 +82,16 @@ namespace BubbleChartOilWells.Models
                 List<double> row = new List<double>();
 
                 for (int j = 1; j <= column_count; j++)
-                    if (xlRange.Cells[i, j] != null && xlRange.Cells[i, j].Value2 != null)
-                        row.Add(Double.Parse(xlRange.Cells[i, j].Value2.ToString()));
+                        row.Add(Double.Parse(xlRange.Cells[i, j]?.Value2?.ToString()));
 
 
                 OilWell oil_well = new OilWell(row);
 
-                double prod_sum = oil_well.Oil_Production + oil_well.Liquid_Production;
-                if (prod_sum < Bubble._min_oil_value)
-                    Bubble._min_oil_value = prod_sum;
-                else if (prod_sum > Bubble._max_oil_value)
-                    Bubble._max_oil_value = prod_sum;
+                double prod_sum = oil_well.oil_prod + oil_well.liquid_prod;
+                if (prod_sum < Bubble.MIN_oil_value)
+                    Bubble.MIN_oil_value = prod_sum;
+                else if (prod_sum > Bubble.MAX_oil_value)
+                    Bubble.MAX_oil_value = prod_sum;
 
 
                 oil_wells.Add(oil_well); // writing data in List

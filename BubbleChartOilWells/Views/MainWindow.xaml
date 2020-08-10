@@ -48,10 +48,13 @@
 
 
             <!--Menu-->
-            <Menu WindowChrome.IsHitTestVisibleInChrome="True" Grid.Row="0" Grid.Column="0" Background="#FF3A3A3A">
-                <MenuItem Header="_File import" HorizontalAlignment="Left" Background="Violet"  Height="40" FontSize="14" Foreground="White" Command="{Binding ImportFileCommand}"/>
-            </Menu>
-            <!--<Button Command="{Binding ImportFileCommand}" WindowChrome.IsHitTestVisibleInChrome="True" Grid.Row="0" Grid.Column="0">qwerty</Button>            -->
+            <!--<Menu WindowChrome.IsHitTestVisibleInChrome="True" Grid.Row="0" Grid.Column="0" Background="#FF3A3A3A">
+                --><!--<MenuItem Header="_File import" HorizontalAlignment="Left" Background="Violet"  Height="40" FontSize="14" Foreground="White" Command="{Binding ImportFileCommand}"/>--><!--
+            </Menu>-->
+            <Button Command="{Binding ButtonTest}"
+                    WindowChrome.IsHitTestVisibleInChrome="True" Grid.Row="0" Grid.Column="0">
+                File Import
+            </Button>           
 
 
 
@@ -62,13 +65,13 @@
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
-                <Button  Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top" Command="{x:Static SystemCommands.MinimizeWindowCommand}" Background="{x:Null}" Foreground="{x:Null}">
+                <Button  Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top" Command="{x:Static SystemCommands.MinimizeWindowCommand}" Background="{x:Null}" Foreground="{x:Null}" BorderBrush="{x:Null}">
                     <Image Source="Icons/minimize.png"/>
                 </Button>
-                <Button x:Name="button_maximize" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Command="{x:Static SystemCommands.MaximizeWindowCommand}" Background="{x:Null}" Foreground="{x:Null}">
+                <Button x:Name="button_maximize" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Command="{x:Static SystemCommands.MaximizeWindowCommand}" Background="{x:Null}" Foreground="{x:Null}" BorderBrush="{x:Null}">
                     <Image x:Name="icon_maximize" Source="Icons/maximize.png"/>
                 </Button>
-                <Button  x:Name="button_close" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Top" Command="{x:Static SystemCommands.CloseWindowCommand}" Background="{x:Null}" Foreground="{x:Null}">
+                <Button  x:Name="button_close" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Top" Command="{x:Static SystemCommands.CloseWindowCommand}" Background="{x:Null}" Foreground="{x:Null}" BorderBrush="{x:Null}">
                     <Image Source="Icons/close.png" Stretch="Fill"/>
                 </Button>
             </Grid>

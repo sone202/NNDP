@@ -14,10 +14,10 @@ namespace BubbleChartOilWells.Models
             ID = (int)values[0];
             X = values[1];
             Y = values[2];
-            Oil_Debit = values[3];
-            Liquid_Debit = values[4];
-            Oil_Production = values[5];
-            Liquid_Production = values[6];
+            oil_debit = values[3];
+            liquid_debit = values[4];
+            oil_prod = values[5];
+            liquid_prod = values[6];
         }
 
         public int ID;
@@ -25,10 +25,10 @@ namespace BubbleChartOilWells.Models
         public double X;
         public double Y;
 
-        public double Oil_Debit;
-        public double Liquid_Debit;
+        public double oil_debit;
+        public double liquid_debit;
 
-        public double Oil_Production;
-        public double Liquid_Production;
+        public double oil_prod;
+        public double liquid_prod;
     }
 }
