@@ -1,16 +1,19 @@
-﻿using BubbleChartOilWells.Commands;
-using BubbleChartOilWells.Interfaces;
+﻿using AsyncAwaitBestPractices.MVVM;
 using BubbleChartOilWells.Models;
+using Microsoft.Vbe.Interop;
 using System;
 using System.Activities.Statements;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
@@ -19,7 +22,7 @@ namespace BubbleChartOilWells.ViewModels
     public class MainViewModel : BaseViewModel
     {
         static public List<Bubble> _oil_wells = new List<Bubble>();
-        static public List<Path> _oil_wells_paths = new List<Path>();
+        static public ObservableCollection<object> _oil_wells_paths { get; private set; } = new ObservableCollection<object>();
         static public Bubble _current_selected;
 
         static public Dictionary<Bubble, OilWell> _data_Bubble_OilWell = new Dictionary<Bubble, OilWell>();
@@ -27,97 +30,71 @@ namespace BubbleChartOilWells.ViewModels
         static public Dictionary<Path, Bubble> _data_Path_Bubble = new Dictionary<Path, Bubble>();
 
 
+        static public ObservableCollection<object> _widgets { get; private set; } = new ObservableCollection<object>();
 
-
-        //private IAsyncCommand _importFileCommand;
-        //public IAsyncCommand ImportFileCommand
-        //{
-        //    get
-        //    {
-        //        if (this._importFileCommand == null)
-        //        {
-        //            this._importFileCommand = new AsyncCommand(() => FileImport(), () => true, null);
-        //        }
-        //        return this._importFileCommand;
-        //    }
-        //}
-        private AsyncCommand _ButtonTest;
-        public AsyncCommand ButtonTest
+        private Border box_settings = new Border
         {
-            get
-            {
-                return _ButtonTest ?? (_ButtonTest = new AsyncCommand(FileImport));
-            }
+            BorderBrush = Brushes.Gray,
+            BorderThickness = new Thickness(1),
+        };
+        private TreeView _tree = new TreeView { };
+       
+
+
+
+        private AsyncCommand _importFileAsyncCommand;
+        public AsyncCommand ImportFileAsyncCommand
+        {
+            get { return _importFileAsyncCommand ?? (_importFileAsyncCommand = new AsyncCommand(FileImportAsync)); }
         }
-        public MainViewModel()
-        {
-            //ButtonTest = new AsyncCommand(FileImport, CanExecuteSubmit);
-            //ButtonTest = new AsyncCommand(FileImport);
-        }
-        
-        private async Task FileImport()
+        private async Task FileImportAsync()
         {
 
-            //// adding wells to the grid
-            //drawing_area.Children.Clear();
-            //drawing_area.UpdateLayout();
-
-
-            await Task.Delay(1);
-            MessageBox.Show("2");
-            _oil_wells = new DataImport().data_list;
+            // adding wells to the grid
+            _oil_wells = await Task.Run(() => DataImport.GetDataList());
             foreach (var bubble in _oil_wells)
             {
                 bubble.Update();
+
                 foreach (var path in bubble.paths)
-                {
                     _oil_wells_paths.Add(path);
-                    //_data_path_bubble[path] = bubble;
-                }
-                //drawing_area.Children.Add(bubble.ID);
+
+                _oil_wells_paths.Add(bubble.ID);
             }
         }
 
 
 
-        private IAsyncCommand _openSettingsCommand;
-        public IAsyncCommand OpenSettingsCommand
+        private AsyncCommand _openSettingsAsyncCommand;
+        public AsyncCommand OpenSettingsAsyncCommand
         {
-            get
-            {
-                if (this._openSettingsCommand == null)
-                {
-                    this._openSettingsCommand = new AsyncCommand(() => OpenSettings(), () => true, null);
-                }
-                return this._openSettingsCommand;
-            }
+            get { return _openSettingsAsyncCommand ?? (_openSettingsAsyncCommand = new AsyncCommand(OpenSettingsAsync)); }
         }
-        private async Task OpenSettings()
+        private async Task OpenSettingsAsync()
         {
-            TextBox box_settings = new TextBox();
-            box_settings.Text = "settings test";
-            //grid_tools.Children.Add(box_settings);
+            TextBox tmp = new TextBox();
+            tmp.Text = "settings test";
+            box_settings.Child = tmp;
+            if (!_widgets.Contains(box_settings))
+                _widgets.Add(box_settings);
+            else
+                _widgets.Remove(box_settings);
         }
 
 
 
-        private IAsyncCommand _openTreeCommand;
-        public IAsyncCommand OpenTreeCommand
+        private AsyncCommand _openTreeAsyncCommand;
+        public AsyncCommand OpenTreeAsyncCommand
         {
-            get
-            {
-                if (this._openTreeCommand == null)
-                {
-                    this._openTreeCommand = new AsyncCommand(() => OpenTree(), () => true, null);
-                }
-                return this._openTreeCommand;
-            }
+            get { return _openTreeAsyncCommand ?? (_openTreeAsyncCommand = new AsyncCommand(OpenTreeAsync)); }
         }
-        private async Task OpenTree()
+        private async Task OpenTreeAsync()
         {
-            TextBox box_tree = new TextBox();
-            box_tree.Text = "tree test";
-            //grid_tools.Children.Add(box_tree);
+            ;
+            if (!_widgets.Contains(_tree))
+                _widgets.Add(_tree);
+            else
+                _widgets.Remove(_tree);
         }
     }
 }

@@ -10,14 +10,14 @@ using System.IO;
 
 namespace BubbleChartOilWells.Models
 {
-    class DataImport
+    static class DataImport
     {
-        public string file_path { get; private set; }
-        public List<Bubble> data_list { get; private set; } = new List<Bubble>();
-        public Dictionary<OilWell, Bubble> data_dict_OB { get; private set; } = new Dictionary<OilWell, Bubble>();
-        public Dictionary<Bubble, OilWell> data_dict_BO { get; private set; } = new Dictionary<Bubble, OilWell>();
+        public static string file_path { get; private set; }
+        public static List<Bubble> data_list { get; private set; } = new List<Bubble>();
+        public static Dictionary<OilWell, Bubble> data_dict_OB { get; private set; } = new Dictionary<OilWell, Bubble>();
+        public static Dictionary<Bubble, OilWell> data_dict_BO { get; private set; } = new Dictionary<Bubble, OilWell>();
 
-        public DataImport()
+        static DataImport()
         {
             //-----------------------------------------------------------------
             // open file
@@ -38,8 +38,26 @@ namespace BubbleChartOilWells.Models
                 data_dict_BO[new Bubble(oil)] = oil; // writing data in List
             }
         }
+        public static List<Bubble> GetDataList()
+        {
+            //-----------------------------------------------------------------
+            // open file
+            //file_path = GetFileName();    
 
-        private string GetFileName()
+            // DELETE BEFORE RELEASE
+            file_path = "C:\\Users\\timzl\\Documents\\test.xlsx";
+            //--------------------------------------------------------------------
+
+
+            // excel data parsing           
+            List<OilWell> oil_wells = GetExcelData(file_path);
+
+            foreach (var oil in oil_wells)
+                data_list.Add(new Bubble(oil));
+
+            return data_list;
+        }
+        private static string GetFileName()
         {
             OpenFileDialog OFD = new OpenFileDialog();
             OFD.InitialDirectory = "c:\\";
@@ -53,7 +71,7 @@ namespace BubbleChartOilWells.Models
             else
                 return null;
         }
-        private List<OilWell> GetExcelData(string file_path)
+        private static List<OilWell> GetExcelData(string file_path)
         {
 
             List<OilWell> oil_wells = new List<OilWell>();
@@ -82,7 +100,7 @@ namespace BubbleChartOilWells.Models
                 List<double> row = new List<double>();
 
                 for (int j = 1; j <= column_count; j++)
-                        row.Add(Double.Parse(xlRange.Cells[i, j]?.Value2?.ToString()));
+                    row.Add(Double.Parse(xlRange.Cells[i, j]?.Value2?.ToString()));
 
 
                 OilWell oil_well = new OilWell(row);

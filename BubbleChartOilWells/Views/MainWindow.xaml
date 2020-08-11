@@ -48,34 +48,30 @@
 
 
             <!--Menu-->
-            <!--<Menu WindowChrome.IsHitTestVisibleInChrome="True" Grid.Row="0" Grid.Column="0" Background="#FF3A3A3A">
-                --><!--<MenuItem Header="_File import" HorizontalAlignment="Left" Background="Violet"  Height="40" FontSize="14" Foreground="White" Command="{Binding ImportFileCommand}"/>--><!--
-            </Menu>-->
-            <Button Command="{Binding ButtonTest}"
-                    WindowChrome.IsHitTestVisibleInChrome="True" Grid.Row="0" Grid.Column="0">
-                File Import
-            </Button>           
+            <Menu WindowChrome.IsHitTestVisibleInChrome="True" Grid.Row="0" Grid.Column="0" Background="#FF3A3A3A">
+                <MenuItem Header="_File import" HorizontalAlignment="Left" Background="Violet"  Height="40" FontSize="14" Foreground="White" Command="{Binding ImportFileAsyncCommand}"/>
+            </Menu>
 
 
 
-            <!-- Window control buttons -->
+            <!--#region Window control buttons -->
             <Grid WindowChrome.IsHitTestVisibleInChrome="True" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Top" Height="30">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
-                <Button  Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top" Command="{x:Static SystemCommands.MinimizeWindowCommand}" Background="{x:Null}" Foreground="{x:Null}" BorderBrush="{x:Null}">
+                <Button  Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top" Command="{x:Static SystemCommands.MinimizeWindowCommand}" Background="{x:Null}" Foreground="{x:Null}" BorderBrush="{x:Null}" BorderThickness="0">
                     <Image Source="Icons/minimize.png"/>
                 </Button>
-                <Button x:Name="button_maximize" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Command="{x:Static SystemCommands.MaximizeWindowCommand}" Background="{x:Null}" Foreground="{x:Null}" BorderBrush="{x:Null}">
+                <Button x:Name="button_maximize" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Command="{x:Static SystemCommands.MaximizeWindowCommand}" Background="{x:Null}" Foreground="{x:Null}" BorderBrush="{x:Null}" BorderThickness="0">
                     <Image x:Name="icon_maximize" Source="Icons/maximize.png"/>
                 </Button>
-                <Button  x:Name="button_close" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Top" Command="{x:Static SystemCommands.CloseWindowCommand}" Background="{x:Null}" Foreground="{x:Null}" BorderBrush="{x:Null}">
+                <Button  x:Name="button_close" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Top" Command="{x:Static SystemCommands.CloseWindowCommand}" Background="{x:Null}" Foreground="{x:Null}" BorderBrush="{x:Null}" BorderThickness="0">
                     <Image Source="Icons/close.png" Stretch="Fill"/>
                 </Button>
             </Grid>
-
+            <!--#endregion-->
 
             <Grid Background="#FF3A3A3A" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3">
                 <Grid.RowDefinitions>
@@ -100,15 +96,12 @@
 
                 <!--Drawing area-->
                 <Border x:Name="drawing_area" Grid.Row="1" Grid.Column="2" BorderBrush="Gray" BorderThickness="1" >
-                    <Border.LayoutTransform>
-                        <ScaleTransform ScaleY="-1"/>
-                    </Border.LayoutTransform>
                     <ItemsControl ItemsSource="{Binding _oil_wells_paths}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <Canvas IsItemsHost="True"  Background="White" ClipToBounds="True" MouseMove="drawing_area_MouseMove">
                                     <!--MouseDown="drawing_area_MouseDown"-->
-                                   
+
 
                                     <Canvas.Triggers>
                                         <EventTrigger RoutedEvent="MouseMove">
@@ -135,12 +128,10 @@
                 <Border Grid.Row="1" Grid.Column="3" BorderBrush="Gray" BorderThickness="1">
                     <ToolBarTray Orientation="Vertical">
                         <ToolBar>
-                            <Button x:Name="button_settings" >
-                                <!--Click="Settings_Click"-->
+                            <Button Command="{Binding OpenSettingsAsyncCommand}" >
                                 <Image Source="Icons/settings.png" Width="20"/>
                             </Button>
-                            <Button x:Name="button_tree" >
-                                <!--Click="Tree_Click"-->
+                            <Button Command="{Binding OpenTreeAsyncCommand}" >
                                 <Image Source="Icons/tree.png" Width="20"/>
                             </Button>
                         </ToolBar>
@@ -149,9 +140,9 @@
 
 
                 <!--tools Window-->
-                <Border  Grid.Row="1" Grid.Column="1" BorderBrush="Gray" BorderThickness="1">
-                    <Grid Grid.Row="1" Grid.Column="1" x:Name="grid_tools"/>
-                </Border>
+                <StackPanel  Grid.Row="1" Grid.Column="1">
+                    <ItemsControl ItemsSource="{Binding _widgets}"/>
+                </StackPanel>
 
 
 

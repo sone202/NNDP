@@ -43,6 +43,7 @@ namespace BubbleChartOilWells.Interfaces
                 try
                 {
                     _isExecuting = true;
+                    RaiseCanExecuteChanged();
                     await _execute();
                 }
                 finally
