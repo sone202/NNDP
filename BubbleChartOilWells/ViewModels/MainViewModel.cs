@@ -21,24 +21,51 @@ namespace BubbleChartOilWells.ViewModels
 {
     public class MainViewModel : BaseViewModel
     {
-        static public List<Bubble> _oil_wells = new List<Bubble>();
-        static public ObservableCollection<object> _oil_wells_paths { get; private set; } = new ObservableCollection<object>();
-        static public Bubble _current_selected;
+        static private List<Bubble> _oil_wells = new List<Bubble>();
+        static private ObservableCollection<Node> _tree_data { get; set; }
+        //static public Bubble _current_selected;
 
-        static public Dictionary<Bubble, OilWell> _data_Bubble_OilWell = new Dictionary<Bubble, OilWell>();
-        static public Dictionary<Path, OilWell> _data_Path_OilWell = new Dictionary<Path, OilWell>();
-        static public Dictionary<Path, Bubble> _data_Path_Bubble = new Dictionary<Path, Bubble>();
+        //static private Dictionary<Bubble, OilWell> _data_Bubble_OilWell = new Dictionary<Bubble, OilWell>();
+        //static private Dictionary<Path, OilWell> _data_Path_OilWell = new Dictionary<Path, OilWell>();
+        //static private Dictionary<Path, Bubble> _data_Path_Bubble = new Dictionary<Path, Bubble>();
 
 
-        static public ObservableCollection<object> _widgets { get; private set; } = new ObservableCollection<object>();
+        static public ObservableCollection<object> oil_wells_paths { get; private set; } = new ObservableCollection<object>();
 
-        private Border box_settings = new Border
+        static public ObservableCollection<object> widgets { get; private set; }
+
+
+
+
+        public MainViewModel()
         {
-            BorderBrush = Brushes.Gray,
-            BorderThickness = new Thickness(1),
-        };
-        private TreeView _tree = new TreeView { };
-       
+            widgets = new ObservableCollection<object>();
+            for (int i = 0; i < 2; i++)
+                widgets.Add(new Border
+                {
+                    BorderBrush = Brushes.Gray,
+                    BorderThickness = new Thickness(1),
+                    Visibility = Visibility.Collapsed
+                });
+
+            TreeView test = new TreeView
+            {
+            };
+            _tree_data = new ObservableCollection<Node>
+            {
+                new Node { Name = "Скважины" },
+                new Node
+                {
+                    Name ="Пузырьковые карты",
+                    Nodes = new ObservableCollection<Node>
+                    {
+                         new Node { Name = "Карта текущих отборов" },
+                         new Node { Name = "Карта накопленных отборов" }
+                    }
+                },
+                new Node { Name = "Карты" }
+            };
+        }
 
 
 
@@ -57,9 +84,9 @@ namespace BubbleChartOilWells.ViewModels
                 bubble.Update();
 
                 foreach (var path in bubble.paths)
-                    _oil_wells_paths.Add(path);
+                    oil_wells_paths.Add(path);
 
-                _oil_wells_paths.Add(bubble.ID);
+                oil_wells_paths.Add(bubble.ID);
             }
         }
 
@@ -72,13 +99,11 @@ namespace BubbleChartOilWells.ViewModels
         }
         private async Task OpenSettingsAsync()
         {
-            TextBox tmp = new TextBox();
-            tmp.Text = "settings test";
-            box_settings.Child = tmp;
-            if (!_widgets.Contains(box_settings))
-                _widgets.Add(box_settings);
-            else
-                _widgets.Remove(box_settings);
+            (widgets[0] as Border).Visibility = (widgets[0] as Border).Visibility == Visibility.Collapsed ? Visibility.Visible : Visibility.Collapsed;
+
+            if ((widgets[0] as Border).Visibility == Visibility.Visible)
+                (widgets[0] as Border).Child = new TextBox { Text = "Settings_test" };
+
         }
 
 
@@ -90,11 +115,13 @@ namespace BubbleChartOilWells.ViewModels
         }
         private async Task OpenTreeAsync()
         {
-            ;
-            if (!_widgets.Contains(_tree))
-                _widgets.Add(_tree);
-            else
-                _widgets.Remove(_tree);
+            (widgets[1] as Border).Visibility = (widgets[1] as Border).Visibility == Visibility.Collapsed ? Visibility.Visible : Visibility.Collapsed;
+
+            if ((widgets[1] as Border).Visibility == Visibility.Visible)
+                (widgets[1] as Border).Child = new TreeView { ItemsSource = _tree_data };
+
+            TreeView tmp = new TreeView { ItemsSource = _tree_data };
+               
         }
     }
 }

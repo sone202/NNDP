@@ -78,14 +78,10 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Commands\RelayCommand.cs" />
-    <Compile Include="Extensions\FireAndForgetSafeAsync.cs" />
-    <Compile Include="Interfaces\IAsyncCommand.cs" />
-    <Compile Include="Interfaces\ICommand.cs" />
-    <Compile Include="Interfaces\IErrorHandler.cs" />
     <Compile Include="Models\Bubble.cs" />
     <Compile Include="Models\DataImport.cs" />
     <Compile Include="Commands\EventsHandlers.cs" />
+    <Compile Include="Models\Node.cs" />
     <Compile Include="Models\OilWell.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />

@@ -96,7 +96,7 @@
 
                 <!--Drawing area-->
                 <Border x:Name="drawing_area" Grid.Row="1" Grid.Column="2" BorderBrush="Gray" BorderThickness="1" >
-                    <ItemsControl ItemsSource="{Binding _oil_wells_paths}">
+                    <ItemsControl ItemsSource="{Binding oil_wells_paths}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <Canvas IsItemsHost="True"  Background="White" ClipToBounds="True" MouseMove="drawing_area_MouseMove">
@@ -141,7 +141,7 @@
 
                 <!--tools Window-->
                 <StackPanel  Grid.Row="1" Grid.Column="1">
-                    <ItemsControl ItemsSource="{Binding _widgets}"/>
+                    <ItemsControl ItemsSource="{Binding widgets, Mode=TwoWay}"/>
                 </StackPanel>
 
 
