@@ -7,19 +7,8 @@ using System.Threading.Tasks;
 
 namespace BubbleChartOilWells.Models
 {
-    public struct OilWell
+    public class OilWell
     {
-        public OilWell(List<double> values)
-        {
-            ID = (int)values[0];
-            X = values[1];
-            Y = values[2];
-            oil_debit = values[3];
-            liquid_debit = values[4];
-            oil_prod = values[5];
-            liquid_prod = values[6];
-        }
-
         public int ID;
 
         public double X;
@@ -30,5 +19,17 @@ namespace BubbleChartOilWells.Models
 
         public double oil_prod;
         public double liquid_prod;
+
+        public OilWell(List<double> values)
+        {
+            ID = (int)values[0];
+            X = values[1];
+            Y = values[2];
+            oil_debit = values[3];
+            liquid_debit = values[4];
+            oil_prod = values[5];
+            liquid_prod = values[6];
+        }
+       
     }
 }

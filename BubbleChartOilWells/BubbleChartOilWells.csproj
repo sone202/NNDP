@@ -42,6 +42,9 @@
       <HintPath>..\packages\AsyncAwaitBestPractices.MVVM.4.2.0\lib\netstandard1.0\AsyncAwaitBestPractices.MVVM.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Build.Tasks.v4.0" />
+    <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.19\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Activities" />
     <Reference Include="System.Data" />
@@ -80,7 +83,6 @@
     </Compile>
     <Compile Include="Models\Bubble.cs" />
     <Compile Include="Models\DataImport.cs" />
-    <Compile Include="Commands\EventsHandlers.cs" />
     <Compile Include="Models\Node.cs" />
     <Compile Include="Models\OilWell.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />

@@ -42,15 +42,24 @@ namespace BubbleChartOilWells.Models
         {
             //-----------------------------------------------------------------
             // open file
-            //file_path = GetFileName();    
-
+            file_path = GetFileName();
+            if (file_path == null)
+            {
+                //MessageBox.Show("Invalid file name");
+                return null;
+            }
             // DELETE BEFORE RELEASE
-            file_path = "C:\\Users\\timzl\\Documents\\test.xlsx";
+            //file_path = "C:\\Users\\timzl\\Documents\\test.xlsx";
             //--------------------------------------------------------------------
 
 
             // excel data parsing           
             List<OilWell> oil_wells = GetExcelData(file_path);
+            if (oil_wells == null)
+            {
+                MessageBox.Show("No data in file");
+                return null;
+            }
 
             foreach (var oil in oil_wells)
                 data_list.Add(new Bubble(oil));
@@ -59,17 +68,15 @@ namespace BubbleChartOilWells.Models
         }
         private static string GetFileName()
         {
-            OpenFileDialog OFD = new OpenFileDialog();
-            OFD.InitialDirectory = "c:\\";
-            OFD.Filter = "Excel all files (*.xlsx, *.xlsm, *.xltx, *.xltm)|*.xlsx; *.xlsm; *.xltx; *.xltm|All files (*.*)|*.*";
-            OFD.FilterIndex = 1;
-            OFD.RestoreDirectory = true;
-            if (OFD.ShowDialog() == true)
+            OpenFileDialog OFD = new OpenFileDialog
             {
-                return OFD.FileName;
-            }
-            else
-                return null;
+                InitialDirectory = "c:\\",
+                Filter = "Excel all files (*.xlsx, *.xlsm, *.xltx, *.xltm)|*.xlsx; *.xlsm; *.xltx; *.xltm",
+                FilterIndex = 1,
+                RestoreDirectory = true
+            };
+            return OFD.ShowDialog() == true ? OFD.FileName : null;
+
         }
         private static List<OilWell> GetExcelData(string file_path)
         {
@@ -87,11 +94,9 @@ namespace BubbleChartOilWells.Models
             int row_count = xlRange.Rows.Count;
             int column_count = xlRange.Columns.Count;
 
-            if (row_count < 2)
-            {
-                MessageBox.Show("No Data", "Warning");
+            if (row_count < 2)            
                 return null;
-            }
+            
 
 
             // parsing

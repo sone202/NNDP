@@ -44,7 +44,7 @@ namespace BubbleChartOilWells.Models
             double angle_in_rad = Math.PI / 180 * (360 / (data.oil_prod + data.liquid_prod)) * data.liquid_prod;
 
 
-            
+
             EllipseGeometry coordinate_point = new EllipseGeometry
             {
                 Center = _coordinates,
@@ -92,7 +92,7 @@ namespace BubbleChartOilWells.Models
             {
                 Stroke = Brushes.DarkGray,
                 Fill = angle_in_rad > Math.PI ? _brush_liquid : _brush_oil,
-                StrokeThickness = 1,
+                StrokeThickness = 0,
                 Data = circle,
             };
 
@@ -100,7 +100,7 @@ namespace BubbleChartOilWells.Models
             Path path_segment = new Path
             {
                 Fill = angle_in_rad > Math.PI ? _brush_oil : _brush_liquid,
-                StrokeThickness = 1,
+                StrokeThickness = 0,
                 Data = new PathGeometry
                 {
                     Figures = new PathFigureCollection {
@@ -137,11 +137,32 @@ namespace BubbleChartOilWells.Models
         {
             is_selected = true;
             paths[0].Stroke = Brushes.Red;
+            paths[0].StrokeThickness = 2;
         }
         public void Unselect()
         {
             is_selected = false;
             paths[0].Stroke = Brushes.DarkGray;
+            paths[0].StrokeThickness = 0;
+
+        }
+
+        public bool Contains(object sender)
+        {
+            try
+            {
+                foreach (var el in paths)
+                    if (el == sender)
+                        return true;
+                if (ID == sender)
+                    return true;
+                return false;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
+            return false;
         }
 
 

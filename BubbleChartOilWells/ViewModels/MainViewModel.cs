@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
@@ -21,75 +22,121 @@ namespace BubbleChartOilWells.ViewModels
 {
     public class MainViewModel : BaseViewModel
     {
-        static private List<Bubble> _oil_wells = new List<Bubble>();
-        static private ObservableCollection<Node> _tree_data { get; set; }
-        //static public Bubble _current_selected;
+        static private List<Bubble> _oil_wells;
+        static public Bubble _current_selected;
 
-        //static private Dictionary<Bubble, OilWell> _data_Bubble_OilWell = new Dictionary<Bubble, OilWell>();
+        static private Dictionary<Bubble, OilWell> _data_Bubble_OilWell = new Dictionary<Bubble, OilWell>();
         //static private Dictionary<Path, OilWell> _data_Path_OilWell = new Dictionary<Path, OilWell>();
         //static private Dictionary<Path, Bubble> _data_Path_Bubble = new Dictionary<Path, Bubble>();
 
 
         static public ObservableCollection<object> oil_wells_paths { get; private set; } = new ObservableCollection<object>();
 
-        static public ObservableCollection<object> widgets { get; private set; }
 
-
-
-
-        public MainViewModel()
+        private bool _fileImport_isBusy = false;
+        public bool fileImport_isBusy
         {
-            widgets = new ObservableCollection<object>();
-            for (int i = 0; i < 2; i++)
-                widgets.Add(new Border
-                {
-                    BorderBrush = Brushes.Gray,
-                    BorderThickness = new Thickness(1),
-                    Visibility = Visibility.Collapsed
-                });
-
-            TreeView test = new TreeView
+            get => _fileImport_isBusy;
+            set
             {
-            };
-            _tree_data = new ObservableCollection<Node>
-            {
-                new Node { Name = "Скважины" },
-                new Node
+                if (_fileImport_isBusy != value)
                 {
-                    Name ="Пузырьковые карты",
-                    Nodes = new ObservableCollection<Node>
-                    {
-                         new Node { Name = "Карта текущих отборов" },
-                         new Node { Name = "Карта накопленных отборов" }
-                    }
-                },
-                new Node { Name = "Карты" }
-            };
+                    _fileImport_isBusy = value;
+                    ImportFileAsyncCommand.RaiseCanExecuteChanged();
+                }
+            }
         }
+
+        private bool _tree_visibility = false;
+        public bool tree_visibility
+        {
+            get => _tree_visibility;
+            set
+            {
+                _tree_visibility = value;
+                OnPropertyChanged(nameof(tree_visibility));
+            }
+        }
+
+
+        private bool _settings_visibility = false;
+        public bool settings_visibility
+        {
+            get => _settings_visibility;
+            set
+            {
+                _settings_visibility = value;
+                OnPropertyChanged(nameof(settings_visibility));
+            }
+        }
+
+
+        private bool _any_selected = false;
+        public bool any_selected
+        {
+            get => _any_selected;
+            set
+            {
+                _any_selected = value;
+                OnPropertyChanged(nameof(any_selected));
+            }
+        }
+
+
+        private string _well_info;
+        public string well_info
+        {
+            get => _well_info;
+            set
+            {
+                _well_info = value;
+                OnPropertyChanged(nameof(well_info));
+            }
+        }
+
+
+
+
 
 
 
         private AsyncCommand _importFileAsyncCommand;
         public AsyncCommand ImportFileAsyncCommand
         {
-            get { return _importFileAsyncCommand ?? (_importFileAsyncCommand = new AsyncCommand(FileImportAsync)); }
+            get { return _importFileAsyncCommand ?? (_importFileAsyncCommand = new AsyncCommand(FileImportAsync, CanExecute)); }
         }
         private async Task FileImportAsync()
         {
-
             // adding wells to the grid
-            _oil_wells = await Task.Run(() => DataImport.GetDataList());
-            foreach (var bubble in _oil_wells)
+            try
             {
-                bubble.Update();
-
-                foreach (var path in bubble.paths)
-                    oil_wells_paths.Add(path);
-
-                oil_wells_paths.Add(bubble.ID);
+                fileImport_isBusy = true;
+                await Task.Run(() => _oil_wells = DataImport.GetDataList());
             }
-        }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+                fileImport_isBusy = false;
+            }
+            if (_oil_wells?.Count > 0)
+                foreach (var bubble in _oil_wells)
+                {
+                    bubble.Update();
+                    foreach (var path in bubble.paths)
+                    {
+                        oil_wells_paths.Add(path);
+                    }
+                    oil_wells_paths.Add(bubble.ID);
 
+                    _data_Bubble_OilWell[bubble] = bubble.data;
+                }
+
+            fileImport_isBusy = false;
+        }
+        private bool CanExecute(object sender)
+        {
+            return !fileImport_isBusy;
+        }
 
 
         private AsyncCommand _openSettingsAsyncCommand;
@@ -99,11 +146,7 @@ namespace BubbleChartOilWells.ViewModels
         }
         private async Task OpenSettingsAsync()
         {
-            (widgets[0] as Border).Visibility = (widgets[0] as Border).Visibility == Visibility.Collapsed ? Visibility.Visible : Visibility.Collapsed;
-
-            if ((widgets[0] as Border).Visibility == Visibility.Visible)
-                (widgets[0] as Border).Child = new TextBox { Text = "Settings_test" };
-
+            await Task.Run(() => settings_visibility = settings_visibility == false ? true : false);
         }
 
 
@@ -115,13 +158,52 @@ namespace BubbleChartOilWells.ViewModels
         }
         private async Task OpenTreeAsync()
         {
-            (widgets[1] as Border).Visibility = (widgets[1] as Border).Visibility == Visibility.Collapsed ? Visibility.Visible : Visibility.Collapsed;
-
-            if ((widgets[1] as Border).Visibility == Visibility.Visible)
-                (widgets[1] as Border).Child = new TreeView { ItemsSource = _tree_data };
-
-            TreeView tmp = new TreeView { ItemsSource = _tree_data };
-               
+            await Task.Run(() => tree_visibility = tree_visibility == false ? true : false);
         }
+
+
+        private AsyncCommand _bubbleSelectingAsyncCommand;
+        public AsyncCommand BubbleSelectingAsyncCommand
+        {
+            get { return _bubbleSelectingAsyncCommand ?? (_bubbleSelectingAsyncCommand = new AsyncCommand(BubbleSelectingAsync)); }
+        }
+
+        private async Task BubbleSelectingAsync()
+        {
+            // getting element under mouse cursor
+            var el = Mouse.DirectlyOver;
+            Bubble clicked_well = null;
+            if (oil_wells_paths.Contains(el))
+            {
+                System.Threading.Tasks.Parallel.ForEach(_oil_wells, well =>
+                {
+                    if (well.Contains(el))
+                    {
+                        clicked_well = well;
+                        return;
+                    }
+                });
+                _current_selected?.Unselect();
+                clicked_well?.Select();
+                _current_selected = clicked_well;
+                any_selected = true;
+            }
+            else
+            {
+                _current_selected?.Unselect();
+                _current_selected = null;
+                any_selected = false;
+            }
+            if (_current_selected != null)
+                well_info = "Номер скважины: " + _current_selected.data.ID +
+                "\nX = " + _current_selected.data.X +
+                "\nY = " + _current_selected.data.Y +
+                "\nТекущий дебит нефти = " + _current_selected.data.oil_debit + " т/сут" +
+                "\nТекущий дебит жидкости = " + _current_selected.data.liquid_debit + " т/сут" +
+                "\nНакопленная добыча нефти = " + _current_selected.data.oil_prod + " тыс. т" +
+                "\nНакопленная добыча жидкости = " + _current_selected.data.liquid_prod + " тыс. т";
+        }
+
     }
 }
+

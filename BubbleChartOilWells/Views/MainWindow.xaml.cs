@@ -18,7 +18,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace BubbleChartOilWells
-{ 
+{
 
     public partial class MainWindow : Window
     {
@@ -47,6 +47,10 @@ namespace BubbleChartOilWells
             }
         }
         private void CommandBinding_Executed_Close(object sender, ExecutedRoutedEventArgs e) { SystemCommands.CloseWindow(this); }
+        private void CommandBinding_Executed_MouseDown(object sender, ExecutedRoutedEventArgs e)
+        {
+            var data = e;
+        }
 
 
         //// drawing area events
@@ -70,14 +74,6 @@ namespace BubbleChartOilWells
         //                    "\nТекущий дебит жидкости = " + _data_path_bubble[(drawing_area.Children[i] as Path)]._data.Liquid_Debit + " т/сут" +
         //                    "\nНакопленная добыча нефти = " + _data_path_bubble[(drawing_area.Children[i] as Path)]._data.Oil_Production + " тыс. т" +
         //                    "\nНакопленная добыча жидкости = " + _data_path_bubble[(drawing_area.Children[i] as Path)]._data.Liquid_Production + " тыс. т";
-        //                //textblock_info.Text =
-        //                //    "Номер скважины: " + _data_path_bubble[(drawing_area.Children[i] as Path)]._data.ID +
-        //                //    "\nX = " + _data_path_bubble[(drawing_area.Children[i] as Path)]._data.X +
-        //                //    "\nY = " + _data_path_bubble[(drawing_area.Children[i] as Path)]._data.Y +
-        //                //    "\nТекущий дебит нефти = " + _data_path_bubble[(drawing_area.Children[i] as Path)]._data.Oil_Debit + " т/сут" +
-        //                //    "\nТекущий дебит жидкости = " + _data_path_bubble[(drawing_area.Children[i] as Path)]._data.Liquid_Debit + " т/сут" +
-        //                //    "\nНакопленная добыча нефти = " + _data_path_bubble[(drawing_area.Children[i] as Path)]._data.Oil_Production + " тыс. т" +
-        //                //    "\nНакопленная добыча жидкости = " + _data_path_bubble[(drawing_area.Children[i] as Path)]._data.Liquid_Production + " тыс. т";
 
         //                // unselecting previous selected oilwell
         //                if (_current_selected != null)
@@ -106,5 +102,6 @@ namespace BubbleChartOilWells
         //}
 
         private void drawing_area_MouseMove(object sender, MouseEventArgs e) { label_coordinates.Content = e.GetPosition(drawing_area); }
+
     }
 }
