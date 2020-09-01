@@ -10,49 +10,43 @@ namespace BubbleChartOilWells.Models
 {
     public class OilWell
     {
-        public Region region;
-        public Field field;
-        public Area area;
-        public List<Objective> objectives;
+        public string region;
+        public string field;
+        public string area;
+        public SortedSet<string> objectives;
 
         public int ID;
 
         public Point coordinates;
 
-        public List<DateTime> dates;
 
-        public Dictionary<DateTime, int> work_period;
+        public List<(string, DateTime)> dates = new List<(string, DateTime)>();
 
-        public Dictionary<DateTime, double> liquid_debit;
-        public Dictionary<DateTime, double> oil_debit;
-        public Dictionary<DateTime, double> water_debit;
+        public Dictionary<(string, DateTime), double> work_period = new Dictionary<(string, DateTime), double>();
 
-        public Dictionary<DateTime, double> liquid_prod;
-        public Dictionary<DateTime, double> oil_prod;
-        public Dictionary<DateTime, double> water_prod;
+        public Dictionary<(string, DateTime), double> liquid_debit = new Dictionary<(string, DateTime), double>();
+        public Dictionary<(string, DateTime), double> oil_debit = new Dictionary<(string, DateTime), double>();
+        public Dictionary<(string, DateTime), double> water_debit = new Dictionary<(string, DateTime), double>();
 
-        public Dictionary<DateTime, double> liquid_prod_SUM;
-        public Dictionary<DateTime, double> oil_prod_SUM;
-        public Dictionary<DateTime, double> water_prod_SUM;
+        public Dictionary<(string, DateTime), double> liquid_prod = new Dictionary<(string, DateTime), double>();
+        public Dictionary<(string, DateTime), double> oil_prod = new Dictionary<(string, DateTime), double>();
+        public Dictionary<(string, DateTime), double> water_prod = new Dictionary<(string, DateTime), double>();
 
-        public Dictionary<DateTime, double> water_encroachment;
-        public Dictionary<DateTime, double> injection;
-        public Dictionary<DateTime, double> injection_capacity;
+        public Dictionary<(string, DateTime), double> liquid_prod_SUM = new Dictionary<(string, DateTime), double>();
+        public Dictionary<(string, DateTime), double> oil_prod_SUM = new Dictionary<(string, DateTime), double>();
+        public Dictionary<(string, DateTime), double> water_prod_SUM = new Dictionary<(string, DateTime), double>();
+
+        public Dictionary<(string, DateTime), double> water_encroachment = new Dictionary<(string, DateTime), double>();
+        public Dictionary<(string, DateTime), double> injection = new Dictionary<(string, DateTime), double>();
+        public Dictionary<(string, DateTime), double> injection_capacity = new Dictionary<(string, DateTime), double>();
 
 
 
 
         public Bubble bubble;
-
+        public OilWell() { }
         public OilWell(int ID) { this.ID = ID; }
-        public OilWell(int ID, Region region,Field field, Area area, Point coordinates)
-        {
-            this.ID = ID;
-            this.region = region;
-            this.field = field;
-            this.area = area;
-            this.coordinates = coordinates;
-        }
+
         //public void Update()
         //{
         //    bubble.Update(this);

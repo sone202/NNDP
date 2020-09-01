@@ -25,7 +25,11 @@ namespace BubbleChartOilWells.ViewModels
     {
         static public List<Region> REGIONS = new List<Region>();
 
-
+        public MainViewModel()
+        {
+            _oil_wells = DataImport._oil_wells;
+            ;
+        }
 
 
         static private List<OilWell> _oil_wells;
@@ -63,8 +67,8 @@ namespace BubbleChartOilWells.ViewModels
                 Bubble.scale = value;
                 if (_oil_wells != null && _oil_wells.Count != 0)
                     foreach (var el in _oil_wells)
-                      //  el.Update();
-                OnPropertyChanged(nameof(scale));
+                        //  el.Update();
+                        OnPropertyChanged(nameof(scale));
             }
         }
 

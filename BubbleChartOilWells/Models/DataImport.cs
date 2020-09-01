@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.ComponentModel;
 using System.IO;
+using System.Globalization;
 
 namespace BubbleChartOilWells.Models
 {
@@ -71,240 +72,221 @@ namespace BubbleChartOilWells.Models
             //--------------------------------------------------------------------
             #endregion
 
-            _file_path = "C:\\Users\\timzl\\Documents\\Обменный_файл(синтетика) - Copy.xlsx";
+            _file_path = "C:\\Users\\timzl\\Documents\\Обменный_файл(синтетика).xlsx";
 
             // excel data parsing           
             List<List<List<string>>> raw_data = GetExcelData(_file_path);
 
 
             //el - line from worksheet 2
-            System.Threading.Tasks.Parallel.ForEach(raw_data[1], el =>
+            //System.Threading.Tasks.Parallel.ForEach(raw_data[1], el =>
+            //{
+            //    try
+            //    {
+            //        #region 2 Worksheet
+            //        // 1 col = region
+            //        // 2 col = field
+            //        // 3 col = area
+            //        // 4 col = oil well ID
+            //        // 5 col = coordinate X
+            //        // 6 col = coordinate Y
+            //        #endregion
+            //        OilWell cur_oil_well = new OilWell
+            //        {
+            //            region = el[0],
+            //            field = el[1],
+            //            area = el[2],
+            //            ID = Int32.Parse(el[3]),
+            //            coordinates = new Point(double.Parse(el[4]), double.Parse(el[5]))
+            //        };
+            //        _oil_wells.Add(cur_oil_well);
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        MessageBox.Show(e.Message);
+            //        return;
+            //    }
+            //});
+            foreach (var el in raw_data[1])
             {
                 try
-                {                 // adding new region
-                    if (_regions.Count != 0)
+                {
+                    #region 2 Worksheet
+                    // 1 col = region
+                    // 2 col = field
+                    // 3 col = area
+                    // 4 col = oil well ID
+                    // 5 col = coordinate X
+                    // 6 col = coordinate Y
+                    #endregion
+                    OilWell cur_oil_well = new OilWell
                     {
-                        if (_regions[_regions.Count].name != el[0])
-                            _regions.Add(new Region(el[0]));
-                    }
-                    else
-                        _regions.Add(new Region(el[0]));
-
-
-
-                    // adding new field to the region
-                    ref List<Field> fields = ref _regions[_regions.Count - 1].fields;
-                    if (fields.Count != 0)
-                        foreach (Field field in fields)
-                        {
-                            if (!field.name.Equals(el[1]))
-                            {
-                                fields.Add(new Field(el[1]));
-                                break;
-                            }
-                        }
-                    else
-                        fields.Add(new Field(el[1]));
-
-
-                    // adding new areas
-                    ref List<Area> areas = ref fields[fields.Count - 1].areas;
-                    if (areas.Count != 0)
-                        foreach (Area area in areas)
-                        {
-                            if (!area.name.Equals(el[2]))
-                            {
-                                areas.Add(new Area(el[2]));
-                                break;
-                            }
-                        }
-                    else
-                        areas.Add(new Area(el[2]));
-
-
-                    // adding new oil wells
-                    ref List<OilWell> oil_wells = ref areas[areas.Count - 1].oil_wells;
-                    if (oil_wells.Count != 0)
-                        foreach (OilWell oil_well in oil_wells)
-                        {
-                            if (!oil_well.ID.Equals(el[3]))
-                            {
-                                oil_wells.Add(new OilWell(int.Parse(el[3])));
-                                break;
-                            }
-                        }
-                    else
-                        oil_wells.Add(new OilWell(
-                            int.Parse(el[3]),
-                            _regions[_regions.Count - 1],
-                            fields[fields.Count - 1],
-                            areas[areas.Count - 1],
-                            new Point(double.Parse(el[4]), double.Parse(el[5]))
-                            ));
-
-                    DataImport._oil_wells.AddRange(oil_wells);
+                        region = el[0],
+                        field = el[1],
+                        area = el[2],
+                        ID = Int32.Parse(el[3]),
+                        coordinates = new Point(double.Parse(el[4]), double.Parse(el[5]))
+                    };
+                    _oil_wells.Add(cur_oil_well);
                 }
                 catch (Exception e)
                 {
                     MessageBox.Show(e.Message);
+                    return;
                 }
-            });
-
-
+            };
+            ;
 
 
 
 
 
             //el - line from worksheet 1
-            System.Threading.Tasks.Parallel.ForEach(raw_data[0], el =>
+            //System.Threading.Tasks.Parallel.ForEach(raw_data[0], el =>
+            //{
+            //    try
+            //    {
+            //        #region 1 Worksheet
+            //        // 01 col = region
+            //        // 02 col = field
+            //        // 03 col = area
+            //        // 04 col = oil well ID
+            //        // 05 col = date
+            //        // 06 col = objective
+            //        // 07 col = pattern
+            //        // 08 col = state
+            //        // 09 col = work_period
+
+            //        // 10 col = liquid_debit;
+            //        // 11 col = oil_debit;
+            //        // 12 col = water_debit;
+
+            //        // 13 col = water_encroachment;
+            //        // 14 col = injection_capacity;
+
+            //        // 15 col = liquid_prod;
+            //        // 16 col = oil_prod;
+            //        // 17 col = water_prod;
+            //        // 18 col = injection;
+
+            //        // 19 col = liquid_prod_SUM;
+            //        // 20 col = oil_prod_SUM;
+            //        // 21 col = water_prod_SUM;
+            //        #endregion
+            //        int index = 0;
+            //        for (int i = 0; i < _oil_wells.Count; i++)
+            //        {
+            //            if (
+            //            _oil_wells[i].region == el[0] &&
+            //            _oil_wells[i].field == el[1] &&
+            //            _oil_wells[i].area == el[2] &&
+            //            _oil_wells[i].ID == Int32.Parse(el[3]))
+            //                index = i;
+            //        }
+            //        DateTime date = Convert.ToDateTime(el[4]);
+            //        Dictionary<string, DateTime> dates_obj = new Dictionary<string, DateTime>();
+            //        dates_obj[el[5]] = date;
+
+            //        _oil_wells[index].dates.Add(el[5], date);
+            //        _oil_wells[index].work_period[dates_obj] = Int32.Parse(el[8]);
+
+            //        _oil_wells[index].liquid_debit[dates_obj] = double.Parse(el[9]);
+            //        _oil_wells[index].oil_debit[dates_obj] = double.Parse(el[10]);
+            //        _oil_wells[index].water_debit[dates_obj] = double.Parse(el[11]);
+
+            //        _oil_wells[index].water_encroachment[dates_obj] = double.Parse(el[12]);
+            //        _oil_wells[index].injection_capacity[dates_obj] = double.Parse(el[13]);
+            //        _oil_wells[index].liquid_prod[dates_obj] = double.Parse(el[14]);
+            //        _oil_wells[index].oil_prod[dates_obj] = double.Parse(el[15]);
+            //        _oil_wells[index].water_prod[dates_obj] = double.Parse(el[16]);
+
+            //        _oil_wells[index].injection[dates_obj] = double.Parse(el[17]);
+            //        _oil_wells[index].liquid_prod_SUM[dates_obj] = double.Parse(el[18]);
+            //        _oil_wells[index].oil_prod_SUM[dates_obj] = double.Parse(el[19]);
+            //        _oil_wells[index].water_prod_SUM[dates_obj] = double.Parse(el[20]);
+
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        MessageBox.Show(e.Message);
+            //        return;
+            //    }
+
+            //});
+            foreach (var el in raw_data[0])
             {
                 try
                 {
-                    // getting region
-                    int CRI = 0; // current region index
-                    for (int i = 0; i < _regions.Count; i++)
-                        if (_regions[i].name == el[0])
+                    #region 1 Worksheet
+                    // 01 col = region
+                    // 02 col = field
+                    // 03 col = area
+                    // 04 col = oil well ID
+                    // 05 col = date
+                    // 06 col = objective
+                    // 07 col = pattern
+                    // 08 col = state
+                    // 09 col = work_period
+
+                    // 10 col = liquid_debit;
+                    // 11 col = oil_debit;
+                    // 12 col = water_debit;
+
+                    // 13 col = water_encroachment;
+                    // 14 col = injection_capacity;
+
+                    // 15 col = liquid_prod;
+                    // 16 col = oil_prod;
+                    // 17 col = water_prod;
+                    // 18 col = injection;
+
+                    // 19 col = liquid_prod_SUM;
+                    // 20 col = oil_prod_SUM;
+                    // 21 col = water_prod_SUM;
+                    #endregion
+                    int index = 0;
+                    for (int i = 0; i < _oil_wells.Count; i++)
+                    {
+                        if (
+                        _oil_wells[i].region == el[0] &&
+                        _oil_wells[i].field == el[1] &&
+                        _oil_wells[i].area == el[2] &&
+                        _oil_wells[i].ID == Int32.Parse(el[3]))
                         {
-                            CRI = i;
+                            index = i;
                             break;
                         }
+                    }
+                    
+                    DateTime date = DateTime.FromOADate(double.Parse(el[4]));
+                    (string, DateTime) dates_obj = (el[5], date);
 
-                    // getting field
-                    int CFI = 0; // current field index
-                    for (int i = 0; i < _regions[CRI].fields.Count; i++)
-                        if (_regions[CRI].fields[i].name == el[1])
-                        {
-                            CFI = i;
-                            break;
-                        }
+                    _oil_wells[index].dates.Add(dates_obj);
+                    _oil_wells[index].work_period[dates_obj] = double.Parse(el[8]);
 
+                    _oil_wells[index].liquid_debit[dates_obj] = double.Parse(el[9]);
+                    _oil_wells[index].oil_debit[dates_obj] = double.Parse(el[10]);
+                    _oil_wells[index].water_debit[dates_obj] = double.Parse(el[11]);
 
-                    // getting area
-                    int CAI = 0; // current area index
-                    for (int i = 0; i < _regions[CRI].fields[CFI].areas.Count; i++)
-                        if (_regions[CRI].fields[CFI].areas[i].name == el[2])
-                        {
-                            CAI = i;
-                            break;
-                        }
+                    _oil_wells[index].water_encroachment[dates_obj] = double.Parse(el[12]);
+                    _oil_wells[index].injection_capacity[dates_obj] = double.Parse(el[13]);
+                    _oil_wells[index].liquid_prod[dates_obj] = double.Parse(el[14]);
+                    _oil_wells[index].oil_prod[dates_obj] = double.Parse(el[15]);
+                    _oil_wells[index].water_prod[dates_obj] = double.Parse(el[16]);
 
+                    _oil_wells[index].injection[dates_obj] = double.Parse(el[17]);
+                    _oil_wells[index].liquid_prod_SUM[dates_obj] = double.Parse(el[18]);
+                    _oil_wells[index].oil_prod_SUM[dates_obj] = double.Parse(el[19]);
+                    _oil_wells[index].water_prod_SUM[dates_obj] = double.Parse(el[20]);
 
-                    // adding new objectives
-                    ref List<Objective> objectives = ref _regions[CRI].fields[CFI].objectives;
-                    if (objectives.Count != 0)
-                        foreach (Objective objective in objectives)
-                        {
-                            if (!objective.name.Equals(el[5]))
-                            {
-                                objectives.Add(new Objective(el[5]));
-                                break;
-                            }
-                        }
-                    else
-                        objectives.Add(new Objective(el[5]));
-
-
-                    // adding oil well from current region and field to the objectives
-                    ref List<OilWell> oil_wells = ref objectives[objectives.Count - 1].oil_wells;
-                    if (oil_wells.Count != 0)
-                        foreach (OilWell oil_well in oil_wells)
-                        {
-                            bool flag = false;
-                            if (!oil_well.ID.Equals(el[3]))
-                            {
-                                foreach (OilWell DA_oil_well in DataImport._oil_wells)
-                                    if (DA_oil_well.ID == Int32.Parse(el[3]))
-                                    {
-                                        oil_wells.Add(DA_oil_well);
-                                        flag = true;
-                                        break;
-                                    }
-                            }
-                            if (flag)
-                                break;
-                        }
-                    else
-                        foreach (OilWell DA_oil_well in DataImport._oil_wells)
-                            if (DA_oil_well.ID == Int32.Parse(el[3]))
-                            {
-                                oil_wells.Add(DA_oil_well);
-                                break;
-                            }
-
-
-                    // searching current well 
-                    foreach (OilWell DA_oil_well in DataImport._oil_wells)
-                        if (DA_oil_well.ID == Int32.Parse(el[3]))
-                        {
-
-                            // adding objective to the well
-                            if (DA_oil_well.objectives.Count != 0)
-                                foreach (Objective objective in DA_oil_well.objectives)
-                                    if (objective != objectives[objectives.Count - 1])
-                                    {
-                                        DA_oil_well.objectives.Add(objectives[objectives.Count - 1]);
-                                        break;
-                                    }
-                                    else
-                                        DA_oil_well.objectives.Add(objectives[objectives.Count - 1]);
-
-                            #region 1 Worksheet
-                            // 01 col = region
-                            // 02 col = field
-                            // 03 col = area
-                            // 04 col = oil well ID
-                            // 05 col = date
-                            // 06 col = objective
-                            // 07 col = pattern
-                            // 08 col = state
-                            // 09 col = work_period
-
-                            // 10 col = liquid_debit;
-                            // 11 col = oil_debit;
-                            // 12 col = water_debit;
-
-                            // 13 col = water_encroachment;
-                            // 14 col = injection_capacity;
-
-                            // 15 col = liquid_prod;
-                            // 16 col = oil_prod;
-                            // 17 col = water_prod;
-                            // 18 col = injection;
-
-                            // 19 col = liquid_prod_SUM;
-                            // 20 col = oil_prod_SUM;
-                            // 21 col = water_prod_SUM;
-                            #endregion
-
-                            DateTime date = Convert.ToDateTime(el[4]);
-                            DA_oil_well.dates.Add(date);
-                            DA_oil_well.work_period[date] = Int32.Parse(el[8]);
-
-                            DA_oil_well.liquid_debit[date] = double.Parse(el[9]);
-                            DA_oil_well.oil_debit[date] = double.Parse(el[10]);
-                            DA_oil_well.water_debit[date] = double.Parse(el[11]);
-
-                            DA_oil_well.water_encroachment[date] = double.Parse(el[12]);
-                            DA_oil_well.injection_capacity[date] = double.Parse(el[13]);
-
-                            DA_oil_well.liquid_prod[date] = double.Parse(el[14]);
-                            DA_oil_well.oil_prod[date] = double.Parse(el[15]);
-                            DA_oil_well.water_prod[date] = double.Parse(el[16]);
-
-                            DA_oil_well.injection[date] = double.Parse(el[17]);
-                            DA_oil_well.liquid_prod_SUM[date] = double.Parse(el[18]);
-                            DA_oil_well.oil_prod_SUM[date] = double.Parse(el[19]);
-                            DA_oil_well.water_prod_SUM[date] = double.Parse(el[20]);
-                        }
                 }
                 catch (Exception e)
                 {
                     MessageBox.Show(e.Message);
+                    return;
                 }
 
-            });
-
+            };
             ;
         }
 
