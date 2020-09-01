@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -22,17 +23,22 @@ namespace BubbleChartOilWells.ViewModels
 {
     public class MainViewModel : BaseViewModel
     {
-        static private List<Bubble> _oil_wells;
-        static public Bubble _current_selected;
+        static public List<Region> REGIONS = new List<Region>();
 
+
+
+
+        static private List<OilWell> _oil_wells;
+        static public Bubble _current_selected;
         static private Dictionary<Bubble, OilWell> _data_Bubble_OilWell = new Dictionary<Bubble, OilWell>();
         //static private Dictionary<Path, OilWell> _data_Path_OilWell = new Dictionary<Path, OilWell>();
         //static private Dictionary<Path, Bubble> _data_Path_Bubble = new Dictionary<Path, Bubble>();
 
+        static public CompositeCollection oil_wells_paths { get; private set; } = new CompositeCollection();
+        static public ObservableCollection<object> oil_wells_prod { get; private set; } = new ObservableCollection<object>();
+        static public ObservableCollection<object> oil_wells_debit { get; private set; } = new ObservableCollection<object>();
 
-        static public ObservableCollection<object> oil_wells_paths { get; private set; } = new ObservableCollection<object>();
-
-
+        #region Observable valuables
         private bool _fileImport_isBusy = false;
         public bool fileImport_isBusy
         {
@@ -44,6 +50,32 @@ namespace BubbleChartOilWells.ViewModels
                     _fileImport_isBusy = value;
                     ImportFileAsyncCommand.RaiseCanExecuteChanged();
                 }
+            }
+        }
+
+        private int _scale = Bubble.scale;
+        public int scale
+        {
+            get { return _scale; }
+            set
+            {
+                _scale = value;
+                Bubble.scale = value;
+                if (_oil_wells != null && _oil_wells.Count != 0)
+                    foreach (var el in _oil_wells)
+                      //  el.Update();
+                OnPropertyChanged(nameof(scale));
+            }
+        }
+
+        private bool _scale_focus = true;
+        public bool scale_focus
+        {
+            get { return _scale_focus; }
+            set
+            {
+                _scale_focus = value;
+                OnPropertyChanged(nameof(scale_focus));
             }
         }
 
@@ -83,27 +115,55 @@ namespace BubbleChartOilWells.ViewModels
         }
 
 
-        private string _well_info;
-        public string well_info
-        {
-            get => _well_info;
-            set
-            {
-                _well_info = value;
-                OnPropertyChanged(nameof(well_info));
-            }
-        }
+        //private string _well_info;
+        //public string well_info
+        //{
+        //    get => _well_info;
+        //    set
+        //    {
+        //        _well_info = value;
+        //        OnPropertyChanged(nameof(well_info));
+        //    }
+        //}
 
+        //private bool _debit_shown = true;
+        //public bool debit_shown
+        //{
+        //    get => _debit_shown;
+        //    set
+        //    {
+        //        _debit_shown = value;
+        //        foreach (Bubble el in _oil_wells)
+        //        {
+        //            el.ShowDebit(value);
+        //            el.ShowID(_prod_shown, _debit_shown);
+        //        }
+        //        OnPropertyChanged(nameof(debit_shown));
+        //    }
+        //}
 
+        //private bool _prod_shown = true;
+        //public bool prod_shown
+        //{
+        //    get => _prod_shown;
+        //    set
+        //    {
+        //        _prod_shown = value;
+        //        foreach (var el in _oil_wells)
+        //        {
+        //            el.ShowProd(value);
+        //            el.ShowID(_prod_shown, _debit_shown);
+        //        }
+        //        OnPropertyChanged(nameof(prod_shown));
+        //    }
+        //}
+        #endregion
 
-
-
-
-
+        #region Async commands
         private AsyncCommand _importFileAsyncCommand;
         public AsyncCommand ImportFileAsyncCommand
         {
-            get { return _importFileAsyncCommand ?? (_importFileAsyncCommand = new AsyncCommand(FileImportAsync, CanExecute)); }
+            get { return _importFileAsyncCommand ?? (_importFileAsyncCommand = new AsyncCommand(FileImportAsync, CanFileImport)); }
         }
         private async Task FileImportAsync()
         {
@@ -111,32 +171,41 @@ namespace BubbleChartOilWells.ViewModels
             try
             {
                 fileImport_isBusy = true;
-                await Task.Run(() => _oil_wells = DataImport.GetDataList());
+                await Task.Run(() => _oil_wells = DataImport._oil_wells);
             }
             catch (Exception e)
             {
                 MessageBox.Show(e.Message);
                 fileImport_isBusy = false;
             }
-            if (_oil_wells?.Count > 0)
-                foreach (var bubble in _oil_wells)
-                {
-                    bubble.Update();
-                    foreach (var path in bubble.paths)
-                    {
-                        oil_wells_paths.Add(path);
-                    }
-                    oil_wells_paths.Add(bubble.ID);
 
-                    _data_Bubble_OilWell[bubble] = bubble.data;
-                }
 
+
+            //if (_oil_wells?.Count > 0)
+            //{
+            //    foreach (var bubble in _oil_wells)
+            //    {
+            //        bubble.Update();
+            //        foreach (var path in bubble.paths_debit)
+            //        {
+            //            oil_wells_debit.Add(path);
+            //            oil_wells_paths.Add(path);
+            //        }
+            //        foreach (var path in bubble.paths_prod)
+            //        {
+            //            oil_wells_prod.Add(path);
+            //            oil_wells_paths.Add(path);
+            //        }
+            //        //oil_wells_debit.Add(bubble.ID);
+            //        //.oil_wells_prod.Add(bubble.ID);
+            //        oil_wells_paths.Add(bubble.ID);
+
+            //        _data_Bubble_OilWell[bubble] = bubble.data;
+            //    }
+            //}
             fileImport_isBusy = false;
         }
-        private bool CanExecute(object sender)
-        {
-            return !fileImport_isBusy;
-        }
+        private bool CanFileImport(object sender) { return !fileImport_isBusy; }
 
 
         private AsyncCommand _openSettingsAsyncCommand;
@@ -162,48 +231,47 @@ namespace BubbleChartOilWells.ViewModels
         }
 
 
-        private AsyncCommand _bubbleSelectingAsyncCommand;
-        public AsyncCommand BubbleSelectingAsyncCommand
-        {
-            get { return _bubbleSelectingAsyncCommand ?? (_bubbleSelectingAsyncCommand = new AsyncCommand(BubbleSelectingAsync)); }
-        }
-
-        private async Task BubbleSelectingAsync()
-        {
-            // getting element under mouse cursor
-            var el = Mouse.DirectlyOver;
-            Bubble clicked_well = null;
-            if (oil_wells_paths.Contains(el))
-            {
-                System.Threading.Tasks.Parallel.ForEach(_oil_wells, well =>
-                {
-                    if (well.Contains(el))
-                    {
-                        clicked_well = well;
-                        return;
-                    }
-                });
-                _current_selected?.Unselect();
-                clicked_well?.Select();
-                _current_selected = clicked_well;
-                any_selected = true;
-            }
-            else
-            {
-                _current_selected?.Unselect();
-                _current_selected = null;
-                any_selected = false;
-            }
-            if (_current_selected != null)
-                well_info = "Номер скважины: " + _current_selected.data.ID +
-                "\nX = " + _current_selected.data.X +
-                "\nY = " + _current_selected.data.Y +
-                "\nТекущий дебит нефти = " + _current_selected.data.oil_debit + " т/сут" +
-                "\nТекущий дебит жидкости = " + _current_selected.data.liquid_debit + " т/сут" +
-                "\nНакопленная добыча нефти = " + _current_selected.data.oil_prod + " тыс. т" +
-                "\nНакопленная добыча жидкости = " + _current_selected.data.liquid_prod + " тыс. т";
-        }
-
+        //private AsyncCommand _bubbleSelectingAsyncCommand;
+        //public AsyncCommand BubbleSelectingAsyncCommand
+        //{
+        //    get { return _bubbleSelectingAsyncCommand ?? (_bubbleSelectingAsyncCommand = new AsyncCommand(BubbleSelectingAsync)); }
+        //}
+        //private async Task BubbleSelectingAsync()
+        //{
+        //    // getting element under mouse cursor
+        //    var el = Mouse.DirectlyOver;
+        //    Bubble clicked_well = null;
+        //    if (oil_wells_paths.Contains(el))
+        //    {
+        //        System.Threading.Tasks.Parallel.ForEach(_oil_wells, well =>
+        //        {
+        //            if (well.Contains(el))
+        //            {
+        //                clicked_well = well;
+        //                return;
+        //            }
+        //        });
+        //        _current_selected?.Unselect();
+        //        clicked_well?.Select();
+        //        _current_selected = clicked_well;
+        //        any_selected = true;
+        //    }
+        //    else
+        //    {
+        //        _current_selected?.Unselect();
+        //        _current_selected = null;
+        //        any_selected = false;
+        //    }
+        //    if (_current_selected != null)
+        //        well_info = "Номер скважины: " + _current_selected.data.ID +
+        //        "\nX = " + _current_selected.data.X +
+        //        "\nY = " + _current_selected.data.Y +
+        //        "\nТекущий дебит нефти = " + _current_selected.data.oil_debit + " т/сут" +
+        //        "\nТекущий дебит жидкости = " + _current_selected.data.liquid_debit + " т/сут" +
+        //        "\nНакопленная добыча нефти = " + _current_selected.data.oil_prod + " тыс. т" +
+        //        "\nНакопленная добыча жидкости = " + _current_selected.data.liquid_prod + " тыс. т";
+        //}
+        #endregion
     }
 }
 

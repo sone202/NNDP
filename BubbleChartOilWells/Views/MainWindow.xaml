@@ -4,10 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors" 
+        xmlns:local="clr-namespace:BubbleChartOilWells.Converters"
         mc:Ignorable="d"
         Height="450" Width="800" WindowStyle="None" AllowsTransparency="True" Background="Transparent" >
 
-    <!--#region Boolean to Visibility converter-->
+    <!--#region Windows Resources-->
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
@@ -86,11 +87,11 @@
             </Grid.ColumnDefinitions>
 
 
-            <!--Menu-->
+            <!--#region Menu-->
             <Menu WindowChrome.IsHitTestVisibleInChrome="True" Grid.Row="0" Grid.Column="0" Background="#FF3A3A3A">
-                <MenuItem Header="_File import" HorizontalAlignment="Left" Background="Violet"  Height="40" FontSize="14" Foreground="White" Command="{Binding ImportFileAsyncCommand}"/>
+                <MenuItem Header="_File import" HorizontalAlignment="Left"  Height="40" FontSize="14" Foreground="White" Command="{Binding ImportFileAsyncCommand}"/>
             </Menu>
-
+            <!--#endregion-->
 
 
             <!--#region Window control buttons -->
@@ -162,22 +163,17 @@
 
 
                 <!--ROW 1-->
-
                 <!--Drawing area-->
-                <Border x:Name="drawing_area" Grid.Row="1" Grid.Column="2" Style="{StaticResource ControlBorder}" Margin="5,0">
+                <Border x:Name="drawing_area"  Background="White" Grid.Row="1" Grid.Column="2" Style="{StaticResource ControlBorder}" Margin="5,0">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseDown">
+                            <i:InvokeCommandAction Command="{Binding BubbleSelectingAsyncCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                     <ItemsControl ItemsSource="{Binding oil_wells_paths}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <Canvas x:Name="drawing_area" IsItemsHost="True"  Background="White" ClipToBounds="True" MouseMove="drawing_area_MouseMove" >
-
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="MouseDown">
-                                            <i:InvokeCommandAction Command="{Binding BubbleSelectingAsyncCommand}"/>
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-
-
-                                </Canvas>
+                                <Canvas IsItemsHost="True"  ClipToBounds="True" MouseMove="drawing_area_MouseMove" />
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                     </ItemsControl>
@@ -186,9 +182,23 @@
 
                 <!--INFO-->
                 <Border Grid.Row="1" Grid.Column="2" Background="White" Style="{StaticResource ControlBorder}" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Top"
-                         Visibility="{Binding Path = any_selected, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter} }">
+                         Visibility="{Binding Path=any_selected, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter} }">
                     <TextBlock Text="{Binding Path=well_info, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Margin="5" />
                 </Border>
+                <TextBox Grid.Row="1" Grid.Column="2" Background="White" Margin="10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Text="{Binding Path=scale, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" BorderThickness="0"
+                               />
+                <!--<Border Grid.Row="1" Grid.Column="2" Background="White" Style="{StaticResource ControlBorder}" Margin="10" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+
+                     
+                        <TextBox Grid.Column="1" Text=": 1" BorderThickness="0" IsReadOnly="True" Focusable="False"/>
+                    </Grid>
+                </Border>-->
+
 
                 <!--ToolBar-->
                 <Border Grid.Row="1" Grid.Column="3" Style="{StaticResource ControlBorder}">
@@ -218,8 +228,8 @@
                         <TreeView BorderThickness="0">
                             <TreeViewItem Header="Скважины"/>
                             <TreeViewItem Header="Пузырьковые карты">
-                                <CheckBox>Карта текущих отборов</CheckBox>
-                                <CheckBox>Карта накопленных отборов</CheckBox>
+                                <CheckBox IsChecked="{Binding Path=debit_shown, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">Карта текущих отборов</CheckBox>
+                                <CheckBox IsChecked="{Binding Path=prod_shown, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">Карта накопленных отборов</CheckBox>
                             </TreeViewItem>
                             <TreeViewItem Header="Карты"/>
                         </TreeView>

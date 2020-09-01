@@ -4,32 +4,58 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace BubbleChartOilWells.Models
 {
     public class OilWell
     {
+        public Region region;
+        public Field field;
+        public Area area;
+        public List<Objective> objectives;
+
         public int ID;
 
-        public double X;
-        public double Y;
+        public Point coordinates;
 
-        public double oil_debit;
-        public double liquid_debit;
+        public List<DateTime> dates;
 
-        public double oil_prod;
-        public double liquid_prod;
+        public Dictionary<DateTime, int> work_period;
 
-        public OilWell(List<double> values)
+        public Dictionary<DateTime, double> liquid_debit;
+        public Dictionary<DateTime, double> oil_debit;
+        public Dictionary<DateTime, double> water_debit;
+
+        public Dictionary<DateTime, double> liquid_prod;
+        public Dictionary<DateTime, double> oil_prod;
+        public Dictionary<DateTime, double> water_prod;
+
+        public Dictionary<DateTime, double> liquid_prod_SUM;
+        public Dictionary<DateTime, double> oil_prod_SUM;
+        public Dictionary<DateTime, double> water_prod_SUM;
+
+        public Dictionary<DateTime, double> water_encroachment;
+        public Dictionary<DateTime, double> injection;
+        public Dictionary<DateTime, double> injection_capacity;
+
+
+
+
+        public Bubble bubble;
+
+        public OilWell(int ID) { this.ID = ID; }
+        public OilWell(int ID, Region region,Field field, Area area, Point coordinates)
         {
-            ID = (int)values[0];
-            X = values[1];
-            Y = values[2];
-            oil_debit = values[3];
-            liquid_debit = values[4];
-            oil_prod = values[5];
-            liquid_prod = values[6];
+            this.ID = ID;
+            this.region = region;
+            this.field = field;
+            this.area = area;
+            this.coordinates = coordinates;
         }
-       
+        //public void Update()
+        //{
+        //    bubble.Update(this);
+        //}
     }
 }
