@@ -18,36 +18,36 @@ namespace BubbleChartOilWells.Models
 {
     public class Bubble : INotifyPropertyChanged
     {
-        public static double MIN_oil_value = 100000;
-        public static double MAX_oil_value = 0;
+        public static double MINOilValue = 100000;
+        public static double MAXOilValue = 0;
 
-        private Point _coordinates;
-        private double _radius;
+        private Point coordinates;
+        private double radius;
 
-        private Brush _brush_oil = Brushes.SaddleBrown;
-        private Brush _brush_liquid = Brushes.LightBlue;
+        private Brush brushOil = Brushes.SaddleBrown;
+        private Brush brushLiquid = Brushes.LightBlue;
 
-        public OilWell data { get; private set; }
+        public OilWell Data { get; private set; }
 
-        public bool is_selected { get; private set; } = false;
+        public bool IsSelected { get; private set; } = false;
 
-        public List<Path> paths { get; private set; } = new List<Path>();
+        public List<Path> Paths { get; private set; } = new List<Path>();
 
         public TextBlock ID { get; private set; }
 
-        public Bubble(OilWell data) { this.data = data; }
+        public Bubble(OilWell data) { Data = data; }
 
         public void Update()
         {
-            _coordinates = new Point(data.X, data.Y);
-            _radius = Math.Round(100 / MAX_oil_value * (data.oil_prod + data.liquid_prod), 2);
-            double angle_in_rad = Math.PI / 180 * (360 / (data.oil_prod + data.liquid_prod)) * data.liquid_prod;
+            coordinates = new Point(Data.X, Data.Y);
+            radius = Math.Round(100 / MAXOilValue * (Data.oil_prod + Data.liquid_prod), 2);
+            double angleInRad = Math.PI / 180 * (360 / (Data.oil_prod + Data.liquid_prod)) * Data.liquid_prod;
 
 
 
-            EllipseGeometry coordinate_point = new EllipseGeometry
+            EllipseGeometry coordinatePoint = new EllipseGeometry
             {
-                Center = _coordinates,
+                Center = coordinates,
                 RadiusX = 2,
                 RadiusY = 2
             };
@@ -55,57 +55,57 @@ namespace BubbleChartOilWells.Models
             // figures
             EllipseGeometry circle = new EllipseGeometry
             {
-                Center = _coordinates,
-                RadiusX = _radius,
-                RadiusY = _radius
+                Center = coordinates,
+                RadiusX = radius,
+                RadiusY = radius
             };
 
             PolyLineSegment polyline = new PolyLineSegment
             {
                 Points = new PointCollection {
-                _coordinates,
-                new Point(_coordinates.X + _radius, _coordinates.Y),
-                new Point(_coordinates.X + Math.Cos(angle_in_rad) * _radius, _coordinates.Y + Math.Sin(angle_in_rad) * _radius) }
+                coordinates,
+                new Point(coordinates.X + radius, coordinates.Y),
+                new Point(coordinates.X + Math.Cos(angleInRad) * radius, coordinates.Y + Math.Sin(angleInRad) * radius) }
 
             };
 
             ArcSegment arc = new ArcSegment
             {
-                Point = new Point(_coordinates.X + Math.Cos(angle_in_rad) * _radius, _coordinates.Y + Math.Sin(angle_in_rad) * _radius),
-                Size = new Size(_radius, _radius),
-                SweepDirection = angle_in_rad > Math.PI ? SweepDirection.Counterclockwise : SweepDirection.Clockwise
+                Point = new Point(coordinates.X + Math.Cos(angleInRad) * radius, coordinates.Y + Math.Sin(angleInRad) * radius),
+                Size = new Size(radius, radius),
+                SweepDirection = angleInRad > Math.PI ? SweepDirection.Counterclockwise : SweepDirection.Clockwise
             };
 
 
 
             // coordinate point
-            Path path_coordinate_point = new Path
+            Path pathCoordinatePoint = new Path
             {
                 Stroke = Brushes.Black,
                 Fill = Brushes.Black,
                 StrokeThickness = 1,
-                Data = coordinate_point,
+                Data = coordinatePoint,
             };
 
             // main circle
-            Path path_circle = new Path
+            Path pathCircle = new Path
             {
                 Stroke = Brushes.DarkGray,
-                Fill = angle_in_rad > Math.PI ? _brush_liquid : _brush_oil,
+                Fill = angleInRad > Math.PI ? brushLiquid : brushOil,
                 StrokeThickness = 0,
                 Data = circle,
             };
 
             // pie segment
-            Path path_segment = new Path
+            Path pathSegment = new Path
             {
-                Fill = angle_in_rad > Math.PI ? _brush_oil : _brush_liquid,
+                Fill = angleInRad > Math.PI ? brushOil : brushLiquid,
                 StrokeThickness = 0,
                 Data = new PathGeometry
                 {
                     Figures = new PathFigureCollection {
                         new PathFigure {
-                            StartPoint = new Point(_coordinates.X + _radius, _coordinates.Y),
+                            StartPoint = new Point(coordinates.X + radius, coordinates.Y),
                             Segments = new PathSegmentCollection { arc, polyline }
                         }
                     }
@@ -114,36 +114,36 @@ namespace BubbleChartOilWells.Models
 
             TextBlock ID = new TextBlock
             {
-                Text = data.ID.ToString(),
+                Text = Data.ID.ToString(),
                 FontSize = 14,
                 Height = 20,
                 Width = 40
             };
-            Canvas.SetLeft(ID, _coordinates.X + 5);
-            Canvas.SetTop(ID, _coordinates.Y - 20);
+            Canvas.SetLeft(ID, coordinates.X + 5);
+            Canvas.SetTop(ID, coordinates.Y - 20);
 
 
 
 
             // adding to the path list
-            paths.Clear();
-            paths.Add(path_circle);
-            paths.Add(path_segment);
-            paths.Add(path_coordinate_point);
+            Paths.Clear();
+            Paths.Add(pathCircle);
+            Paths.Add(pathSegment);
+            Paths.Add(pathCoordinatePoint);
             this.ID = ID;
         }
 
         public void Select()
         {
-            is_selected = true;
-            paths[0].Stroke = Brushes.Red;
-            paths[0].StrokeThickness = 2;
+            IsSelected = true;
+            Paths[0].Stroke = Brushes.Red;
+            Paths[0].StrokeThickness = 2;
         }
         public void Unselect()
         {
-            is_selected = false;
-            paths[0].Stroke = Brushes.DarkGray;
-            paths[0].StrokeThickness = 0;
+            IsSelected = false;
+            Paths[0].Stroke = Brushes.DarkGray;
+            Paths[0].StrokeThickness = 0;
 
         }
 
@@ -151,7 +151,7 @@ namespace BubbleChartOilWells.Models
         {
             try
             {
-                foreach (var el in paths)
+                foreach (var el in Paths)
                     if (el == sender)
                         return true;
                 if (ID == sender)

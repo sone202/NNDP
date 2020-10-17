@@ -111,10 +111,10 @@ namespace BubbleChartOilWells.Models
                 OilWell oil_well = new OilWell(row);
 
                 double prod_sum = oil_well.oil_prod + oil_well.liquid_prod;
-                if (prod_sum < Bubble.MIN_oil_value)
-                    Bubble.MIN_oil_value = prod_sum;
-                else if (prod_sum > Bubble.MAX_oil_value)
-                    Bubble.MAX_oil_value = prod_sum;
+                if (prod_sum < Bubble.MINOilValue)
+                    Bubble.MINOilValue = prod_sum;
+                else if (prod_sum > Bubble.MAXOilValue)
+                    Bubble.MAXOilValue = prod_sum;
 
 
                 oil_wells.Add(oil_well); // writing data in List

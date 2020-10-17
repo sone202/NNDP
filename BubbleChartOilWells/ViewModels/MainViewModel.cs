@@ -113,13 +113,13 @@ namespace BubbleChartOilWells.ViewModels
                 foreach (var bubble in oilWell)
                 {
                     bubble.Update();
-                    foreach (var path in bubble.paths)
+                    foreach (var path in bubble.Paths)
                     {
                         OilWellsPaths.Add(path);
                     }
                     OilWellsPaths.Add(bubble.ID);
 
-                    dataBubbleOilWell[bubble] = bubble.data;
+                    dataBubbleOilWell[bubble] = bubble.Data;
                 }
 
             FileImportIsBusy = false;
@@ -178,13 +178,13 @@ namespace BubbleChartOilWells.ViewModels
                 AnySelected = false;
             }
             if (CurrentSelected != null)
-                WellInfo = "Номер скважины: " + CurrentSelected.data.ID +
-                "\nX = " + CurrentSelected.data.X +
-                "\nY = " + CurrentSelected.data.Y +
-                "\nТекущий дебит нефти = " + CurrentSelected.data.oil_debit + " т/сут" +
-                "\nТекущий дебит жидкости = " + CurrentSelected.data.liquid_debit + " т/сут" +
-                "\nНакопленная добыча нефти = " + CurrentSelected.data.oil_prod + " тыс. т" +
-                "\nНакопленная добыча жидкости = " + CurrentSelected.data.liquid_prod + " тыс. т";
+                WellInfo = "Номер скважины: " + CurrentSelected.Data.ID +
+                "\nX = " + CurrentSelected.Data.X +
+                "\nY = " + CurrentSelected.Data.Y +
+                "\nТекущий дебит нефти = " + CurrentSelected.Data.oil_debit + " т/сут" +
+                "\nТекущий дебит жидкости = " + CurrentSelected.Data.liquid_debit + " т/сут" +
+                "\nНакопленная добыча нефти = " + CurrentSelected.Data.oil_prod + " тыс. т" +
+                "\nНакопленная добыча жидкости = " + CurrentSelected.Data.liquid_prod + " тыс. т";
         }
     }
 }
