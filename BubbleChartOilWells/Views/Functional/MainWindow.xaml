@@ -1,0 +1,456 @@
+﻿<Window x:Class="BubbleChartOilWells.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Platform"
+        xmlns:cs="clr-namespace:BubbleChartOilWells"
+        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+        xmlns:controls="clr-namespace:BubbleChartOilWells.Views.Functional"
+        mc:Ignorable="d"
+        MinHeight="600"
+        MinWidth="1050"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="{StaticResource MainBackgroundBrush}">
+
+    <Window.InputBindings>
+        <KeyBinding Modifiers="Control"
+                    Key="G" />
+    </Window.InputBindings>
+
+    <Window.CommandBindings>
+        <CommandBinding CanExecute="CommandBinding_CanExecute"
+                        Command="{x:Static SystemCommands.CloseWindowCommand}"
+                        Executed="CommandBinding_Executed_Close" />
+        <CommandBinding CanExecute="CommandBinding_CanExecute"
+                        Command="{x:Static SystemCommands.MaximizeWindowCommand}"
+                        Executed="CommandBinding_Executed_Maximize" />
+        <CommandBinding CanExecute="CommandBinding_CanExecute"
+                        Command="{x:Static SystemCommands.MinimizeWindowCommand}"
+                        Executed="CommandBinding_Executed_Minimize" />
+    </Window.CommandBindings>
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="35"
+                      ResizeBorderThickness="5" />
+    </WindowChrome.WindowChrome>
+
+    <Border BorderThickness="1">
+        <Border.Style>
+            <Style TargetType="{x:Type Border}">
+                <Style.Triggers>
+                    <!-- Add to avoid border disappearing when window is maximised -->
+                    <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}"
+                                 Value="Maximized">
+                        <Setter Property="Margin"
+                                Value="6" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}"
+                                 Value="Normal">
+                        <Setter Property="Margin"
+                                Value="0" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+
+            <!--#region Menu-->
+            <Menu Grid.Column="0"
+                  Grid.Row="0"
+                  IsMainMenu="True"
+                  WindowChrome.IsHitTestVisibleInChrome="True">
+                <MenuItem x:Name="FileImport"
+                          Header="_Файл"
+                          Template="{StaticResource VsMenuTop}">
+                    <MenuItem Command="{Binding ImportOilWellsAsyncCommand}"
+                              Header="Импортировать Excel"
+                              IsEnabled="{Binding IsMenuEnabled}"
+                              Template="{StaticResource VsMenuSub}" />
+                    <MenuItem Command="{Binding GetOilWellsAsyncCommand}"
+                              Header="Открыть последний"
+                              IsEnabled="{Binding IsMenuEnabled}"
+                              Template="{StaticResource VsMenuSub}" />
+
+                    <Separator Template="{StaticResource VsMenuSep}" />
+                    <MenuItem Command="{Binding ImportIrapMapAsyncCommand}"
+                              Header="Импортировать карту в формате irap"
+                              IsEnabled="{Binding IsMapImportEnabled}"
+                              Template="{StaticResource VsMenuSub}" />
+
+                    <MenuItem Command="{Binding ImportUserMapAsyncCommand}"
+                              Header="Импортировать пользовательскую карту"
+                              IsEnabled="{Binding IsMapImportEnabled}"
+                              Template="{StaticResource VsMenuSub}" />
+
+                    <Separator Template="{StaticResource VsMenuSep}" />
+                    <MenuItem Command="{Binding ImportUserMapContourAsyncCommand}"
+                              Header="Импортировать контур"
+                              IsEnabled="{Binding IsMapImportEnabled}"
+                              Template="{StaticResource VsMenuSub}" />
+
+                    <Separator Template="{StaticResource VsMenuSep}" />
+                    <MenuItem x:Name="ExportOilWellMapValuesButton"
+                              x:FieldModifier="public"
+                              Click="ExportOilWellMapValuesButtonClick"
+                              Header="Экспорт значений сетки в Excel"
+                              Template="{StaticResource VsMenuSub}" />
+                    <MenuItem x:Name="SaveMapButton"
+                              x:FieldModifier="public"
+                              Click="SaveMapButtonClick"
+                              Header="Сохранить карту в формате irap"
+                              Template="{StaticResource VsMenuSub}" />
+
+                </MenuItem>
+                <MenuItem x:Name="Tools"
+                          Header="_Справка"
+                          Template="{StaticResource VsMenuTop}">
+                    <MenuItem Command="{Binding}"
+                              Header="Обозначения скважин"
+                              Template="{StaticResource VsMenuSub}" />
+                    <MenuItem Command="{Binding}"
+                              Header="Нейросеть"
+                              IsEnabled="{Binding}"
+                              Template="{StaticResource VsMenuSub}" />
+                    <MenuItem Command="{Binding}"
+                              Header="Вычисления"
+                              IsEnabled="{Binding}"
+                              Template="{StaticResource VsMenuSub}" />
+                </MenuItem>
+            </Menu>
+            <!--#endregion-->
+
+            <!--#region Window control buttons -->
+            <Grid Grid.Column="2"
+                  Grid.Row="0"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Top"
+                  Height="30"
+                  WindowChrome.IsHitTestVisibleInChrome="True">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Command="{x:Static SystemCommands.MinimizeWindowCommand}"
+                        Style="{StaticResource WinButton}">
+                    <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/minimize.png" />
+                </Button>
+                <Button Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Command="{x:Static SystemCommands.MaximizeWindowCommand}"
+                        Style="{StaticResource WinButton}">
+                    <Image x:Name="icon_maximize">
+                        <Image.Style>
+                            <Style TargetType="Image">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                 Value="Maximized">
+                                        <Setter Property="Source"
+                                                Value="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/restore.png" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                 Value="Normal">
+                                        <Setter Property="Source"
+                                                Value="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/maximize.png" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Image.Style>
+                    </Image>
+                </Button>
+                <Button x:Name="MainWindowCloseButton"
+                        x:FieldModifier="public"
+                        Grid.Column="2"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Command="{x:Static SystemCommands.CloseWindowCommand}"
+                        Style="{StaticResource CloseWinButton}">
+                    <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/close.png" />
+                </Button>
+            </Grid>
+            <!--#endregion-->
+
+            <Grid Grid.Column="0"
+                  Grid.ColumnSpan="3"
+                  Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="10" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="10" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="10" />
+                </Grid.RowDefinitions>
+
+                <!-- #region Drawing area -->
+                <Border Grid.Column="3"
+                        Grid.Row="1"
+                        Background="White"
+                        Margin="0,0,2,0"
+                        Style="{StaticResource ControlBorder}"
+                        Visibility="{Binding IsChecked, ElementName=BubbleChartRadioButton, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <controls:DrawingAreaUC x:Name="DrawingAreaUserControl"
+                                            Margin="0,10,10,0" />
+                </Border>
+                <!--#endregion-->
+
+                <!--#region Calculations-->
+                <Border Grid.Column="3"
+                        Grid.Row="1"
+                        Background="White"
+                        Margin="0,0,2,0"
+                        Style="{StaticResource ControlBorder}"
+                        Visibility="{Binding IsChecked, ElementName=CalculateRadioButton, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <controls:CalculationsUC x:Name="CalculationsUserControl" />
+                </Border>
+                <!--#endregion-->
+
+                <!--#region NeuralNet-->
+                <Border  Grid.Column="3"
+                         Grid.Row="1"
+                         Background="White"
+                         Margin="0,0,2,0"
+                         Style="{StaticResource ControlBorder}"
+                         Visibility="{Binding IsChecked, ElementName=NeuralnetRadioButton, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <controls:NeuralNetUC x:Name="NeuralNetUserControl" />
+                </Border>
+                <!--#endregion-->
+
+                <!--#region ToolBar-->
+                <Border  Grid.Column="4"
+                         Grid.Row="1"
+                         Style="{StaticResource ControlBorder}"
+                         Margin="0,0,0,0">
+                    <ToolBarTray Background="{StaticResource ToolBarBackgroundBrush}"
+                                 Orientation="Vertical">
+                        <ToolBar Background="Transparent">
+
+                            <CheckBox x:Name="NavigationCheckBox"
+                                      IsChecked="True">
+                                <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/tree.png"
+                                       Height="22" />
+                            </CheckBox>
+                            <CheckBox x:Name="SettingsCheckBox"
+                                      IsChecked="True">
+                                <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/settings.png"
+                                       Height="22" />
+                            </CheckBox>
+
+                            <Separator Background="{StaticResource ToolBarSeparatorBrush}" />
+                            <RadioButton x:Name="CalculateRadioButton"
+                                         GroupName="UserControls">
+                                <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/calculate.png"
+                                       Height="22" />
+                            </RadioButton>
+                            <RadioButton x:Name="NeuralnetRadioButton"
+                                         GroupName="UserControls">
+                                <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/neuralnet.png"
+                                       Height="22" />
+                            </RadioButton>
+                            <RadioButton x:Name="BubbleChartRadioButton"
+                                         GroupName="UserControls"
+                                         IsChecked="True">
+                                <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/bubble_chart.png"
+                                       Height="22" />
+
+                            </RadioButton>
+
+                            <!--<Separator Background="{StaticResource ToolBarSeparatorBrush}" />
+                            <Button x:Name="ExportOilWellMapValuesButton"
+                                    x:FieldModifier="public"
+                                    Click="ExportOilWellMapValuesButtonClick">
+                                <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/file_export.png"
+                                       Height="22" />
+                            </Button>
+                            <Button x:Name="SaveMapButton"
+                                    x:FieldModifier="public"
+                                    Click="SaveMapButtonClick">
+                                <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/save_map_as_irap.png"
+                                       Height="22" />
+                            </Button>-->
+
+                            <Separator Background="{StaticResource ToolBarSeparatorBrush}" />
+                            <CheckBox x:Name="BubbleEnableCheckBox"
+                                      Click="OilWellMapChecked"
+                                      IsChecked="{Binding IsBubblesChecked}"
+                                      IsEnabled="False">
+                                <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/pie_chart.png"
+                                       Height="22" />
+                            </CheckBox>
+
+                        </ToolBar>
+                    </ToolBarTray>
+                </Border>
+                <!--#endregion-->
+
+                <!--#region ToolsWindows-->
+                <Grid Grid.Column="1"
+                      Grid.Row="1"
+                      Grid.ColumnSpan="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Border x:Name="NavigationPanel"
+                            Grid.Row="0"
+                            Margin="0,0,2,2"
+                            Style="{StaticResource ControlBorder}"
+                            Visibility="{Binding IsChecked, ElementName=NavigationCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <TreeView BorderThickness="0"
+                                  Padding="2, 5, 5, 5">
+                            <TreeView.Resources>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
+                                                 Color="Transparent" />
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}"
+                                                 Color="Black" />
+                                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}"
+                                                 Color="Transparent" />
+                                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}"
+                                                 Color="Black" />
+                            </TreeView.Resources>
+                            <TreeViewItem Header="Скважины" />
+                            <TreeViewItem Header="Пузырьковые карты"
+                                          IsExpanded="{Binding OilWellVMs, Converter={StaticResource ItemsCountToBooleanConverter}}">
+                                <RadioButton x:Name="ProdMapRadioButton"
+                                             Checked="OilWellMapChecked"
+                                             Visibility="Collapsed"
+                                             GroupName="OilWellMap"
+                                             IsChecked="{Binding IsProdMapChecked}">Карта текущих отборов</RadioButton>
+                                <RadioButton x:Name="ProdSumMapRadioButton"
+                                             Checked="OilWellMapChecked"
+                                             GroupName="OilWellMap"
+                                             Visibility="Collapsed"
+                                             IsChecked="{Binding IsProdSumMapChecked}">Карта накопленных отборов</RadioButton>
+                            </TreeViewItem>
+                            <TreeViewItem Header="Карты"
+                                          IsExpanded="{Binding MapVMs, Converter={StaticResource ItemsCountToBooleanConverter}}">
+                                <ItemsControl ItemsSource="{Binding MapVMs}"
+                                              SizeChanged="MapVMsItemsControlSizeChanged">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <DockPanel LastChildFill="True">
+
+                                                <RadioButton MouseDoubleClick="MoveTo"
+                                                             Checked="MapChecked"
+                                                             GroupName="MapVms"
+                                                             IsChecked="{Binding IsSelected}"
+                                                             VerticalAlignment="Center" />
+
+                                                <TextBox Text="{Binding Name}"
+                                                         Style="{StaticResource TextBoxWithoutBorders}" />
+
+                                            </DockPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </TreeViewItem>
+                        </TreeView>
+                    </Border>
+                    <Border x:Name="SettingsPanel"
+                            Grid.Row="1"
+                            Margin="0,0,2,2"
+                            Style="{StaticResource ControlBorder}"
+                            Visibility="{Binding IsChecked, ElementName=SettingsCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <TextBlock Background="White">Settings</TextBlock>
+                    </Border>
+                    <Border x:Name="SelectedOilWellPanel"
+                            Grid.Row="2"
+                            Margin="0,0,2,0"
+                            Style="{StaticResource ControlBorder}"
+                            Visibility="{Binding IsChecked, ElementName=SettingsCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <ListView Background="White"
+                                  BorderThickness="0"
+                                  ItemsSource="{Binding SelectedOilWell}">
+                        </ListView>
+                    </Border>
+                </Grid>
+                <!--#endregion-->
+
+            </Grid>
+
+            <!--#region Status Bar-->
+            <StatusBar Grid.Column="0"
+                       Grid.ColumnSpan="3"
+                       Grid.Row="2"
+                       Background="{StaticResource StatusBarReadyBrush}"
+                       Padding="0">
+
+                <StatusBarItem x:Name="ReadyStatusBarItem"
+                               Background="{StaticResource StatusBarReadyBrush}"
+                               Padding="0"
+                               Visibility="{Binding IsReady, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <StackPanel Orientation="Horizontal"
+                                Margin="5,0">
+                        <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/ready.png"
+                               Height="14" />
+                        <Label Content="Ready"
+                               Foreground="White" />
+                    </StackPanel>
+                </StatusBarItem>
+
+                <StatusBarItem x:Name="LoadingStatusBarItem"
+                               Background="{StaticResource StatusBarLoadingBrush}"
+                               Padding="0"
+                               Visibility="{Binding IsReady, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=false}">
+                    <StackPanel Orientation="Horizontal"
+                                Margin="5,0">
+                        <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/loading.png"
+                               Height="14">
+                            <Image.RenderTransform>
+                                <RotateTransform x:Name="rotate"
+                                                 CenterX="7"
+                                                 CenterY="7" />
+                            </Image.RenderTransform>
+                            <Image.Triggers>
+                                <EventTrigger RoutedEvent="Image.Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard RepeatBehavior="Forever">
+                                            <DoubleAnimation Storyboard.TargetName="rotate"
+                                                             Storyboard.TargetProperty="Angle"
+                                                             By="360"
+                                                             Duration="0:0:1" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Image.Triggers>
+                        </Image>
+                        <Label Content="Loading"
+                               Foreground="White" />
+                    </StackPanel>
+                </StatusBarItem>
+            </StatusBar>
+            <!--#endregion-->
+        </Grid>
+    </Border>
+</Window>
