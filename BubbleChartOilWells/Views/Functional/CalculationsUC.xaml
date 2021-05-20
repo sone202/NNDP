@@ -10,8 +10,7 @@
              xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
              mc:Ignorable="d"
              d:DesignHeight="450"
-             d:DesignWidth="800"
-             Background="White">
+             d:DesignWidth="800">
     <Grid>
         <UserControl>
             <UserControl.Resources>
@@ -23,7 +22,7 @@
                     <Setter Property="Margin"
                             Value="0,0,0,10" />
                     <Setter Property="MaxWidth"
-                            Value="150" />
+                            Value="200" />
                     <Setter Property="MinWidth"
                             Value="100" />
                     <Setter Property="BorderBrush"
@@ -43,8 +42,7 @@
                 </Style>
             </UserControl.Resources>
 
-            <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                          VerticalScrollBarVisibility="Auto">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <Grid>
 
                     <Grid.RowDefinitions>
@@ -59,9 +57,8 @@
                         <StackPanel Margin="10,0,0,0"
                                     Orientation="Vertical">
 
-                            <!-- KH/K, H Switch-->
-                            <StackPanel Margin="10"
-                                        Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal"
+                                        Margin="10">
                                 <Label Content="K, H" />
                                 <CheckBox x:Name="KHCheckBox"
                                           Margin="4"
@@ -75,24 +72,23 @@
 
                                 <StackPanel Margin="0,0,10,0"
                                             Orientation="Vertical"
-                                            Visibility="{Binding IsChecked, ElementName=KHCheckBox, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=false}">
+                                            Visibility="{Binding IsChecked, ElementName=KHCheckBox, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
 
                                     <Label Content="K"
                                            HorizontalAlignment="Left"
                                            Width="30" />
-                                    <ComboBox DisplayMemberPath="Name"
-                                              Height="20"
+                                    <ComboBox Height="20"
                                               HorizontalAlignment="Left"
                                               ItemsSource="{Binding MapVMs}"
-                                              SelectedValue="{Binding DebitGainVM.K}"
+                                              DisplayMemberPath="Name"
+                                              SelectedValue="{Binding LiquidDebitGainVM.K}"
                                               VerticalAlignment="Top"
-                                              Width="150"
-                                              ToolTip="Абсолютная проницаемость коллектора, мДарси" />
+                                              Width="150" />
                                 </StackPanel>
 
                                 <StackPanel Margin="0,0,10,0"
                                             Orientation="Vertical"
-                                            Visibility="{Binding IsChecked, ElementName=KHCheckBox, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=false}">
+                                            Visibility="{Binding IsChecked, ElementName=KHCheckBox, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
                                     <Label Content="H"
                                            HorizontalAlignment="Left"
                                            Width="30" />
@@ -100,10 +96,9 @@
                                               HorizontalAlignment="Left"
                                               ItemsSource="{Binding MapVMs}"
                                               DisplayMemberPath="Name"
-                                              SelectedValue="{Binding DebitGainVM.H}"
+                                              SelectedValue="{Binding LiquidDebitGainVM.H}"
                                               VerticalAlignment="Top"
-                                              Width="150"
-                                              ToolTip="Эффективная мощность коллектора, м" />
+                                              Width="150" />
                                 </StackPanel>
 
                                 <StackPanel Margin="0,0,10,0"
@@ -116,10 +111,9 @@
                                               HorizontalAlignment="Left"
                                               ItemsSource="{Binding MapVMs}"
                                               DisplayMemberPath="Name"
-                                              SelectedValue="{Binding DebitGainVM.KH}"
+                                              SelectedValue="{Binding LiquidDebitGainVM.KH}"
                                               VerticalAlignment="Top"
-                                              Width="150"
-                                              ToolTip="TODO" />
+                                              Width="150" />
                                 </StackPanel>
 
                                 <StackPanel Margin="0,0,10,0"
@@ -131,10 +125,9 @@
                                               HorizontalAlignment="Left"
                                               ItemsSource="{Binding MapVMs}"
                                               DisplayMemberPath="Name"
-                                              SelectedValue="{Binding DebitGainVM.Pr}"
+                                              SelectedValue="{Binding LiquidDebitGainVM.Pr}"
                                               VerticalAlignment="Top"
-                                              Width="150"
-                                              ToolTip="Пластовое давление (давление на контуре питания скважины (r)), атм" />
+                                              Width="150" />
                                 </StackPanel>
 
                             </WrapPanel>
@@ -143,76 +136,59 @@
 
                                 <StackPanel>
                                     <Label Content="Pwf, атм" />
-                                    <TextBox Text="{Binding Path = DebitGainVM.Pwf}"
-                                             ToolTip="Забойное давление, атм" />
+                                    <TextBox Text="{Binding Path = LiquidDebitGainVM.Pwf}" />
                                 </StackPanel>
 
                                 <!-- default = 250 -->
                                 <StackPanel>
                                     <Label Content="re, м" />
-                                    <TextBox Text="{Binding Path = DebitGainVM.Re}"
-                                             ToolTip="Радиус контура питания, м" />
+                                    <TextBox Text="{Binding Path = LiquidDebitGainVM.re}" />
                                 </StackPanel>
 
                                 <StackPanel>
                                     <!-- default = 0.1 -->
                                     <Label Content="rw, м" />
-                                    <TextBox Text="{Binding Path = DebitGainVM.Rw}"
-                                             ToolTip="Радиус скважины по долоту, м" />
+                                    <TextBox Text="{Binding Path = LiquidDebitGainVM.rw}" />
                                 </StackPanel>
 
                                 <StackPanel>
                                     <!-- default = 0 -->
                                     <Label Content="Stot, ед." />
-                                    <TextBox Text="{Binding Path = DebitGainVM.Stot}"
-                                             ToolTip="Общий скин-фактор, ед." />
+                                    <TextBox Text="{Binding Path = LiquidDebitGainVM.Stot}" />
                                 </StackPanel>
 
                                 <StackPanel>
                                     <!-- default = 0.55 -->
                                     <Label Content="Sw" />
-                                    <ComboBox DisplayMemberPath="Name"
-                                              Height="20"
-                                              HorizontalAlignment="Left"
-                                              ItemsSource="{Binding MapVMs}"
-                                              SelectedValue="{Binding DebitGainVM.Sw}"
-                                              VerticalAlignment="Top"
-                                              Width="100"
-                                              ToolTip="TODO" />
+                                    <TextBox Text="{Binding Path = LiquidDebitGainVM.Sw}" />
                                 </StackPanel>
 
                                 <StackPanel>
                                     <Label Content="MUo, сПз" />
-                                    <TextBox Text="{Binding Path = DebitGainVM.MUo}"
-                                             ToolTip="Вязкость нефти, сПз" />
+                                    <TextBox Text="{Binding Path = LiquidDebitGainVM.MUo}" />
                                 </StackPanel>
 
                                 <StackPanel>
                                     <Label Content="MUw, сПз" />
-                                    <TextBox Text="{Binding Path = DebitGainVM.MUw}"
-                                             ToolTip="Вязкость воды, сПз" />
+                                    <TextBox Text="{Binding Path = LiquidDebitGainVM.MUw}" />
                                 </StackPanel>
 
                                 <StackPanel>
                                     <Label Content="Bo, ед." />
-                                    <TextBox Text="{Binding Path = DebitGainVM.Bo}"
-                                             ToolTip="Объемный коэффициент нефти, ед." />
+                                    <TextBox Text="{Binding Path = LiquidDebitGainVM.Bo}" />
                                 </StackPanel>
 
                                 <StackPanel>
                                     <Label Content="Bw, ед." />
-                                    <TextBox Text="{Binding Path = DebitGainVM.Bw}"
-                                             ToolTip="Объемный коэффициент воды, ед." />
+                                    <TextBox Text="{Binding Path = LiquidDebitGainVM.Bw}" />
                                 </StackPanel>
 
                             </WrapPanel>
 
-                            <!-- Data table with "OFP" info-->
                             <WrapPanel ItemWidth="auto">
                                 <DataGrid x:Name="OfpDataGrid"
-                                          x:FieldModifier="public"
                                           HorizontalAlignment="Left"
-                                          ItemsSource="{Binding DebitGainVM.Ofp}"
+                                          ItemsSource="{Binding LiquidDebitGainVM.Ofp}"
                                           Width="auto"
                                           CanUserResizeColumns="False"
                                           CanUserReorderColumns="False"
@@ -226,7 +202,7 @@
                                     <DataGrid.RowHeaderStyle>
                                         <Style TargetType="{x:Type DataGridRowHeader}">
                                             <Setter Property="Content"
-                                                    Value="{Binding Converter={StaticResource DataGridRowIndexConverter}, ConverterParameter = OfpDataGrid}" />
+                                                    Value="{Binding Converter={StaticResource DataGridRowIndexConverter},ConverterParameter=OfpDataGrid}" />
                                             <Setter Property="Width"
                                                     Value="20" />
                                             <Setter Property="HorizontalAlignment"
@@ -235,7 +211,7 @@
                                     </DataGrid.RowHeaderStyle>
                                 </DataGrid>
 
-                                <lvc:CartesianChart Series="{Binding OfpSeriesCollection}"
+                                <lvc:CartesianChart Series="{Binding SwSeriesCollection}"
                                                     LegendLocation="Right"
                                                     MinWidth="500"
                                                     MinHeight="250"
@@ -243,14 +219,13 @@
 
                                     <lvc:CartesianChart.AxisX>
                                         <lvc:Axis Title="Водонасыщенность"
-                                                  MinValue="0"
-                                                  MaxValue="1" />
+                                                  Labels="{Binding SwLabels}" />
                                     </lvc:CartesianChart.AxisX>
 
                                     <lvc:CartesianChart.AxisY>
                                         <lvc:Axis Title="Относительная проницаемость"
                                                   MinValue="0"
-                                                  MaxValue="1.2" />
+                                                  MaxValue="1" />
 
                                     </lvc:CartesianChart.AxisY>
 
@@ -267,27 +242,10 @@
                                 Orientation="Horizontal"
                                 VerticalAlignment="Bottom">
 
-                        <Button Background="{StaticResource DrawMapButtonBrush}"
+                        <Button Background="{StaticResource CalculateButtonBrush}"
                                 Foreground="White"
-                                Command="{Binding DrawDebitGainMapAsyncCommand}"
-                                CommandParameter="liquid"
-                                Content="Построить карту жидкости"
-                                Margin="10"
-                                Padding="10,5" />
-
-                        <Button Background="{StaticResource DrawMapButtonBrush}"
-                                Foreground="White"
-                                Command="{Binding DrawDebitGainMapAsyncCommand}"
-                                CommandParameter="water"
-                                Content="Построить карту воды"
-                                Margin="10"
-                                Padding="10,5" />
-
-                        <Button Background="{StaticResource DrawMapButtonBrush}"
-                                Foreground="White"
-                                Command="{Binding DrawDebitGainMapAsyncCommand}"
-                                CommandParameter="oil"
-                                Content="Построить карту нефти"
+                                Command="{Binding CalculateWaterDebitGainAsyncCommand}"
+                                Content="Построить карту"
                                 Margin="10"
                                 Padding="10,5" />
 

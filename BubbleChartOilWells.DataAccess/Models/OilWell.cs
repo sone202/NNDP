@@ -37,9 +37,13 @@ namespace BubbleChartOilWells.DataAccess.Models
         /// </summary>
         public double Y { get; set; }
 
+
         /// <summary>
         /// Объекты учета добычи
         /// </summary>
+        /// 
+        
+
         public List<Objective> Objectives { get; set; } = new List<Objective>();
     }
 }

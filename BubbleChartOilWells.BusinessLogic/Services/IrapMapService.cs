@@ -30,9 +30,8 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                 using (var reader = new StreamReader(fileName))
                 {
                     var firstRow = reader.ReadLine().Split(' ').Select(x => Convert.ToDouble(x, CultureInfo.InvariantCulture));
-                    irapMapDto.CountPerColumn = firstRow.ElementAt(1);
-                    irapMapDto.CellWidth = firstRow.ElementAt(2);
-                    irapMapDto.CellHeight = firstRow.ElementAt(3);
+                    irapMapDto.RectangleWidth = firstRow.ElementAt(2);
+                    irapMapDto.RectangleHeight = firstRow.ElementAt(3);
 
                     var secondRow = reader.ReadLine().Split(' ').Select(x => Convert.ToDouble(x, CultureInfo.InvariantCulture));
                     irapMapDto.MinX = secondRow.ElementAt(0);
@@ -52,20 +51,20 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                 var pictureWidth = Convert.ToInt32(irapMapDto.CountPerRow);
                 var pictureHeight = Convert.ToInt32(irapMapDto.ZValues.Count / irapMapDto.CountPerRow);
 
-                var bitmap = ConvertToBitmap.GetMapBitmap(pictureWidth, pictureHeight, irapMapDto.ZValues, 9999900);
+                var bitmap = ConvertToBitmap.GetBitmap(pictureWidth, pictureHeight, irapMapDto.ZValues, 9999900);
 
                 var bitmapSource = Imaging.CreateBitmapSourceFromHBitmap(bitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
                 bitmapSource.Freeze();
 
                 var mapVM = new MapVM
                 {
-                    Name = Path.GetFileNameWithoutExtension(fileName),
+                    Name = fileName.Replace("\\", "/").Split('/').Last().Split('.').First(),
                     Width = irapMapDto.MaxX - irapMapDto.MinX,
                     Height = irapMapDto.MaxY - irapMapDto.MinY,
                     IsSelected = true,
                     LeftBottomCoordinate = new System.Windows.Point(irapMapDto.MinX, irapMapDto.MinY),
                     BitmapSource = bitmapSource,
-                    Z = irapMapDto.ZValues
+                    ZValues = irapMapDto.ZValues
                 };
 
                 return ResultResponse<MapVM>.GetSuccessResponse(mapVM);

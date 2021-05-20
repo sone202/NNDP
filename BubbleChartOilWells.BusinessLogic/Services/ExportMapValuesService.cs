@@ -18,58 +18,46 @@ namespace BubbleChartOilWells.BusinessLogic.Services
 {
     public class ExportMapValuesService
     {
-        public ResultResponse<string> ExportMapValuesToExcel(IEnumerable<MapVM> mapVMs, IEnumerable<OilWellVM> oilWellVMs, string fileName, string sheetName = "Лист1")
+        public void ExportMapValuesToExcel(IEnumerable<MapVM> mapVMs, IEnumerable<OilWellVM> oilWellVMs, string fileName, string sheetName = "Лист1")
         {
-            try
+
+            CreateSpreadsheetDocument(fileName, sheetName);
+
+            using (var spreadsheetDocument = SpreadsheetDocument.Open(fileName, true))
             {
-                CreateSpreadsheetDocument(fileName, sheetName);
+                var workbookPart = spreadsheetDocument.WorkbookPart;
+                var worksheet = workbookPart.WorksheetParts.FirstOrDefault().Worksheet;
+                var sheetData = worksheet.GetFirstChild<SheetData>();
 
-                using (var spreadsheetDocument = SpreadsheetDocument.Open(fileName, true))
+                // setting start cell
+                var tableRowStartIndex = 1u;
+                var tableStartChar = 'A';
+
+                var oilWellExcels = oilWellVMs.Select(x => new OilWellExcel(x)).ToList();
+                var coordinates = oilWellExcels.Select(x => new Point(x.X, x.Y)).ToList();
+                var mapExcels = mapVMs.Select(x => new MapExcel(x, coordinates)).ToList();
+
+                var headers = new List<string> { "Месторождение", "Площадь", "Скважина", "Объект", "Х", "Y" };
+                var columnsWidth = CalculateColumnsLength(oilWellExcels, headers, 30, Enumerable.Repeat<int?>(5, headers.Count).ToArray());
+                ChangeColumnWidth(worksheet, sheetData, columnsWidth, 'A');
+
+                mapExcels.ForEach(x => headers.Add(x.Name));
+                columnsWidth = CalculateColumnsLength(mapExcels, mapExcels.Select(x => x.Name), 30, Enumerable.Repeat<int?>(5, mapExcels.Count).ToArray());
+                ChangeColumnWidth(worksheet, sheetData, columnsWidth, 'G');
+
+                AppendHeader(headers, sheetData, tableRowStartIndex, tableStartChar);
+
+                SerialiazeToSheet(oilWellExcels, sheetData, tableRowStartIndex, tableStartChar);
+                tableStartChar = (Char)(Convert.ToUInt16(tableStartChar) + 6);
+
+                foreach (var map in mapExcels)
                 {
-                    var workbookPart = spreadsheetDocument.WorkbookPart;
-                    var worksheet = workbookPart.WorksheetParts.FirstOrDefault().Worksheet;
-                    var sheetData = worksheet.GetFirstChild<SheetData>();
-
-                    // setting start cell
-                    var tableRowStartIndex = 1u;
-                    var tableStartChar = 'A';
-
-                    // writing oilWells to excel
-                    var oilWellExcels = oilWellVMs.Select(x => new OilWellExcel(x)).ToList();
-                    var coordinates = oilWellExcels.Select(x => new Point(x.X, x.Y)).ToList();
-
-                    var oilWellheaders = new List<string> { "Месторождение", "Площадь", "Скважина", "Объект", "Х", "Y" };
-                    var columnsWidth = CalculateColumnsLength(oilWellExcels, oilWellheaders, 30, Enumerable.Repeat<int?>(5, oilWellheaders.Count).ToArray());
-                    ChangeColumnWidth(worksheet, sheetData, columnsWidth, tableStartChar);
-                    AppendHeader(oilWellheaders, sheetData, tableRowStartIndex, tableStartChar);
-                    SerialiazeToSheet(oilWellExcels, sheetData, tableRowStartIndex + 1, tableStartChar);
-                    tableStartChar = (Char)(Convert.ToUInt16(tableStartChar) + 6);
-
-                    // TODO: refactor
-                    // writing map grid values to excel
-                    foreach (var map in mapVMs)
-                    {
-                        var mapGridValues = GetMapGridValues(map, coordinates);
-                        columnsWidth = CalculateColumnsLength(mapGridValues, new List<string> { map.Name }, 30, Enumerable.Repeat<int?>(5, 1).ToArray());
-                        ChangeColumnWidth(worksheet, sheetData, columnsWidth, tableStartChar);
-                        AppendHeader(new List<string>() { map.Name }, sheetData, tableRowStartIndex, tableStartChar);
-                        SerialiazeToSheet(mapGridValues, sheetData, tableRowStartIndex + 1, tableStartChar++);
-                    }
-
-                    worksheet.Save();
-                    workbookPart.Workbook.Save();
-                    spreadsheetDocument.Save();
-                    spreadsheetDocument.Close();
+                    SerialiazeToSheet(map.Z, sheetData, tableRowStartIndex, tableStartChar);
+                    tableStartChar = (Char)(Convert.ToUInt16(tableStartChar) + 1);
                 }
 
-                return ResultResponse<string>.GetSuccessResponse();
-            }
-            catch (Exception e)
-            {
-                // TODO: write error to log
-                return ResultResponse<string>.GetErrorResponse($@"Ошибка экспорта значенй сетки карты в excel.{Environment.NewLine}
-                                                              {e.Message}{Environment.NewLine}
-                                                              {e.StackTrace}");
+                workbookPart.Workbook.Save();
+                spreadsheetDocument.Close();
             }
         }
 
@@ -175,39 +163,14 @@ namespace BubbleChartOilWells.BusinessLogic.Services
             {
                 var valueRow = GetOrAddRow(sheetData, currentRowIndex);
                 var currentCellChar = startCellChar;
-
-                foreach (var property in properties)
+                if (properties.Length == 0)
                 {
-                    var value = item.GetType().GetProperty(property.Name)?.GetValue(item, null);
+                    var value = item;
                     var valueCell = new Cell
                     {
                         CellReference = $"{currentCellChar++}{currentRowIndex}",
                         StyleIndex = 2U
                     };
-
-                    // Если свойство является массивов, то пропускаем
-                    if (property.PropertyType.IsArray)
-                    {
-                        continue;
-                    }
-
-                    if (property.PropertyType == typeof(DateTime?) || property.PropertyType == typeof(DateTime))
-                    {
-                        value = ((DateTime?)value)?.ToOADate().ToString(CultureInfo.InvariantCulture);
-                        valueCell.StyleIndex = 3U;
-                    }
-                    else if (property.PropertyType.IsPrimitive)
-                    {
-                        valueCell.DataType = new EnumValue<CellValues>(CellValues.Number);
-                        valueCell.CellValue = new CellValue(double.Parse(value.ToString()).ToString(new NumberFormatInfo { NumberDecimalSeparator = "," }));
-                        valueRow.Append(valueCell);
-                        continue;
-                    }
-
-                    if (property.PropertyType == typeof(string))
-                    {
-                        valueCell.DataType = new EnumValue<CellValues>(CellValues.String);
-                    }
 
                     if (value != null && !string.IsNullOrEmpty(value.ToString()))
                     {
@@ -224,7 +187,57 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                         valueCell.CellValue = new CellValue(string.Empty);
                     }
                     valueRow.Append(valueCell);
+                }
+                else
+                {
 
+                    foreach (var property in properties)
+                    {
+                        var value = item.GetType().GetProperty(property.Name)?.GetValue(item, null);
+                        var valueCell = new Cell
+                        {
+                            CellReference = $"{currentCellChar++}{currentRowIndex}",
+                            StyleIndex = 2U
+                        };
+
+                        // Если свойство является массивов, то пропускаем
+                        if (property.PropertyType.IsArray)
+                        {
+                            continue;
+                        }
+
+                        if (property.PropertyType == typeof(DateTime?) || property.PropertyType == typeof(DateTime))
+                        {
+                            value = ((DateTime?)value)?.ToOADate().ToString(CultureInfo.InvariantCulture);
+                            valueCell.StyleIndex = 3U;
+                        }
+                        else if (property.PropertyType == typeof(System.ValueType))
+                        {
+                            valueCell.DataType = new EnumValue<CellValues>(CellValues.Number);
+                        }
+
+                        if (property.PropertyType == typeof(string))
+                        {
+                            valueCell.DataType = new EnumValue<CellValues>(CellValues.String);
+                        }
+
+                        if (value != null && !string.IsNullOrEmpty(value.ToString()))
+                        {
+                            // Если длинная строка, то переносим текст
+                            if (value.ToString().Length > 70)
+                            {
+                                valueCell.StyleIndex = 4U;
+                            }
+
+                            valueCell.CellValue = new CellValue(value.ToString());
+                        }
+                        else
+                        {
+                            valueCell.CellValue = new CellValue(string.Empty);
+                        }
+                        valueRow.Append(valueCell);
+
+                    }
                 }
                 currentRowIndex++;
             }
@@ -478,63 +491,6 @@ namespace BubbleChartOilWells.BusinessLogic.Services
             }
             worksheet.InsertBefore(columns, sheetData);
         }
-
-        /// <summary>
-        /// Получение списка значений сетки карты по скважинам
-        /// </summary>
-        /// <param name="mapVM"></param>
-        /// <param name="coordinates"></param>
-        /// <returns></returns>
-        private List<MapGridValue> GetMapGridValues(MapVM mapVM, IEnumerable<Point> coordinates)
-        {
-            var mapGridValues = new List<MapGridValue>();
-
-            var startCoordinate = mapVM.LeftBottomCoordinate;
-            var cellWidth = mapVM.Width / mapVM.BitmapSource.PixelWidth;
-            var cellHeight = mapVM.Height / mapVM.BitmapSource.PixelHeight;
-
-            // searching map values with oil well coordinate
-            foreach (var point in coordinates)
-            {
-                var xCounter = 0;
-                var yCounter = 0;
-
-                var currentValue = -1d;
-                for (double i = startCoordinate.X + cellWidth; i <= startCoordinate.X + mapVM.Width; i += cellWidth)
-                {
-                    if (point.X > startCoordinate.X + mapVM.Width || (point.Y > startCoordinate.Y + mapVM.Height))
-                    {
-                        break;
-                    }
-
-                    if (point.X < i)
-                    {
-                        for (double j = startCoordinate.Y + cellHeight; j <= startCoordinate.Y + mapVM.Height; j += cellHeight)
-                        {
-                            if (point.Y < j)
-                            {
-                                try
-                                {
-                                    currentValue = mapVM.Z[mapVM.BitmapSource.PixelWidth * yCounter + xCounter];
-                                }
-                                catch
-                                {
-                                    currentValue = -1;
-                                }
-                                break;
-                            }
-                            yCounter++;
-                        }
-                        break;
-                    }
-                    xCounter++;
-                }
-                mapGridValues.Add(new MapGridValue(currentValue));
-            }
-
-            return mapGridValues;
-        }
-
     }
 
     public class OilWellExcel
@@ -551,18 +507,59 @@ namespace BubbleChartOilWells.BusinessLogic.Services
             Field = oilWellVM.Field;
             Area = oilWellVM.Area;
             Name = oilWellVM.Name;
-            Objectives = oilWellVM.Objectives.Count == 0 ? "-1" : oilWellVM.Objectives[0].Name;
+            Objectives = oilWellVM.Objectives[0].Name;
             X = oilWellVM.X;
             Y = oilWellVM.Y;
         }
     }
 
-    public class MapGridValue
+    public class MapExcel
     {
-        public double Z { get; set; }
-        public MapGridValue(double z)
+        public List<double> Z { get; set; }
+        public string Name { get; set; }
+
+        public MapExcel(MapVM mapVM, IEnumerable<Point> coordinates)
         {
-            Z = z;
+            Z = new List<double>();
+            Name = mapVM.Name;
+
+            var startCoordinate = mapVM.LeftBottomCoordinate;
+            var cellWidth = mapVM.Width / mapVM.BitmapSource.PixelWidth;
+            var cellHeight = mapVM.Height / mapVM.BitmapSource.PixelHeight;
+
+
+            // searching map values with oil well coordinate
+            foreach (var el in coordinates)
+            {
+                var xCounter = 0;
+                var yCounter = 0;
+
+                for (double i = startCoordinate.X + cellWidth; i <= startCoordinate.X + mapVM.Width; i += cellWidth)
+                {
+                    if (el.X < i)
+                    {
+                        for (double j = startCoordinate.Y + cellHeight; j <= startCoordinate.Y + mapVM.Height; j += cellHeight)
+                        {
+                            if (el.Y < j)
+                            {
+                                try
+                                {
+                                    Z.Add(mapVM.ZValues[mapVM.BitmapSource.PixelWidth * yCounter + xCounter]);
+                                }
+                                catch
+                                {
+                                    Z.Add(-1);
+                                }
+                                break;
+                            }
+                            yCounter++;
+                        }
+                        break;
+                    }
+                    xCounter++;
+                }
+            }
         }
     }
+
 }

@@ -3,7 +3,6 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 using System.Linq;
-using System.IO;
 
 namespace BubbleChartOilWells.Views.Resource.GenericResource.Converters
 {
@@ -12,7 +11,7 @@ namespace BubbleChartOilWells.Views.Resource.GenericResource.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return Path.GetFileName(value?.ToString());
+            return value?.ToString().Split('\\').Last();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

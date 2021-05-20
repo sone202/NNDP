@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
-VisualStudioVersion = 16.0.31129.286
+VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BubbleChartOilWells", "BubbleChartOilWells\BubbleChartOilWells.csproj", "{7AFDB3C6-CFC2-4608-B6F5-8C3B52949B3F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BubbleChartOilWells.BusinessLogic", "BubbleChartOilWells.BusinessLogic\BubbleChartOilWells.BusinessLogic.csproj", "{FDCF6703-8240-4684-8D4A-900B5FB621E9}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BubbleChartOilWells.Contracts", "BubbleChartOilWells.Contracts\BubbleChartOilWells.Contracts.csproj", "{F2C1CFDE-1E98-49BE-AC2C-48D95C65A939}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BubbleChartOilWells.BusinessLogic", "BubbleChartOilWells.BusinessLogic\BubbleChartOilWells.BusinessLogic.csproj", "{FDCF6703-8240-4684-8D4A-900B5FB621E9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BubbleChartOilWells.DataAccess", "BubbleChartOilWells.DataAccess\BubbleChartOilWells.DataAccess.csproj", "{4513EB17-FF9C-4F88-8BD2-778FAC5EE9F6}"
 EndProject
@@ -21,14 +21,14 @@ Global
 		{7AFDB3C6-CFC2-4608-B6F5-8C3B52949B3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7AFDB3C6-CFC2-4608-B6F5-8C3B52949B3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7AFDB3C6-CFC2-4608-B6F5-8C3B52949B3F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FDCF6703-8240-4684-8D4A-900B5FB621E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FDCF6703-8240-4684-8D4A-900B5FB621E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FDCF6703-8240-4684-8D4A-900B5FB621E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FDCF6703-8240-4684-8D4A-900B5FB621E9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F2C1CFDE-1E98-49BE-AC2C-48D95C65A939}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F2C1CFDE-1E98-49BE-AC2C-48D95C65A939}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2C1CFDE-1E98-49BE-AC2C-48D95C65A939}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2C1CFDE-1E98-49BE-AC2C-48D95C65A939}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDCF6703-8240-4684-8D4A-900B5FB621E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDCF6703-8240-4684-8D4A-900B5FB621E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDCF6703-8240-4684-8D4A-900B5FB621E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDCF6703-8240-4684-8D4A-900B5FB621E9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4513EB17-FF9C-4F88-8BD2-778FAC5EE9F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4513EB17-FF9C-4F88-8BD2-778FAC5EE9F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4513EB17-FF9C-4F88-8BD2-778FAC5EE9F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -38,6 +38,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {897F0D97-083F-4DB9-837D-C6F7C31BDA1D}
+		SolutionGuid = {DE5AAB48-5272-4FCD-AF29-21C0DE02D531}
 	EndGlobalSection
 EndGlobal

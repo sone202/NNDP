@@ -70,7 +70,6 @@ namespace BubbleChartOilWells.BusinessLogic.Utils
             return (R == rgb.R) && (G == rgb.G) && (B == rgb.B);
         }
     }
-
     public class Hsl
     {
         public int H { get; set; }

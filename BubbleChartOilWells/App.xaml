@@ -14,7 +14,6 @@
         <SolidColorBrush x:Key="ResetButtonBrush">#303952</SolidColorBrush>
         <SolidColorBrush x:Key="CalculateButtonBrush">#574b90</SolidColorBrush>
         <SolidColorBrush x:Key="ChooseFileButtonBrush">#574b90</SolidColorBrush>
-        <SolidColorBrush x:Key="DrawMapButtonBrush">#f3a683</SolidColorBrush>
     
         <SolidColorBrush x:Key="SubMenuBrush">#303952</SolidColorBrush>
         <SolidColorBrush x:Key="MenuForegroundBrush">white</SolidColorBrush>
@@ -52,13 +51,13 @@
         <!--#endregion-->
 
         <!--#region Converters-->
-        <Converters:ArrayToStringConverter x:Key="ArrayToStringConverter" />
-        <Converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-        <Converters:DataGridRowIndexConverter x:Key="DataGridRowIndexConverter" />
-        <Converters:FilepathToFilenameConverter x:Key="FilepathToFilenameConverter" />
-        <Converters:EnumerableToBooleanConverter x:Key="ItemsCountToBooleanConverter" />
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <Converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
         <Converters:NumberToAxisValueConverter x:Key="NumberToAxisValueConverter" />
-        <Converters:OilWellVMsToCanvasConverter x:Key="OilWellVMsToCanvasConverter" />
+        <Converters:ToCanvasConverter x:Key="ToCanvasConverter" />
+        <Converters:FilepathToFilenameConverter x:Key="FilepathToFilenameConverter" />
+        <Converters:ArrayToStringConverter x:Key="ArrayToStringConverter" />
+        <Converters:DataGridRowIndexConverter x:Key="DataGridRowIndexConverter" />
         <!--#endregion-->
 
         <!--#region Default Button Style-->
@@ -72,8 +71,6 @@
                     Value="20" />
             <Setter Property="Width"
                     Value="30" />
-            <Setter Property="BorderThickness"
-                    Value="0" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">

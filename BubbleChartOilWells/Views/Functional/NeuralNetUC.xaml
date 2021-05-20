@@ -9,7 +9,7 @@
              xmlns:cs="clr-namespace:BubbleChartOilWells"
              xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" Background="White">
+             d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <UserControl>
             <UserControl.Resources>
@@ -54,9 +54,7 @@
                               Margin="10">
 
                         <WrapPanel>
-                            <!--region Data import panel-->
                             <WrapPanel>
-
                                 <StackPanel>
                                     <Label Content="Данные для обучения нейросети" />
                                     <StackPanel Orientation="Horizontal"
@@ -66,7 +64,7 @@
                                                  Content="Выбрать файл"
                                                  Command="{Binding ImportTrainDataAsyncCommand}"
                                                  Padding="10,5" />
-                                        <Label Content="{Binding NeuralNetVM.TrainingDataFileName, Converter={StaticResource FilepathToFilenameConverter}}"
+                                        <Label Content="{Binding NeuralNetVM.trainingDataFileName, Converter={StaticResource FilepathToFilenameConverter}}"
                                                Width="120" />
                                     </StackPanel>
                                 </StackPanel>
@@ -80,37 +78,42 @@
                                                  Content="Выбрать файл"
                                                  Command="{Binding ImportInitialDataAsyncCommand}"
                                                  Padding="10,5" />
-                                        <Label Content="{Binding NeuralNetVM.PredictDataFileName, Converter={StaticResource FilepathToFilenameConverter}}"
+                                        <Label Content="{Binding NeuralNetVM.initialDataFileName, Converter={StaticResource FilepathToFilenameConverter}}"
                                                Width="120" />
                                     </StackPanel>
                                 </StackPanel>
                             </WrapPanel>
-                            <!--#endregion -->
 
                             <WrapPanel ItemWidth="200">
 
                                 <StackPanel>
                                     <!-- default = 64, 64 -->
                                     <Label Content="Скрытые слои нейронов" />
-                                    <TextBox Text="{Binding NeuralNetVM.Hidden, Converter={StaticResource ArrayToStringConverter}}" />
+                                    <TextBox Text="{Binding NeuralNetVM.hidden, Converter={StaticResource ArrayToStringConverter}}" />
                                 </StackPanel>
 
                                 <StackPanel>
                                     <!-- default = 0.01 -->
                                     <Label Content="Пороговое значение" />
-                                    <TextBox Text="{Binding NeuralNetVM.Threshold}" />
+                                    <TextBox Text="{Binding NeuralNetVM.threshold}" />
                                 </StackPanel>
 
                                 <StackPanel>
                                     <!-- default = 1 -->
                                     <Label Content="Количество повторов обучения" />
-                                    <TextBox Text="{Binding NeuralNetVM.Rep}" />
+                                    <TextBox Text="{Binding NeuralNetVM.rep}" />
                                 </StackPanel>
 
                                 <StackPanel>
                                     <!-- default = 100 000 -->
                                     <Label Content="Максимальное число шагов" />
-                                    <TextBox Text="{Binding NeuralNetVM.Stepmax}" />
+                                    <TextBox Text="{Binding NeuralNetVM.stepmax}" />
+                                </StackPanel>
+
+                                <StackPanel>
+                                    <!-- default = 1 -->
+                                    <Label Content="Количество повторов обучения" />
+                                    <TextBox Text="{Binding NeuralNetVM.rep}" />
                                 </StackPanel>
 
                                 <StackPanel>
@@ -120,7 +123,7 @@
                                               HorizontalAlignment="Left"
                                               MinWidth="100"
                                               MaxWidth="200"
-                                              SelectedValue="{Binding NeuralNetVM.Algorithm}"
+                                              SelectedValue="{Binding NeuralNetVM.algorithm}"
                                               SelectedValuePath="Content">
                                         <ComboBoxItem Content="backprop" />
                                         <ComboBoxItem Content="rprop+" />
@@ -137,7 +140,7 @@
                                               Height="20"
                                               MinWidth="100"
                                               MaxWidth="200"
-                                              SelectedValue="{Binding NeuralNetVM.ErrorFunction}"
+                                              SelectedValue="{Binding NeuralNetVM.errorFunction}"
                                               SelectedValuePath="Content">
                                         <ComboBoxItem Content="sse"
                                                       IsSelected="True" />
@@ -152,7 +155,7 @@
                                               Height="20"
                                               MinWidth="100"
                                               MaxWidth="200"
-                                              SelectedValue="{Binding NeuralNetVM.ActivationFunction}"
+                                              SelectedValue="{Binding NeuralNetVM.activationFunction}"
                                               SelectedValuePath="Content">
                                         <ComboBoxItem Content="logistic"
                                                       IsSelected="True" />
@@ -171,164 +174,76 @@
                               Margin="10"
                               Visibility="{Binding IsNeuralNetTrainResultsVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
 
-                        <WrapPanel>
-                            <WrapPanel Orientation="Vertical">
+                        <WrapPanel Orientation="Vertical">
 
-                                <StackPanel Orientation="Vertical" 
-                                            Height="100">
-                                    <Label Content="Тренировочные данные" />
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label Content="MAPE:" />
-                                        <Label Content="{Binding NeuralNetVM.TrainMAPE}" />
-                                        <Label Content="%" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label Content="MAE:" />
-                                        <Label Content="{Binding NeuralNetVM.TrainMAE}" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label Content="SSE:" />
-                                        <Label Content="{Binding NeuralNetVM.TrainSSE}" />
-                                    </StackPanel>
-                                </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="Средняя ошибка:" />
+                                <Label Content="{Binding NeuralNetVM.error}" />
+                            </StackPanel>
 
-                                <StackPanel Orientation="Horizontal">
-                                    <DataGrid x:Name="TrainResultDataGrid"
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="MAPE:" />
+                                <Label Content="{Binding NeuralNetVM.MAPE}" />
+                            </StackPanel>
+
+                            <StackPanel Orientation="Vertical">
+                                <Label Content="Тренировочные данные" />
+                                <DataGrid x:Name="TrainResultDataGrid"
                                           HorizontalAlignment="Left"
-                                          ItemsSource="{Binding NeuralNetVM.TrainFullResults}"
+                                          ItemsSource="{Binding NeuralNetVM.TrainResult}"
                                           Width="auto"
                                           CanUserResizeColumns="False"
                                           CanUserReorderColumns="False"
                                           CanUserAddRows="False"
-                                          Margin="5"
-                                          MaxHeight="400">
-                                        <DataGrid.ColumnHeaderStyle>
-                                            <Style TargetType="{x:Type DataGridColumnHeader}">
-                                                <Setter Property="MinWidth"
-                                                    Value="50" />
-                                                <Setter Property="MaxWidth"
-                                                    Value="150" />
-                                            </Style>
-                                        </DataGrid.ColumnHeaderStyle>
-                                        <DataGrid.RowHeaderStyle>
-                                            <Style TargetType="{x:Type DataGridRowHeader}">
-                                                <Setter Property="Content"
+                                          Margin="10">
+                                    <DataGrid.ColumnHeaderStyle>
+                                        <Style TargetType="{x:Type DataGridColumnHeader}">
+                                            <Setter Property="Width"
+                                                    Value="200" />
+                                        </Style>
+                                    </DataGrid.ColumnHeaderStyle>
+                                    <DataGrid.RowHeaderStyle>
+                                        <Style TargetType="{x:Type DataGridRowHeader}">
+                                            <Setter Property="Content"
                                                     Value="{Binding Converter={StaticResource DataGridRowIndexConverter}, ConverterParameter=TrainResultDataGrid}" />
-                                                <Setter Property="MinWidth"
-                                                        Value="40" />
-                                                <Setter Property="MaxWidth"
-                                                        Value="150" />
-                                                <Setter Property="HorizontalAlignment"
+                                            <Setter Property="Width"
+                                                    Value="20" />
+                                            <Setter Property="HorizontalAlignment"
                                                     Value="Stretch" />
-                                            </Style>
-                                        </DataGrid.RowHeaderStyle>
-                                    </DataGrid>
+                                        </Style>
+                                    </DataGrid.RowHeaderStyle>
+                                </DataGrid>
+                            </StackPanel >
 
-                                    <lvc:CartesianChart Series="{Binding CrossPlotTrainSeriesCollection}"
-                                                    LegendLocation="Top"
-                                                    MinWidth="500"
-                                                    MinHeight="250"
-                                                    Margin="10,0">
-
-                                        <lvc:CartesianChart.AxisX>
-                                            <lvc:Axis Title="Предсказанные значения" 
-                                                      MinValue="0"/>
-                                        </lvc:CartesianChart.AxisX>
-
-                                        <lvc:CartesianChart.AxisY>
-                                            <lvc:Axis Title="Реальные значения"
-                                                      MinValue="0"/>
-                                        </lvc:CartesianChart.AxisY>
-
-                                    </lvc:CartesianChart>
-
-
-                                </StackPanel>
-                            </WrapPanel>
-
-                            <!-- Test results-->
-                            <WrapPanel Orientation="Vertical">
-                                <StackPanel Orientation="Vertical" 
-                                            Height="100">
-                                    <Label Content="Тестовые данные" />
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label Content="MAPE:" />
-                                        <Label Content="{Binding NeuralNetVM.TestMAPE}" />
-                                        <Label Content="%" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label Content="MAE:" />
-                                        <Label Content="{Binding NeuralNetVM.TestMAE}" />
-                                    </StackPanel>
-                                </StackPanel>
-
-                                <StackPanel Orientation="Horizontal">
-                                    <DataGrid x:Name="TestResultDataGrid"
+                            <StackPanel Orientation="Vertical">
+                                <Label Content="Тестовые данные" />
+                                <DataGrid x:Name="TestResultDataGrid"
                                           HorizontalAlignment="Left"
-                                          ItemsSource="{Binding NeuralNetVM.TestFullResults}"
+                                          ItemsSource="{Binding NeuralNetVM.TestResult}"
                                           Width="auto"
                                           CanUserResizeColumns="False"
                                           CanUserReorderColumns="False"
                                           CanUserAddRows="False"
-                                          Margin="5"
-                                          MaxHeight="400">
-                                        <DataGrid.ColumnHeaderStyle>
-                                            <Style TargetType="{x:Type DataGridColumnHeader}">
-                                                <Setter Property="MinWidth"
-                                                    Value="40" />
-                                                <Setter Property="MaxWidth"
-                                                        Value="150" />
-                                            </Style>
-                                        </DataGrid.ColumnHeaderStyle>
-                                        <DataGrid.RowHeaderStyle>
-                                            <Style TargetType="{x:Type DataGridRowHeader}">
-                                                <Setter Property="Content"
+                                          Margin="10">
+                                    <DataGrid.ColumnHeaderStyle>
+                                        <Style TargetType="{x:Type DataGridColumnHeader}">
+                                            <Setter Property="Width"
+                                                    Value="200" />
+                                        </Style>
+                                    </DataGrid.ColumnHeaderStyle>
+                                    <DataGrid.RowHeaderStyle>
+                                        <Style TargetType="{x:Type DataGridRowHeader}">
+                                            <Setter Property="Content"
                                                     Value="{Binding Converter={StaticResource DataGridRowIndexConverter}, ConverterParameter=TestResultDataGrid}" />
-                                                <Setter Property="MinWidth"
-                                                        Value="40" />
-                                                <Setter Property="MaxWidth"
-                                                        Value="150" />
-                                                <Setter Property="HorizontalAlignment"
+                                            <Setter Property="Width"
+                                                    Value="20" />
+                                            <Setter Property="HorizontalAlignment"
                                                     Value="Stretch" />
-                                            </Style>
-                                        </DataGrid.RowHeaderStyle>
-                                    </DataGrid>
-
-
-                                    <lvc:CartesianChart Series="{Binding CrossPlotTestSeriesCollection}"
-                                                    LegendLocation="Top"
-                                                    MinWidth="500"
-                                                    MinHeight="250"
-                                                    Margin="10,0">
-
-                                        <lvc:CartesianChart.AxisX>
-                                            <lvc:Axis Title="Предсказанные значения"
-                                                      MinValue="0"/>
-                                        </lvc:CartesianChart.AxisX>
-
-                                        <lvc:CartesianChart.AxisY>
-                                            <lvc:Axis Title="Реальные значения"
-                                                      MinValue="0"/>
-                                        </lvc:CartesianChart.AxisY>
-
-                                    </lvc:CartesianChart>
-                                </StackPanel>
-
-                                <ItemsControl ItemsSource="{Binding NeuralNetVM.ImportedDataHeaders}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Label Content="{Binding Path=.}"/>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <WrapPanel Orientation="Horizontal"/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                </ItemsControl>
-                            </WrapPanel>
+                                        </Style>
+                                    </DataGrid.RowHeaderStyle>
+                                </DataGrid>
+                            </StackPanel >
                         </WrapPanel>
-                        
                     </GroupBox>
                     <!--#endregion-->
 
@@ -338,41 +253,34 @@
                               Margin="10"
                               Visibility="{Binding IsNeuralNetPredictionResultsVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
 
-                        <WrapPanel Orientation="Horizontal">
-                            <WrapPanel Orientation="Vertical">
-                                <Label Content="Спрогнозированные данные" />
-                                <DataGrid x:Name="PredictionResultsDataGrid"
+                        <StackPanel Orientation="Vertical"
+                                    Margin="10">
+                            <Label Content="Спрогнозированные данные" />
+                            <DataGrid x:Name="PredictionResultsDataGrid"
                                       HorizontalAlignment="Left"
-                                      ItemsSource="{Binding NeuralNetVM.PredictionFullResults}"
+                                      ItemsSource="{Binding NeuralNetVM.PredictionResult}"
                                       Width="auto"
                                       CanUserResizeColumns="False"
                                       CanUserReorderColumns="False"
-                                      CanUserAddRows="False" 
-                                      Margin="5"
-                                      MaxHeight="400">
-                                    <DataGrid.ColumnHeaderStyle>
-                                        <Style TargetType="{x:Type DataGridColumnHeader}">
-                                            <Setter Property="MinWidth"
-                                                    Value="40" />
-                                            <Setter Property="MaxWidth"
-                                                    Value="150" />
-                                        </Style>
-                                    </DataGrid.ColumnHeaderStyle>
-                                    <DataGrid.RowHeaderStyle>
-                                        <Style TargetType="{x:Type DataGridRowHeader}">
-                                            <Setter Property="Content"
+                                      CanUserAddRows="False">
+                                <DataGrid.ColumnHeaderStyle>
+                                    <Style TargetType="{x:Type DataGridColumnHeader}">
+                                        <Setter Property="Width"
+                                                Value="200" />
+                                    </Style>
+                                </DataGrid.ColumnHeaderStyle>
+                                <DataGrid.RowHeaderStyle>
+                                    <Style TargetType="{x:Type DataGridRowHeader}">
+                                        <Setter Property="Content"
                                                 Value="{Binding Converter={StaticResource DataGridRowIndexConverter}, ConverterParameter=PredictionResultsDataGrid}" />
-                                            <Setter Property="MinWidth"
-                                                    Value="40" />
-                                            <Setter Property="MaxWidth"
-                                                    Value="150" />
-                                            <Setter Property="HorizontalAlignment"
+                                        <Setter Property="Width"
+                                                Value="20" />
+                                        <Setter Property="HorizontalAlignment"
                                                 Value="Stretch" />
-                                        </Style>
-                                    </DataGrid.RowHeaderStyle>
-                                </DataGrid>
-                            </WrapPanel >
-                        </WrapPanel >
+                                    </Style>
+                                </DataGrid.RowHeaderStyle>
+                            </DataGrid>
+                        </StackPanel >
                     </GroupBox>
                     <!--#endregion-->
 

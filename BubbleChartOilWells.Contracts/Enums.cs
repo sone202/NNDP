@@ -7,13 +7,11 @@
     {
         /// <summary>
         /// Transit, exploratory, liquidated
-        /// ТРАНЗ
         /// </summary>
         TrExpLiq = 1,
 
         /// <summary>
         /// Transit
-        /// ТРАНЗ
         /// </summary>
         Tr = 2,
 
@@ -24,13 +22,11 @@
 
         /// <summary>
         /// Extracting, liquidated
-        /// , ЛИКВ
         /// </summary>
         ExtLiq = 4,
 
         /// <summary>
         /// Transit, liquidated
-        /// ТРАНЗ, ЛИКВ
         /// </summary>
         TrLiq = 5,
 
@@ -81,7 +77,6 @@
 
         /// <summary>
         /// Injection, liquidated
-        /// , ЛИКВ
         /// </summary>
         InjLiq = 15,
 

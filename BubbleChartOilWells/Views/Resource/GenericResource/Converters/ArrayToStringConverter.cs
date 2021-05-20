@@ -7,6 +7,7 @@ using System.Linq;
 namespace BubbleChartOilWells.Views.Resource.GenericResource.Converters
 {
     [ValueConversion(typeof(int[]), typeof(string))]
+
     public class ArrayToStringConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

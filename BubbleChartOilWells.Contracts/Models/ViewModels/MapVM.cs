@@ -9,15 +9,13 @@ namespace BubbleChartOilWells.Contracts.Models.ViewModels
     {
         private bool isSelected;
 
-        public double cellWidth { get; set; }
-        public double cellHeight { get; set; }
         public string Name { get; set; }
         public double Width { get; set; }
         public double Height { get; set; }
-        public List<double> Z { get; set; }
+        public List<double> ZValues { get; set; }
         public bool IsSelected
         {
-            get => isSelected;
+            get => isSelected; 
             set
             {
                 isSelected = value;

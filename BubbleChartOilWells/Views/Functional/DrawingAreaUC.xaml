@@ -36,27 +36,27 @@
                         <ScaleTransform ScaleX="1"
                                         ScaleY="-1" />
                     </Canvas.LayoutTransform>
-                    <!-- Axis X line--><!--
+                    <!-- Axis X line-->
                     <Line X1="80"
                           Y1="50"
                           X2="3000"
                           Y2="50"
                           Stroke="Gray"
                           StrokeThickness="1" />
-                    --><!-- Axis Y line--><!--
+                    <!-- Axis Y line-->
                     <Line X1="80"
                           Y1="50"
                           X2="80"
                           Y2="2000"
                           Stroke="Gray"
-                          StrokeThickness="1" />-->
+                          StrokeThickness="1" />
                 </Canvas>
 
                 <!-- Axis X labels-->
-                <ItemsControl x:Name="XAxisLabelsItemsControl"
+                <ItemsControl x:Name="OxValuesItemsControl"
                               Grid.Column="1"
                               Grid.Row="1"
-                              Margin="-25,20,-10,0">
+                              Margin="-25,20,0,0">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Label Content="{Binding Path=., Converter={StaticResource NumberToAxisValueConverter}}"
@@ -72,10 +72,10 @@
                 </ItemsControl>
 
                 <!-- Axis Y labels-->
-                <ItemsControl x:Name="YAxisLabelsItemsControl"
+                <ItemsControl x:Name="OyValuesItemsControl"
                               Grid.Column="0"
                               Grid.Row="0"
-                              Margin="0,-10,20,-25">
+                              Margin="0,0,20,-25">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Label Content="{Binding Path=., Converter={StaticResource NumberToAxisValueConverter}}"
@@ -116,18 +116,16 @@
 
                 <!-- Bubble chart Canvas-->
                 <ItemsControl x:Name="DrawItemsControl"
-                              BorderBrush="{StaticResource BorderBrush}"
-                              BorderThickness="1"
                               Grid.Column="1"
                               Grid.Row="0"
-                              ItemsSource="{Binding OilWellVMs, Converter={StaticResource OilWellVMsToCanvasConverter}}">
+                              ItemsSource="{Binding OilWellVMs, Converter={StaticResource ToCanvasConverter}}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Canvas Background="Transparent"
                                     ClipToBounds="True"
-                                    MouseDown="CanvasMouseDown"
-                                    MouseMove="CanvasMouseMove"
-                                    MouseWheel="CanvasMouseWheel">
+                                    MouseDown="Canvas_MouseDown"
+                                    MouseMove="Canvas_MouseMove"
+                                    MouseWheel="Canvas_MouseWheel">
                                 <Canvas.LayoutTransform>
                                     <ScaleTransform ScaleX="1"
                                                     ScaleY="-1" />

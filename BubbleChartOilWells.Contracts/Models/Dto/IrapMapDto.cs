@@ -4,9 +4,9 @@ namespace BubbleChartOilWells.Contracts.Models.Dto
 {
     public class IrapMapDto
     {
-        public double CellWidth { get; set; }
+        public double RectangleWidth { get; set; }
 
-        public double CellHeight { get; set; }
+        public double RectangleHeight { get; set; }
 
         public double MinX { get; set; }
 
@@ -17,7 +17,6 @@ namespace BubbleChartOilWells.Contracts.Models.Dto
         public double MaxY { get; set; }
 
         public double CountPerRow { get; set; }
-        public double CountPerColumn { get; set; }
 
         public List<double> ZValues { get; set; }
     }

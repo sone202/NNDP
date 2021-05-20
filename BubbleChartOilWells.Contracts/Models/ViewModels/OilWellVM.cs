@@ -57,6 +57,9 @@ namespace BubbleChartOilWells.Contracts.Models.ViewModels
         /// Объекты учета добычи
         /// </summary>
         public List<ObjectiveVM> Objectives { get; set; }
+        
+        //Если сосед- true
+        public bool isNeighbour { get; set; }
 
         // TODO: Need refactoring
         [JsonIgnore]
@@ -64,11 +67,10 @@ namespace BubbleChartOilWells.Contracts.Models.ViewModels
         [JsonIgnore]
         public Canvas OilWellView
         {
-            get => oilWellView;
-            set
+            get => oilWellView; set
             {
                 oilWellView = value;
-                OnPropertyChanged(nameof(OilWellView));
+                OnPropertyChanged(nameof(OilWellView));               
             }
         }
 
@@ -91,6 +93,8 @@ namespace BubbleChartOilWells.Contracts.Models.ViewModels
                 RenderTransform = new TranslateTransform(X, Y)
             };
         }
+
+        
         public void CreateOilWellProdView(int multiplierCoefficient)
         {
             var waterBrush = Brushes.Green;
@@ -320,6 +324,37 @@ namespace BubbleChartOilWells.Contracts.Models.ViewModels
         protected virtual void OnPropertyChanged(string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public void DrawNearHole()
+        {
+            var part = DrawCircle();
+
+            OilWellView = new Canvas
+            {
+                Children = {
+                    part,
+                           },
+                Background = Brushes.Red,
+                RenderTransform = new TranslateTransform(X, Y)
+            };
+
+        }
+
+        private Path DrawCircle()
+        {           
+            double radius = 300;
+            var circle = new Path
+                {
+            Data = new EllipseGeometry
+            {
+                RadiusX = radius,
+                RadiusY = radius
+                },
+            Fill = Brushes.Red,
+            StrokeThickness = 0
+            };
+            return circle;          
         }
     }
 }

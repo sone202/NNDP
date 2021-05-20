@@ -84,36 +84,21 @@
                               Header="Открыть последний"
                               IsEnabled="{Binding IsMenuEnabled}"
                               Template="{StaticResource VsMenuSub}" />
-
                     <Separator Template="{StaticResource VsMenuSep}" />
                     <MenuItem Command="{Binding ImportIrapMapAsyncCommand}"
                               Header="Импортировать карту в формате irap"
                               IsEnabled="{Binding IsMapImportEnabled}"
                               Template="{StaticResource VsMenuSub}" />
-
+                    <Separator Template="{StaticResource VsMenuSep}" />
                     <MenuItem Command="{Binding ImportUserMapAsyncCommand}"
                               Header="Импортировать пользовательскую карту"
                               IsEnabled="{Binding IsMapImportEnabled}"
                               Template="{StaticResource VsMenuSub}" />
-
                     <Separator Template="{StaticResource VsMenuSep}" />
                     <MenuItem Command="{Binding ImportUserMapContourAsyncCommand}"
                               Header="Импортировать контур"
                               IsEnabled="{Binding IsMapImportEnabled}"
                               Template="{StaticResource VsMenuSub}" />
-
-                    <Separator Template="{StaticResource VsMenuSep}" />
-                    <MenuItem x:Name="ExportOilWellMapValuesButton"
-                              x:FieldModifier="public"
-                              Click="ExportOilWellMapValuesButtonClick"
-                              Header="Экспорт значений сетки в Excel"
-                              Template="{StaticResource VsMenuSub}" />
-                    <MenuItem x:Name="SaveMapButton"
-                              x:FieldModifier="public"
-                              Click="SaveMapButtonClick"
-                              Header="Сохранить карту в формате irap"
-                              Template="{StaticResource VsMenuSub}" />
-
                 </MenuItem>
                 <MenuItem x:Name="Tools"
                           Header="_Справка"
@@ -130,6 +115,23 @@
                               IsEnabled="{Binding}"
                               Template="{StaticResource VsMenuSub}" />
                 </MenuItem>
+                <MenuItem x:Name="Menu"
+                    Header="Настройки"
+                    Template="{StaticResource VsMenuTop}">
+                    <MenuItem Command="{Binding}"
+                              x:Name="SearchNear"
+                              Header="Определение соседей"
+                              Template="{StaticResource VsMenuSub}"
+                              Click="SearchNearHole_new"/>
+                    <MenuItem Command="{Binding}"
+                              Header="Изменить радиус"
+                              Template="{StaticResource VsMenuSub}"/>
+                </MenuItem>
+                          
+                
+                
+
+
             </Menu>
             <!--#endregion-->
 
@@ -189,13 +191,16 @@
             </Grid>
             <!--#endregion-->
 
+            <!--region Main content -->
             <Grid Grid.Column="0"
                   Grid.ColumnSpan="3"
                   Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="10" />
-                    <ColumnDefinition Width="auto" />
-                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="83.5" />
+                    <ColumnDefinition Width="49.5"/>
+                    <ColumnDefinition Width="39"/>
+                    <ColumnDefinition Width="55"/>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="auto" />
                     <ColumnDefinition Width="10" />
@@ -208,19 +213,17 @@
                 </Grid.RowDefinitions>
 
                 <!-- #region Drawing area -->
-                <Border Grid.Column="3"
+                <Border Grid.Column="5"
                         Grid.Row="1"
-                        Background="White"
                         Margin="0,0,2,0"
                         Style="{StaticResource ControlBorder}"
                         Visibility="{Binding IsChecked, ElementName=BubbleChartRadioButton, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <controls:DrawingAreaUC x:Name="DrawingAreaUserControl"
-                                            Margin="0,10,10,0" />
+                    <controls:DrawingAreaUC x:Name="DrawingAreaUserControl" />
                 </Border>
                 <!--#endregion-->
 
                 <!--#region Calculations-->
-                <Border Grid.Column="3"
+                <Border Grid.Column="5"
                         Grid.Row="1"
                         Background="White"
                         Margin="0,0,2,0"
@@ -231,7 +234,7 @@
                 <!--#endregion-->
 
                 <!--#region NeuralNet-->
-                <Border  Grid.Column="3"
+                <Border  Grid.Column="5"
                          Grid.Row="1"
                          Background="White"
                          Margin="0,0,2,0"
@@ -242,14 +245,12 @@
                 <!--#endregion-->
 
                 <!--#region ToolBar-->
-                <Border  Grid.Column="4"
+                <Border  Grid.Column="6"
                          Grid.Row="1"
-                         Style="{StaticResource ControlBorder}"
-                         Margin="0,0,0,0">
+                         Style="{StaticResource ControlBorder}">
                     <ToolBarTray Background="{StaticResource ToolBarBackgroundBrush}"
                                  Orientation="Vertical">
                         <ToolBar Background="Transparent">
-
                             <CheckBox x:Name="NavigationCheckBox"
                                       IsChecked="True">
                                 <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/tree.png"
@@ -260,7 +261,6 @@
                                 <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/settings.png"
                                        Height="22" />
                             </CheckBox>
-
                             <Separator Background="{StaticResource ToolBarSeparatorBrush}" />
                             <RadioButton x:Name="CalculateRadioButton"
                                          GroupName="UserControls">
@@ -277,41 +277,31 @@
                                          IsChecked="True">
                                 <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/bubble_chart.png"
                                        Height="22" />
-
                             </RadioButton>
-
-                            <!--<Separator Background="{StaticResource ToolBarSeparatorBrush}" />
+                            <Separator Background="{StaticResource ToolBarSeparatorBrush}" />
                             <Button x:Name="ExportOilWellMapValuesButton"
                                     x:FieldModifier="public"
                                     Click="ExportOilWellMapValuesButtonClick">
                                 <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/file_export.png"
                                        Height="22" />
                             </Button>
-                            <Button x:Name="SaveMapButton"
-                                    x:FieldModifier="public"
-                                    Click="SaveMapButtonClick">
-                                <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/save_map_as_irap.png"
-                                       Height="22" />
-                            </Button>-->
-
                             <Separator Background="{StaticResource ToolBarSeparatorBrush}" />
                             <CheckBox x:Name="BubbleEnableCheckBox"
-                                      Click="OilWellMapChecked"
-                                      IsChecked="{Binding IsBubblesChecked}"
-                                      IsEnabled="False">
+                                      Click="OilWellMap_Checked"
+                                      IsChecked="{Binding IsBubblesEnabled}"
+                                      IsEnabled="False"
+                                      Margin="2,2,2,5">
                                 <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/pie_chart.png"
                                        Height="22" />
                             </CheckBox>
-
                         </ToolBar>
                     </ToolBarTray>
                 </Border>
                 <!--#endregion-->
 
-                <!--#region ToolsWindows-->
+                <!--#region Left Windows Tools-->
                 <Grid Grid.Column="1"
-                      Grid.Row="1"
-                      Grid.ColumnSpan="2">
+                      Grid.Row="1" Grid.ColumnSpan="4">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
                         <RowDefinition Height="*" />
@@ -336,22 +326,22 @@
                             </TreeView.Resources>
                             <TreeViewItem Header="Скважины" />
                             <TreeViewItem Header="Пузырьковые карты"
-                                          IsExpanded="{Binding OilWellVMs, Converter={StaticResource ItemsCountToBooleanConverter}}">
+                                          IsExpanded="True">
                                 <RadioButton x:Name="ProdMapRadioButton"
-                                             Checked="OilWellMapChecked"
-                                             Visibility="Collapsed"
+                                             Checked="OilWellMap_Checked"
+                                             IsEnabled="False"
                                              GroupName="OilWellMap"
-                                             IsChecked="{Binding IsProdMapChecked}">Карта текущих отборов</RadioButton>
+                                             IsChecked="{Binding IsProdMapEnabled}">Карта текущих отборов</RadioButton>
                                 <RadioButton x:Name="ProdSumMapRadioButton"
-                                             Checked="OilWellMapChecked"
+                                             Checked="OilWellMap_Checked"
                                              GroupName="OilWellMap"
-                                             Visibility="Collapsed"
-                                             IsChecked="{Binding IsProdSumMapChecked}">Карта накопленных отборов</RadioButton>
+                                             IsEnabled="False"
+                                             IsChecked="{Binding IsProdSumMapEnabled}">Карта накопленных отборов</RadioButton>
                             </TreeViewItem>
                             <TreeViewItem Header="Карты"
-                                          IsExpanded="{Binding MapVMs, Converter={StaticResource ItemsCountToBooleanConverter}}">
+                                          IsExpanded="True">
                                 <ItemsControl ItemsSource="{Binding MapVMs}"
-                                              SizeChanged="MapVMsItemsControlSizeChanged">
+                                              SizeChanged="MapVMsItemsControl_SizeChanged">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <StackPanel />
@@ -362,7 +352,7 @@
                                             <DockPanel LastChildFill="True">
 
                                                 <RadioButton MouseDoubleClick="MoveTo"
-                                                             Checked="MapChecked"
+                                                             Checked="Map_Checked"
                                                              GroupName="MapVms"
                                                              IsChecked="{Binding IsSelected}"
                                                              VerticalAlignment="Center" />
@@ -398,6 +388,7 @@
                 <!--#endregion-->
 
             </Grid>
+            <!--#endregion-->
 
             <!--#region Status Bar-->
             <StatusBar Grid.Column="0"
@@ -422,7 +413,7 @@
                 <StatusBarItem x:Name="LoadingStatusBarItem"
                                Background="{StaticResource StatusBarLoadingBrush}"
                                Padding="0"
-                               Visibility="{Binding IsReady, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=false}">
+                               Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <StackPanel Orientation="Horizontal"
                                 Margin="5,0">
                         <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/loading.png"
@@ -433,7 +424,7 @@
                                                  CenterY="7" />
                             </Image.RenderTransform>
                             <Image.Triggers>
-                                <EventTrigger RoutedEvent="Image.Loaded">
+                                <EventTrigger RoutedEvent="Loaded">
                                     <BeginStoryboard>
                                         <Storyboard RepeatBehavior="Forever">
                                             <DoubleAnimation Storyboard.TargetName="rotate"
