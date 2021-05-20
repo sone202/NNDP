@@ -135,6 +135,16 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                     }
                 }
 
+                // оставить данные по ежемесячной добыче только на последнюю дату
+                foreach (var oilWell in oilWells)
+                {
+                   // TODO: добавить информацию по всем датам
+                   foreach (var objective in oilWell.Objectives)
+                   {
+                       //objective.MonthlyObjectiveProductions = 
+                   }
+                }
+                
                 var oilWellViewModels = Mapper.Map<List<OilWell>, List<OilWellVM>>(oilWells);
 
                 return ResultResponse<List<OilWellVM>>.GetSuccessResponse(oilWellViewModels);

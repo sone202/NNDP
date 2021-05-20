@@ -175,14 +175,7 @@ namespace BubbleChartOilWells.Views.Functional
         private Point mouseUpPoint;
         private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
-           
             mouseDownPoint = e.GetPosition(sender as UIElement);
-            //int n = (DataContext as MainVM).OilWellVMs.Count();
-            int n = 0;
-            List<OilWellVM> temp = new List<OilWellVM>();
-            
-
-
 
             // TODO: delete
             if (Keyboard.IsKeyDown(Key.LeftCtrl))
@@ -194,27 +187,22 @@ namespace BubbleChartOilWells.Views.Functional
                 parseJson = parseJson.Replace(":", ": ");
 
                 (DataContext as MainVM).SelectedOilWell = parseJson.Split(',').ToList();
-                var currentPoint = OilWellVM.SelectedOilWell;
-                //var monthlyObjectiveProductionDto = new List<MonthlyObjectiveProductionExcelDto>();
 
-                foreach (var nextPoint in (DataContext as MainVM).OilWellVMs)
+                if (OilWellVM.SelectedOilWell != null)
                 {
-                    if ((currentPoint.Region == nextPoint.Region)
-                        && (currentPoint.Area == nextPoint.Area)
-                        && (currentPoint.Field == nextPoint.Field)
-                        && (currentPoint.Name != nextPoint.Name))
-                    {
-                        if (isPointInCircle(currentPoint.X,currentPoint.Y, nextPoint.X,nextPoint.Y))
-                        {
+                    (DataContext as MainVM).OilWellVMs.ToList().ForEach(x => x.IsNeighbour = false);
+                        
+                    var selectedOilWell = OilWellVM.SelectedOilWell;
+                    //var monthlyObjectiveProductionDto = new List<MonthlyObjectiveProductionExcelDto>();
 
-                            //nextPoint.Neighbour = true;
-                            n++;
-                            temp.Add(nextPoint);
+                    foreach (var oilWell in (DataContext as MainVM).OilWellVMs)
+                    {
+                        if (oilWell != selectedOilWell)
+                        {
+                            oilWell.SelectIfInRadius(selectedOilWell, 500);
                         }
                     }
                 }
-                
-                SelectNearHole(temp);
             }
         }
 
@@ -321,40 +309,6 @@ namespace BubbleChartOilWells.Views.Functional
                     SetMap();
             }
         }
-
-        static public bool isPointInCircle(double centerX, double centerY, double x, double y, double R = 500)
-        {
-            if (isInRectangle(centerX, centerY, R, x, y))
-            {
-                double dx = centerX - x;
-                double dy = centerY - y;
-                dx *= dx;
-                dy *= dy;
-                double distanceSquared = dx + dy;
-                double radiusSquared = R * R;
-                return distanceSquared <= radiusSquared;
-            }
-            return false;
-        }
-        static public bool isInRectangle(double centerX, double centerY, double x, double y, double R = 500)
-        {
-            return (x >= centerX - R && x <= centerX + R && y >= centerY - R && y <= centerY + R);
-        }
-        public void SelectNearHole(List<OilWellVM> temp) 
-        {
-            foreach (var point in (DataContext as MainVM).OilWellVMs)
-            {
-                point.isNeighbour = false;
-            }
-            foreach (var point in temp)
-            {
-                point.isNeighbour = true;
-                point.DrawNearHole();               
-            }
-            
-                    
-        }
-                    
     }
 }
     

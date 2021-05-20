@@ -424,7 +424,7 @@
                                                  CenterY="7" />
                             </Image.RenderTransform>
                             <Image.Triggers>
-                                <EventTrigger RoutedEvent="Loaded">
+                                <EventTrigger RoutedEvent="Image.Loaded">
                                     <BeginStoryboard>
                                         <Storyboard RepeatBehavior="Forever">
                                             <DoubleAnimation Storyboard.TargetName="rotate"

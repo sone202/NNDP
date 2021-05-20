@@ -57,25 +57,39 @@ namespace BubbleChartOilWells.Contracts.Models.ViewModels
         /// Объекты учета добычи
         /// </summary>
         public List<ObjectiveVM> Objectives { get; set; }
-        
-        //Если сосед- true
-        public bool isNeighbour { get; set; }
 
-        // TODO: Need refactoring
-        [JsonIgnore]
-        private Canvas oilWellView;
-        [JsonIgnore]
-        public Canvas OilWellView
+        //Если сосед- true
+        private bool isNeighbour = false;
+        public bool IsNeighbour
         {
-            get => oilWellView; set
+            get => isNeighbour;
+            set
             {
-                oilWellView = value;
-                OnPropertyChanged(nameof(OilWellView));               
+                if (value == false && isNeighbour != false)
+                {
+                    OilWellView.Children.RemoveAt(0);
+                }
+                isNeighbour = value;
+                isNeighbour = value;
+                OnPropertyChanged(nameof(IsNeighbour));
             }
         }
 
+        // TODO: Need refactoring
+        [JsonIgnore] private Canvas oilWellView;
+
         [JsonIgnore]
-        public Image StatusImage { get; set; }
+        public Canvas OilWellView
+        {
+            get => oilWellView;
+            set
+            {
+                oilWellView = value;
+                OnPropertyChanged(nameof(OilWellView));
+            }
+        }
+
+        [JsonIgnore] public Image StatusImage { get; set; }
 
         public void CreateOilWellView()
         {
@@ -86,15 +100,17 @@ namespace BubbleChartOilWells.Contracts.Models.ViewModels
 
             OilWellView = new Canvas
             {
-                Children = {
+                Children =
+                {
                     StatusImage,
-                    textBlock },
+                    textBlock
+                },
                 Background = Brushes.Transparent,
                 RenderTransform = new TranslateTransform(X, Y)
             };
         }
 
-        
+
         public void CreateOilWellProdView(int multiplierCoefficient)
         {
             var waterBrush = Brushes.Green;
@@ -115,11 +131,13 @@ namespace BubbleChartOilWells.Contracts.Models.ViewModels
             StatusImage.MouseDown += new System.Windows.Input.MouseButtonEventHandler(OnClick);
             OilWellView = new Canvas
             {
-                Children = {
+                Children =
+                {
                     circlePath,
                     sectorPath,
                     StatusImage,
-                    textBlock },
+                    textBlock
+                },
                 Background = Brushes.Transparent,
                 RenderTransform = new TranslateTransform(X, Y)
             };
@@ -145,20 +163,24 @@ namespace BubbleChartOilWells.Contracts.Models.ViewModels
             StatusImage.MouseDown += new System.Windows.Input.MouseButtonEventHandler(OnClick);
             OilWellView = new Canvas
             {
-                Children = {
+                Children =
+                {
                     circlePath,
                     sectorPath,
                     StatusImage,
-                    textBlock },
+                    textBlock
+                },
                 Background = Brushes.Transparent,
                 RenderTransform = new TranslateTransform(X, Y)
             };
         }
+
         private void OnClick(object sender, RoutedEventArgs e)
         {
             SelectedOilWell = this;
             OnPropertyChanged(nameof(SelectedOilWell));
         }
+
         private Path GetCircle(double radius, double radians, Brush waterBrush, Brush oilBrush)
         {
             var circle = new Path
@@ -187,14 +209,17 @@ namespace BubbleChartOilWells.Contracts.Models.ViewModels
                             StartPoint = new Point(0, 0),
                             Segments = new PathSegmentCollection
                             {
-                                new LineSegment(new Point(radius, 0),false),
+                                new LineSegment(new Point(radius, 0), false),
                                 new ArcSegment
                                 {
                                     Point = new Point(Math.Cos(radians) * radius, Math.Sin(radians) * radius),
                                     Size = new Size(radius, radius),
-                                    SweepDirection = radians > Math.PI ? SweepDirection.Counterclockwise : SweepDirection.Clockwise
+                                    SweepDirection = radians > Math.PI
+                                        ? SweepDirection.Counterclockwise
+                                        : SweepDirection.Clockwise
                                 },
-                                new LineSegment(new Point(Math.Cos(radians) * radius, Math.Sin(radians) * radius), false),
+                                new LineSegment(new Point(Math.Cos(radians) * radius, Math.Sin(radians) * radius),
+                                    false),
                             }
                         }
                     }
@@ -288,7 +313,8 @@ namespace BubbleChartOilWells.Contracts.Models.ViewModels
                     break;
             }
 
-            var imageSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(bitmapImage.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            var imageSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(bitmapImage.GetHbitmap(),
+                IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
 
             var statusImage = new Image
             {
@@ -312,49 +338,38 @@ namespace BubbleChartOilWells.Contracts.Models.ViewModels
                 Text = Name,
                 FontSize = radius == 0 ? 20 : radius / 5,
                 RenderTransform = new TranslateTransform(radius == 0 ? 5 : (radius / 8),
-                                                         radius == 0 ? 5 : (radius / 8)),
+                    radius == 0 ? 5 : (radius / 8)),
                 LayoutTransform = new MatrixTransform(1, 0, 0, -1, 0, 0)
             };
             return name;
         }
 
-
-
         public event PropertyChangedEventHandler PropertyChanged;
+
         protected virtual void OnPropertyChanged(string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public void DrawNearHole()
+        public void SelectIfInRadius(OilWellVM oilWellVm, double R)
         {
-            var part = DrawCircle();
-
-            OilWellView = new Canvas
+            if (X >= oilWellVm.X - R && X <= oilWellVm.X + R && Y >= oilWellVm.Y - R && Y <= oilWellVm.Y + R)
             {
-                Children = {
-                    part,
-                           },
-                Background = Brushes.Red,
-                RenderTransform = new TranslateTransform(X, Y)
-            };
+                IsNeighbour = true;
 
-        }
-
-        private Path DrawCircle()
-        {           
-            double radius = 300;
-            var circle = new Path
+                double radius = 30;
+                OilWellView.Children.Insert(0, new Path
                 {
-            Data = new EllipseGeometry
-            {
-                RadiusX = radius,
-                RadiusY = radius
-                },
-            Fill = Brushes.Red,
-            StrokeThickness = 0
-            };
-            return circle;          
+                    Data = new EllipseGeometry
+                    {
+                        RadiusX = radius,
+                        RadiusY = radius
+                    },
+                    Fill = Brushes.Transparent,
+                    Stroke = Brushes.Red,
+                    StrokeThickness = 2
+                });
+            }
         }
     }
 }

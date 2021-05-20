@@ -22,6 +22,7 @@
                     <RowDefinition Height="*" />
                     <RowDefinition x:Name="BottomRow"
                                    Height="50" />
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <!-- Layer 1 Canvas-->
@@ -139,6 +140,31 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
+                
+                
+                <lvc:CartesianChart Series="{Binding SwSeriesCollection}"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="3"
+                                    Grid.Row="2"
+                                    LegendLocation="Right"
+                                    MinWidth="500"
+                                    MinHeight="250"
+                                    Margin="10,10,10,0">
+
+                    <lvc:CartesianChart.AxisX>
+                        <lvc:Axis Title="Водонасыщенность"
+                                  Labels="{Binding SwLabels}" />
+                    </lvc:CartesianChart.AxisX>
+
+                    <lvc:CartesianChart.AxisY>
+                        <lvc:Axis Title="Относительная проницаемость"
+                                  MinValue="0"
+                                  MaxValue="1" />
+
+                    </lvc:CartesianChart.AxisY>
+
+                </lvc:CartesianChart>
+
             </Grid>
         </UserControl>
     </Grid>

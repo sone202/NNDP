@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using System.Windows.Documents;
+using Newtonsoft.Json;
 
 namespace BubbleChartOilWells.Contracts.Models.ViewModels
 {
@@ -22,5 +24,10 @@ namespace BubbleChartOilWells.Contracts.Models.ViewModels
         /// Ежемесячная добыча объекта учета добычи
         /// </summary>
         public MonthlyObjectiveProductionVM MonthlyObjectiveProduction { get; set; }
+
+        /// <summary>
+        /// Добыча по объекту за все время
+        /// </summary>
+        public List<MonthlyObjectiveProductionVM> MonthlyObjectiveProductions { get; set; }
     }
 }
