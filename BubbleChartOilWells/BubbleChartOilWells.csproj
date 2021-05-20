@@ -151,6 +151,9 @@
     <Compile Include="Views\Functional\DrawingAreaUC.xaml.cs">
       <DependentUpon>DrawingAreaUC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Functional\ExitConfirmationWindow.xaml.cs">
+      <DependentUpon>ExitConfirmationWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Functional\ExportOilMapValuesWindow.xaml.cs">
       <DependentUpon>ExportOilMapValuesWindow.xaml</DependentUpon>
     </Compile>
@@ -175,6 +178,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Functional\ExitConfirmationWindow.xaml" />
     <Page Include="Views\Functional\ExportOilMapValuesWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -315,6 +319,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Views\Resource\GenericResource\Icons\save_map_as_irap.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\Resource\GenericResource\Icons\danger.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

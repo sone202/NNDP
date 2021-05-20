@@ -12,16 +12,15 @@ extended_neuralnet <- function(filepath,
                                seed)
 {
   
-  Sys.setlocale("LC_ALL", ".1251")
   
   # импорт данных из csv-файла
-  imported_data <- read.csv(filepath, sep = ";", header = TRUE, fileEncoding = "Windows-1251")
+  imported_data <- read.csv(filepath, sep = ";", header = TRUE, fileEncoding = "UTF-8")
   imported_data <- as.data.frame(imported_data)
   
-  for(i in 1:ncol(imported_data))
-  {
-    imported_data[,i] = iconv(imported_data[,i], from = "Windows-1251", to="UTF-8")
-  }
+  # for(i in 1:ncol(imported_data))
+  # {
+  #   imported_data[,i] = iconv(imported_data[,i], from = "Windows-1251", to="UTF-8")
+  # }
   
   # копия данных
   full_data <- imported_data

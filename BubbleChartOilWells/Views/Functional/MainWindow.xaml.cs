@@ -47,17 +47,13 @@ namespace BubbleChartOilWells
 
         private void ExportOilWellMapValuesButtonClick(object sender, RoutedEventArgs e)
         {
-            ExportOilMapValuesWindow exportOilMapValuesWindow = new ExportOilMapValuesWindow(DataContext);
-            exportOilMapValuesWindow.Show();
-            MainWindowCloseButton.IsEnabled = false;
-            ExportOilWellMapValuesButton.IsEnabled = false;
+            ExportOilMapValuesWindow exportOilMapValuesWindow = new ExportOilMapValuesWindow(DataContext, this);
+            exportOilMapValuesWindow.ShowDialog();
         }
         private void SaveMapButtonClick(object sender, RoutedEventArgs e)
         {
-            SaveMapWindow saveMapWindow = new SaveMapWindow(DataContext);
-            saveMapWindow.Show();
-            MainWindowCloseButton.IsEnabled = false;
-            SaveMapButton.IsEnabled = false;
+            SaveMapWindow saveMapWindow = new SaveMapWindow(DataContext, this);
+            saveMapWindow.ShowDialog();
         }
 
         #region mininmize / maximize / close buttons
@@ -74,19 +70,13 @@ namespace BubbleChartOilWells
                 SystemCommands.RestoreWindow(this);
             }
         }
-        private void RadiusInput_method(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        private void CommandBinding_Executed_Close(object sender, ExecutedRoutedEventArgs e)
         {
-            e.Handled = IstextNumeric(e.Text);
+            ExitConfirmationWindow exitConfirmationWindow = new ExitConfirmationWindow(DataContext, this);
+            exitConfirmationWindow.ShowDialog();
+
+            //SystemCommands.CloseWindow(this);
         }
-        private static bool IstextNumeric(string str)
-        {
-            System.Text.RegularExpressions.Regex reg = new System.Text.RegularExpressions.Regex("[^0-9]");
-            return reg.IsMatch(str);
-        }
-
-
-
-        private void CommandBinding_Executed_Close(object sender, ExecutedRoutedEventArgs e) => SystemCommands.CloseWindow(this);
         #endregion
     }
 }

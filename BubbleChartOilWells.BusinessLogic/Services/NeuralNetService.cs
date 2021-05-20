@@ -51,7 +51,7 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                 nnVM.ImportedDataHeaders = ConvertImportedDataHeaders(nnVM.TrainingDataFileName);
 
                 engine.Evaluate(
-                    $@"Sys.setlocale(""LC_ALL"", "".1251"")
+                    $@"
                     results <- extended_neuralnet(""{nnVM.TrainingDataFileName.Replace(@"\", @"/")}"",
                                                         0.8,
                                                         formula = {CreateNeuralNetFormula(nnVM.ImportedDataHeaders.Count, SKIP_COLUMNS_COUNT)},
@@ -221,7 +221,8 @@ namespace BubbleChartOilWells.BusinessLogic.Services
         private List<string> ConvertImportedDataHeaders(string fileName, List<string> targetHeaders = null)
         {
             var headers = new List<string>();
-            using (var stream = new StreamReader(fileName, System.Text.Encoding.GetEncoding("Windows-1251")))
+            //using (var stream = new StreamReader(fileName, System.Text.Encoding.GetEncoding("Windows-1251")))
+            using (var stream = new StreamReader(fileName))
             {
                 var line = stream.ReadLine();
                 headers = line.Split(';').ToList();
@@ -238,8 +239,10 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                 }
             }
 
-            var lines = File.ReadAllLines(fileName, System.Text.Encoding.GetEncoding("Windows-1251")).ToList();
-            using (var stream = new StreamWriter(fileName, false, System.Text.Encoding.GetEncoding("Windows-1251")))
+            //var lines = File.ReadAllLines(fileName, System.Text.Encoding.GetEncoding("Windows-1251")).ToList();
+            //using (var stream = new StreamWriter(fileName, false, System.Text.Encoding.GetEncoding("Windows-1251")))
+            var lines = File.ReadAllLines(fileName).ToList();
+            using (var stream = new StreamWriter(fileName, false))
             {
                 for (int i = 0; i < lines.Count; i++)
                 {

@@ -41,7 +41,7 @@ namespace BubbleChartOilWells.BusinessLogic.Services
             using (var writer = new StreamWriter(filepath))
             {
                 // header
-                writer.WriteLine($@"-996 {mapVM.BitmapSource.PixelHeight.ToString(numberFormatInfo)} {mapVM.cellWidth.ToString(numberFormatInfo)} {mapVM.cellHeight.ToString(numberFormatInfo)}");
+                writer.WriteLine($@"-996 {mapVM.BitmapSource.PixelHeight.ToString(numberFormatInfo)} {mapVM.CellWidth.ToString(numberFormatInfo)} {mapVM.CellHeight.ToString(numberFormatInfo)}");
                 writer.Write($@"{mapVM.LeftBottomCoordinate.X.ToString(numberFormatInfo)} {(mapVM.LeftBottomCoordinate.X + mapVM.Width).ToString(numberFormatInfo)} ");
                 writer.WriteLine($@"{mapVM.LeftBottomCoordinate.Y.ToString(numberFormatInfo)} {(mapVM.LeftBottomCoordinate.Y + mapVM.Height).ToString(numberFormatInfo)}");
                 writer.WriteLine($@"{mapVM.BitmapSource.PixelWidth.ToString(numberFormatInfo)} 0.0 {(mapVM.LeftBottomCoordinate.X).ToString(numberFormatInfo)} {mapVM.LeftBottomCoordinate.Y.ToString(numberFormatInfo)}");

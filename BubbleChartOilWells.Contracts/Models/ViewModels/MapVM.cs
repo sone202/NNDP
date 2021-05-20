@@ -9,8 +9,8 @@ namespace BubbleChartOilWells.Contracts.Models.ViewModels
     {
         private bool isSelected;
 
-        public double cellWidth { get; set; }
-        public double cellHeight { get; set; }
+        public double CellWidth { get; set; }
+        public double CellHeight { get; set; }
         public string Name { get; set; }
         public double Width { get; set; }
         public double Height { get; set; }
@@ -28,6 +28,7 @@ namespace BubbleChartOilWells.Contracts.Models.ViewModels
         public Point LeftBottomCoordinate { get; set; }
         public BitmapSource BitmapSource { get; set; }
 
+        public string Objective { get; set; }
 
         // TODO: refactor
         public event PropertyChangedEventHandler PropertyChanged;

@@ -119,7 +119,7 @@
                                               SelectedValue="{Binding DebitGainVM.KH}"
                                               VerticalAlignment="Top"
                                               Width="150"
-                                              ToolTip="TODO" />
+                                              ToolTip="Проводимость, мДм" />
                                 </StackPanel>
 
                                 <StackPanel Margin="0,0,10,0"
@@ -178,7 +178,7 @@
                                               SelectedValue="{Binding DebitGainVM.Sw}"
                                               VerticalAlignment="Top"
                                               Width="100"
-                                              ToolTip="TODO" />
+                                              ToolTip="Водонасыщенность, Д.ед." />
                                 </StackPanel>
 
                                 <StackPanel>

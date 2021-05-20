@@ -12,6 +12,7 @@
         MaxWidth="600"
         WindowStyle="None"
         AllowsTransparency="True"
+        WindowStartupLocation="CenterOwner"
         Background="{StaticResource MainBackgroundBrush}">
 
     <Window.CommandBindings>

@@ -78,11 +78,11 @@
                           Template="{StaticResource VsMenuTop}">
                     <MenuItem Command="{Binding ImportOilWellsAsyncCommand}"
                               Header="Импортировать Excel"
-                              IsEnabled="{Binding IsMenuEnabled}"
+                              IsEnabled="{Binding IsExcelImportEnabled}"
                               Template="{StaticResource VsMenuSub}" />
                     <MenuItem Command="{Binding GetOilWellsAsyncCommand}"
                               Header="Открыть последний"
-                              IsEnabled="{Binding IsMenuEnabled}"
+                              IsEnabled="{Binding IsExcelImportEnabled}"
                               Template="{StaticResource VsMenuSub}" />
 
                     <Separator Template="{StaticResource VsMenuSep}" />
@@ -391,7 +391,7 @@
                             Visibility="{Binding IsChecked, ElementName=SettingsCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <ListView Background="White"
                                   BorderThickness="0"
-                                  ItemsSource="{Binding SelectedOilWell}">
+                                  ItemsSource="{Binding SelectedOilWellPropertiesValues}">
                         </ListView>
                     </Border>
                 </Grid>
@@ -428,7 +428,7 @@
                         <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/loading.png"
                                Height="14">
                             <Image.RenderTransform>
-                                <RotateTransform x:Name="rotate"
+                                <RotateTransform x:Name="RotationIcon"
                                                  CenterX="7"
                                                  CenterY="7" />
                             </Image.RenderTransform>
@@ -436,16 +436,34 @@
                                 <EventTrigger RoutedEvent="Image.Loaded">
                                     <BeginStoryboard>
                                         <Storyboard RepeatBehavior="Forever">
-                                            <DoubleAnimation Storyboard.TargetName="rotate"
+                                            <DoubleAnimation Storyboard.TargetName="RotationIcon"
                                                              Storyboard.TargetProperty="Angle"
                                                              By="360"
                                                              Duration="0:0:1" />
+
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LoadingLabel"
+                                                                           Storyboard.TargetProperty="Content"
+                                                                           Duration="00:00:01.6"
+                                                                           RepeatBehavior="Forever">
+                                                <DiscreteObjectKeyFrame KeyTime="00:00:00.0"
+                                                                        Value="Loading" />
+                                                <DiscreteObjectKeyFrame KeyTime="00:00:00.4"
+                                                                        Value="Loading." />
+                                                <DiscreteObjectKeyFrame KeyTime="00:00:00.8"
+                                                                        Value="Loading.." />
+                                                <DiscreteObjectKeyFrame KeyTime="00:00:01.2"
+                                                                        Value="Loading..." />
+                                            </ObjectAnimationUsingKeyFrames>
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </EventTrigger>
                             </Image.Triggers>
                         </Image>
-                        <Label Content="Loading"
+                        <Label x:Name="LoadingLabel"
                                Foreground="White" />
                     </StackPanel>
                 </StatusBarItem>

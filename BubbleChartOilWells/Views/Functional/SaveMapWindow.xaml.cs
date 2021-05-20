@@ -19,24 +19,20 @@ namespace BubbleChartOilWells.Views.Functional
     /// </summary>
     public partial class SaveMapWindow : Window
     {
-        public SaveMapWindow()
+        public SaveMapWindow(object dataContext, Window mainWindow)
         {
+            DataContext = dataContext;
+            Owner = mainWindow;
+
             InitializeComponent();
-        }
-        public SaveMapWindow(object DataContext)
-        {
-            InitializeComponent();
-            this.DataContext = DataContext;
         }
 
         #region close buttons
+
         private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = true;
-        private void CommandBinding_Executed_Close(object sender, ExecutedRoutedEventArgs e)
-        {
-            SystemCommands.CloseWindow(this);
-            (Application.Current.Windows[0] as MainWindow).MainWindowCloseButton.IsEnabled = true;
-            (Application.Current.Windows[0] as MainWindow).SaveMapButton.IsEnabled = true;
-        }
+
+        private void CommandBinding_Executed_Close(object sender, ExecutedRoutedEventArgs e) => SystemCommands.CloseWindow(this);
+
         #endregion
     }
 }

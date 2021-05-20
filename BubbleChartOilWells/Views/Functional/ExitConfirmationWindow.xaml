@@ -1,0 +1,99 @@
+﻿<Window x:Class="BubbleChartOilWells.Views.Functional.ExitConfirmationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:BubbleChartOilWells.Views.Functional"
+        mc:Ignorable="d"
+        Title="ExitConfirmationWindow"
+        Height="200"
+        Width="400"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource MainBackgroundBrush}">
+
+    <Window.CommandBindings>
+        <CommandBinding CanExecute="CommandBinding_CanExecute"
+                        Command="{x:Static SystemCommands.CloseWindowCommand}"
+                        Executed="CommandBinding_Executed_Close" />
+    </Window.CommandBindings>
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="35"
+                      ResizeBorderThickness="0" />
+    </WindowChrome.WindowChrome>
+
+    <Border BorderThickness="1"
+            Style="{StaticResource ControlBorder}">
+        <Grid>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!--#region Window control buttons -->
+            <Grid Grid.Row="0"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Top"
+                  Height="30"
+                  WindowChrome.IsHitTestVisibleInChrome="True">
+                <Label Foreground="White"
+                       HorizontalAlignment="left"
+                       Margin="10, 5, 0, 0"
+                       VerticalAlignment="Center">
+                    Выход
+                </Label>
+
+                <Button HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Command="{x:Static SystemCommands.CloseWindowCommand}"
+                        Style="{StaticResource CloseWinButton}">
+                    <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/close.png" />
+                </Button>
+            </Grid>
+            <!--#endregion-->
+
+            <!--#region Main content-->
+            <Grid Margin="10" Background="White" Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+                <!--#region Warning message-->
+                <StackPanel Grid.Row="0"
+                            Margin="22, 0"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Left">
+                    <Image VerticalAlignment="Center"
+                           Width="60"
+                           Margin="16, 0"
+                           Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/danger.png" />
+                    <Label Grid.Row="0" VerticalAlignment="Center">Вы хотите сохранить текущую сессию?</Label>
+                </StackPanel>
+                <!--#endregion-->
+
+                <!--#region Buttons-->
+                <StackPanel Grid.Row="1"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Center">
+                    <StackPanel.Resources>
+                        <Style TargetType="{x:Type Button}">
+                            <Setter Property="Margin" Value="16, 0, 16, 20" />
+                            <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="Background" Value="{StaticResource CalculateButtonBrush}"/>
+                            <Setter Property="Padding" Value="10, 2"></Setter>
+                        </Style>
+                    </StackPanel.Resources>
+
+                    <Button Command="{Binding SaveSessionAsyncCommand}">_Сохранить</Button>
+                    <Button Click="NoSaveButtonClick">_Не сохранять</Button>
+                    <Button  Command="{x:Static SystemCommands.CloseWindowCommand}">Отмена</Button>
+                </StackPanel>
+                <!--#endregion-->
+            </Grid>
+            <!--#endregion-->
+        </Grid>
+    </Border>
+</Window>

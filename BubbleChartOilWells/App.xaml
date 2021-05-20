@@ -15,7 +15,7 @@
         <SolidColorBrush x:Key="CalculateButtonBrush">#574b90</SolidColorBrush>
         <SolidColorBrush x:Key="ChooseFileButtonBrush">#574b90</SolidColorBrush>
         <SolidColorBrush x:Key="DrawMapButtonBrush">#f3a683</SolidColorBrush>
-    
+
         <SolidColorBrush x:Key="SubMenuBrush">#303952</SolidColorBrush>
         <SolidColorBrush x:Key="MenuForegroundBrush">white</SolidColorBrush>
 
@@ -358,7 +358,7 @@
             </ControlTemplate.Triggers>
         </ControlTemplate>
 
-        <Style  TargetType="{x:Type ComboBox}">
+        <Style TargetType="{x:Type ComboBox}">
             <Setter Property="UIElement.SnapsToDevicePixels"
                     Value="True" />
             <Setter Property="FrameworkElement.OverridesDefaultStyle"
@@ -519,7 +519,7 @@
             </Style.Triggers>
         </Style>
         <!--#endregion-->
-        
+
         <!--#region Toolbar Button style-->
         <Style x:Key="{x:Static ToolBar.ButtonStyleKey}"
                TargetType="{x:Type Button}">
@@ -558,7 +558,7 @@
             </Style.Triggers>
         </Style>
         <!--#endregion-->
-        
+
         <!--#region Toolbar RadioButton style-->
         <Style x:Key="{x:Static ToolBar.RadioButtonStyleKey}"
                TargetType="{x:Type RadioButton}">
@@ -612,7 +612,7 @@
             </Style.Triggers>
         </Style>
         <!--#endregion-->
-        
+
         <!--#region ToggleSwitch -->
         <Style x:Key="BlueSwitchStyle"
                TargetType="{x:Type CheckBox}">

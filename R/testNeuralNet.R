@@ -1,24 +1,24 @@
 
 if (!require("stats"))
   install.packages("stats", dependencies = TRUE)
-
 library(stats)
+
 if (!require("tidyverse"))
   install.packages("tidyverse", dependencies = TRUE)
-
 library(tidyverse)
+
 if (!require("GGally"))
   install.packages("GGally", dependencies = TRUE)
-
 library(GGally)
+
 if (!require("neuralnet"))
   install.packages("neuralnet", dependencies = TRUE)
-
 library(neuralnet)
+
 if (!require("Rsagacmd"))
   install.packages("Rsagacmd", dependencies = TRUE)
-
 library(Rsagacmd)
+
 library(ggplot2)
 
 # функция нормализации данных
@@ -77,7 +77,7 @@ extended_neuralnet <- function(filepath,
     as.data.frame(normalize(imported_data.test, imported_data))
   
   # обучение нейронной сети
-  set.seed(seed)
+  #set.seed(seed)
   NN <- neuralnet(
     formula = formula,
     data = train,
@@ -129,7 +129,7 @@ extended_neuralnet <- function(filepath,
   #     ylab("Фактические значения") +
   #     theme_bw()
   # )
-  #
+
   # print(binded_train_results)
   
   #--------------------ТЕСТИРОВАНИЕ----------------------------------------------------------
@@ -188,7 +188,7 @@ extended_neuralnet <- function(filepath,
 # импорт данных из csv-файла
 imported_data <-
   read.csv(
-    "C:\\Users\\timzl\\Downloads\\турнейские.csv",
+    "C:\\Users\\timzl\\Documents\\Files\\Исходные карты\\ОПЗ.csv",
     sep = ";",
     header = TRUE,
     encoding = "Windows-1251"
@@ -201,14 +201,14 @@ neurons <- c()
 trainMape <- c()
 testMape <- c()
 
-for (i in 8:16)
+for (i in 4:32)
 {
   result = extended_neuralnet(
     imported_data,
     0.8,
-    x0 ~ x1 + x2 + x3 + x4 + x5 + x7 + x8,
+    x0 ~ x1 + x2 + x3 + x4 + x5,
     c(i, i),
-    0.001,
+    0.0001,
     10000000,
     5,
     0.001,
@@ -228,7 +228,7 @@ for (i in 8:16)
 nnresults <- data.frame(neurons, trainMape, testMape)
 
 colnames(nnresults) = c("neurons", "TrainMape", "TestMape")
-filename <- "C:\\Users\\timzl\\Downloads\\Test Results\\турнейские_1лист"
+filename <- "C:\\Users\\timzl\\Documents\\Files\\Исходные карты\\ОПЗ-"
 filename <-
   paste(filename, paste(format(Sys.time(), "%Y-%m-%d_%H-%M"), "csv", sep = "."), sep = "")
 

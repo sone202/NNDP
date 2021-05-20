@@ -18,6 +18,8 @@ namespace BubbleChartOilWells.Contracts.Models.Dto
 
         public double CountPerRow { get; set; }
         public double CountPerColumn { get; set; }
+        
+        public string Objective { get; set; }
 
         public List<double> ZValues { get; set; }
     }

@@ -29,7 +29,7 @@ namespace BubbleChartOilWells.BusinessLogic.Services
 
                 using (var reader = new StreamReader(fileName))
                 {
-                    var firstRow = reader.ReadLine().Split(' ').Select(x => Convert.ToDouble(x, CultureInfo.InvariantCulture));
+                    var firstRow = reader.ReadLine()?.Split(' ').Select(x => Convert.ToDouble(x, CultureInfo.InvariantCulture));
                     irapMapDto.CountPerColumn = firstRow.ElementAt(1);
                     irapMapDto.CellWidth = firstRow.ElementAt(2);
                     irapMapDto.CellHeight = firstRow.ElementAt(3);

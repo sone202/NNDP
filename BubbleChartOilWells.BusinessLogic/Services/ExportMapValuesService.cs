@@ -18,7 +18,7 @@ namespace BubbleChartOilWells.BusinessLogic.Services
 {
     public class ExportMapValuesService
     {
-        public ResultResponse<string> ExportMapValuesToExcel(IEnumerable<MapVM> mapVMs, IEnumerable<OilWellVM> oilWellVMs, string fileName, string sheetName = "Лист1")
+        public ResultResponse<string> ExportMapValuesToExcel(IEnumerable<MapVM> mapVMs, IEnumerable<OilWellVM> oilWellVMs, string fileName, string sheetName = "Sheet1")
         {
             try
             {
@@ -99,7 +99,7 @@ namespace BubbleChartOilWells.BusinessLogic.Services
         /// <param name="stream">Поток</param>
         /// <param name="sheetName">Наименование листа</param>
         /// <returns></returns>
-        private void CreateSpreadsheetDocument(string fileName, string sheetName)
+        private void CreateSpreadsheetDocument(string fileName, string sheetName = "Sheet1")
         {
             // Create a spreadsheet document by supplying the filepath.
             // By default, AutoSave = true, Editable = true, and Type = xlsx.
@@ -121,7 +121,7 @@ namespace BubbleChartOilWells.BusinessLogic.Services
             {
                 Id = spreadsheetDocument.WorkbookPart.GetIdOfPart(worksheetPart),
                 SheetId = 1,
-                Name = "Лист1"
+                Name = sheetName
             });
 
             workbookpart.Workbook.Save();
@@ -230,156 +230,7 @@ namespace BubbleChartOilWells.BusinessLogic.Services
             }
         }
 
-        /// <summary>
-        /// Получения номера ряда по ячейке (например, из "A2" получим 2)
-        /// </summary>
-        /// <param name="cellReference">Ячейка</param>
-        /// <returns></returns>
-        private uint? GetRowIndexByCellReference(string cellReference)
-        {
-            var charArr = cellReference.ToCharArray();
-            var rowRef = charArr.SkipWhile(x => char.IsLetter(x)).ToArray();
-            var indexStr = new string(rowRef);
-
-            if (uint.TryParse(indexStr, out var res))
-            {
-                return res;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Получение буквы ячейки по ячейке
-        /// </summary>
-        /// <param name="cellReference">Ячейка</param>
-        /// <returns></returns>
-        private char? GetCellCharByCellReference(string cellReference)
-        {
-            var charArr = cellReference.ToCharArray();
-            return charArr.TakeWhile(x => char.IsLetter(x)).ToList().FirstOrDefault();
-        }
-
-        /// <summary>
-        /// Добавление наименования таблицы
-        /// </summary>
-        /// <param name="title">Наименование</param>
-        /// <param name="sheetData">Данные листа</param>
-        /// <param name="rowIndex">Номер ряда</param>
-        /// <param name="cellChar">Буква колонки</param>
-        private void AppendTitle(string title, SheetData sheetData, uint rowIndex, char cellChar)
-        {
-            if (title == null)
-            {
-                return;
-            }
-
-            var valueRow = GetOrAddRow(sheetData, rowIndex);
-
-            var titleCell = new Cell { CellReference = $"{cellChar}{rowIndex}", StyleIndex = 1U };
-            titleCell.CellValue = new CellValue(title);
-            titleCell.DataType = new EnumValue<CellValues>(CellValues.String);
-
-            valueRow.Append(titleCell);
-        }
-
-        /// <summary>
-        /// Добавление стилей к файлу
-        /// </summary>
-        /// <param name="workbookPart"></param>
-        private void ApplyStyles(WorkbookPart workbookPart, bool outlines)
-        {
-            var stylesPart = workbookPart.AddNewPart<WorkbookStylesPart>();
-
-            var borders1 = new Borders() { Count = 2U };
-
-            // Пустые границы
-            var border1 = new Border();
-            var leftBorder1 = new LeftBorder();
-            var rightBorder1 = new RightBorder();
-            var topBorder1 = new TopBorder();
-            var bottomBorder1 = new BottomBorder();
-            var diagonalBorder1 = new DiagonalBorder();
-
-            border1.Append(leftBorder1);
-            border1.Append(rightBorder1);
-            border1.Append(topBorder1);
-            border1.Append(bottomBorder1);
-            border1.Append(diagonalBorder1);
-
-            // Все границы
-            var borderStyle = outlines ? BorderStyleValues.Thin : BorderStyleValues.None;
-
-            var border2 = new Border();
-            var leftBorder2 = new LeftBorder() { Style = borderStyle };
-            var rightBorder2 = new RightBorder() { Style = borderStyle };
-            var topBorder2 = new TopBorder() { Style = borderStyle };
-            var bottomBorder2 = new BottomBorder() { Style = borderStyle };
-            var diagonalBorder2 = new DiagonalBorder();
-
-            var color1 = new Color() { Indexed = 64U };
-
-            rightBorder2.Append(color1.CloneNode(false));
-            topBorder2.Append(color1.CloneNode(false));
-            bottomBorder2.Append(color1.CloneNode(false));
-            leftBorder2.Append(color1.CloneNode(false));
-
-            border2.Append(leftBorder2);
-            border2.Append(rightBorder2);
-            border2.Append(topBorder2);
-            border2.Append(bottomBorder2);
-            border2.Append(diagonalBorder2);
-
-            borders1.Append(border1);
-            borders1.Append(border2);
-
-            // Форматы ячеек
-            // 0 - обычная ячейка
-            // 1 - ячейка с равнением по центру (для названия таблицы)
-            // 2 - ячейка со всеми границами
-            // 3 - ячейка со всеми границами и форматом отображения времени dd/mm/yy hh:mm:ss (см. numberingFormat1)
-            // 4 - ячейка со всеми границами и переносом текста
-            var cellFormats1 = new CellFormats() { Count = 4U };
-            var cellFormat0 = new CellFormat() { NumberFormatId = 0U, FontId = 0U, FillId = 0U, BorderId = 0U, FormatId = 0U };
-            var cellFormat1 = new CellFormat() { NumberFormatId = 0U, FontId = 0U, FillId = 0U, BorderId = 0U, FormatId = 0U, ApplyAlignment = true };
-            var cellFormat2 = new CellFormat() { NumberFormatId = 0U, FontId = 0U, FillId = 0U, BorderId = 1U, FormatId = 0U, ApplyBorder = true };
-            var cellFormat3 = new CellFormat() { NumberFormatId = 165U, FontId = 0U, FillId = 0U, BorderId = 1U, FormatId = 0U, ApplyNumberFormat = true, ApplyBorder = true };
-            var cellFormat4 = new CellFormat() { NumberFormatId = 0U, FontId = 0U, FillId = 0U, BorderId = 1U, FormatId = 0U, ApplyAlignment = true, ApplyBorder = true };
-
-            var alignment1 = new Alignment() { Horizontal = HorizontalAlignmentValues.Center };
-            var alignment2 = new Alignment() { WrapText = true };
-
-            cellFormat1.Append(alignment1);
-            cellFormat4.Append(alignment2);
-
-            cellFormats1.Append(cellFormat0);
-            cellFormats1.Append(cellFormat1);
-            cellFormats1.Append(cellFormat2);
-            cellFormats1.Append(cellFormat3);
-            cellFormats1.Append(cellFormat4);
-
-            var cellStyles1 = new CellStyles() { Count = 1U };
-            var cellStyle1 = new CellStyle() { Name = "Обычный", FormatId = 0U, BuiltinId = 0U };
-
-            cellStyles1.Append(cellStyle1);
-
-            // Форматы отображения
-            var numberingFormats1 = new NumberingFormats() { Count = 1U };
-            var numberingFormat1 = new NumberingFormat() { NumberFormatId = 165U, FormatCode = "dd/mm/yy\\ h:mm;@" };
-            numberingFormats1.Append(numberingFormat1);
-
-            stylesPart.Stylesheet = new Stylesheet
-            {
-                NumberingFormats = numberingFormats1,
-                Fonts = new Fonts(new Font()),
-                Fills = new Fills(new Fill()),
-                Borders = borders1,
-                CellStyleFormats = new CellStyleFormats(new CellFormat()),
-                CellFormats = cellFormats1,
-                CellStyles = cellStyles1
-            };
-        }
-
+        
         /// <summary>
         /// Рассчёт ширины столбцов
         /// </summary>

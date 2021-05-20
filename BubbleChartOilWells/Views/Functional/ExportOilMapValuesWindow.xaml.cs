@@ -19,24 +19,19 @@ namespace BubbleChartOilWells.Views.Functional
     /// </summary>
     public partial class ExportOilMapValuesWindow : Window
     {
-        public ExportOilMapValuesWindow()
+        public ExportOilMapValuesWindow(object dataContext, Window mainWindow)
         {
+            Owner = mainWindow;
+            DataContext = dataContext;
+
             InitializeComponent();
-        } 
-        public ExportOilMapValuesWindow(object DataContext)
-        {
-            InitializeComponent();
-            this.DataContext = DataContext;
         }
 
         #region close buttons
         private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = true;
-        private void CommandBinding_Executed_Close(object sender, ExecutedRoutedEventArgs e)
-        {
-            SystemCommands.CloseWindow(this);
-            (Application.Current.Windows[0] as MainWindow).MainWindowCloseButton.IsEnabled = true;
-            (Application.Current.Windows[0] as MainWindow).ExportOilWellMapValuesButton.IsEnabled = true;
-        }
+
+        private void CommandBinding_Executed_Close(object sender, ExecutedRoutedEventArgs e) => SystemCommands.CloseWindow(this);
+
         #endregion
     }
 }

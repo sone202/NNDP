@@ -18,12 +18,13 @@ namespace BubbleChartOilWells.BusinessLogic.Services
 {
     public class DebitGainService
     {
+        private const double MAP_NULL_VALUE = 9999900;
+
         public DebitGainService()
         {
             // TODO: Logger
         }
 
-        
         public ResultResponse<MapVM> CreateDebitGainMap(DebitGainVM debitGainVM, string mapType)
         {
             try
@@ -34,6 +35,12 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                 {
                     for (int i = 0; i < debitGainVM.K.Z.Count; i++)
                     {
+                        if (debitGainVM.K.Z[i] == MAP_NULL_VALUE || debitGainVM.H.Z[i] == MAP_NULL_VALUE)
+                        {
+                            KHValues.Add(MAP_NULL_VALUE);
+                            continue;
+                        }
+
                         KHValues.Add(debitGainVM.K.Z[i] * debitGainVM.H.Z[i]);
                     }
                 }
@@ -48,70 +55,88 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                     // q = ___________________________ * (________ + ________)            
                     //     18.41*(ln(re/rw)-0.75+Stot)     MUo*Bo     MUw*Bw
                     case "liquid":
+                    {
+                        for (int i = 0; i < debitGainVM.Pr.Z.Count; i++)
                         {
-                            for (int i = 0; i < debitGainVM.Pr.Z.Count; i++)
+                            if (KHValues[i] != MAP_NULL_VALUE)
                             {
-                                if (KHValues[i] != 9999900)
-                                {
-                                    z.Add(KHValues[i] * (debitGainVM.Pr.Z[i] - debitGainVM.Pwf)
-                                        / (18.41 * (Math.Log(debitGainVM.Re / debitGainVM.Rw) - 0.75 + debitGainVM.Stot))
-                                        * (debitGainVM.KoInEachMapCell[i] / (debitGainVM.MUo * debitGainVM.Bo) + debitGainVM.KwInEachMapCell[i] / (debitGainVM.MUw * debitGainVM.Bw)));
-                                }
-                                else
-                                {
-                                    z.Add(9999900);
-                                }
+                                // z.Add(KHValues[i] * (debitGainVM.Pr.Z[i] - debitGainVM.Pwf)
+                                //       / (18.41 * (Math.Log(debitGainVM.Re / debitGainVM.Rw) - 0.75 + debitGainVM.Stot))
+                                //       * (debitGainVM.KoInEachMapCell[i] / (debitGainVM.MUo * debitGainVM.Bo) +
+                                //          debitGainVM.KwInEachMapCell[i] / (debitGainVM.MUw * debitGainVM.Bw)));
+                                //
+                                
+                                // TODO: refactor
+                                // water + oil
+                                
+                                z.Add(KHValues[i] * (debitGainVM.Pr.Z[i] - debitGainVM.Pwf)
+                                      / (18.41 * (Math.Log(debitGainVM.Re / debitGainVM.Rw) - 0.75 + debitGainVM.Stot))
+                                      * (debitGainVM.KwInEachMapCell[i] / (debitGainVM.MUw * debitGainVM.Bw))
+                                      
+                                      + KHValues[i] * (debitGainVM.Pr.Z[i] - debitGainVM.Pwf)
+                                      / (18.41 * (Math.Log(debitGainVM.Re / debitGainVM.Rw) - 0.75 + debitGainVM.Stot))
+                                      * (debitGainVM.KoInEachMapCell[i] / (debitGainVM.MUo * debitGainVM.Bo)));
                             }
-                            break;
+                            else
+                            {
+                                z.Add(MAP_NULL_VALUE);
+                            }
                         }
+
+                        break;
+                    }
 
                     //            KH(Pr-Pwf)                Ko                     
                     // q = ___________________________ * (________)            
                     //     18.41*(ln(re/rw)-0.75+Stot)     MUo*Bo 
                     case "oil":
+                    {
+                        for (int i = 0; i < debitGainVM.Pr.Z.Count; i++)
                         {
-                            for (int i = 0; i < debitGainVM.Pr.Z.Count; i++)
+                            if (KHValues[i] != MAP_NULL_VALUE)
                             {
-                                if (KHValues[i] != 9999900)
-                                {
-                                    z.Add(KHValues[i] * (debitGainVM.Pr.Z[i] - debitGainVM.Pwf)
-                                        / (18.41 * (Math.Log(debitGainVM.Re / debitGainVM.Rw) - 0.75 + debitGainVM.Stot))
-                                        * (debitGainVM.KoInEachMapCell[i] / (debitGainVM.MUo * debitGainVM.Bo)));
-                                }
-                                else
-                                {
-                                    z.Add(9999900);
-                                }
+                                z.Add(KHValues[i] * (debitGainVM.Pr.Z[i] - debitGainVM.Pwf)
+                                      / (18.41 * (Math.Log(debitGainVM.Re / debitGainVM.Rw) - 0.75 + debitGainVM.Stot))
+                                      * (debitGainVM.KoInEachMapCell[i] / (debitGainVM.MUo * debitGainVM.Bo)));
                             }
-                            break;
+                            else
+                            {
+                                z.Add(MAP_NULL_VALUE);
+                            }
                         }
+
+                        break;
+                    }
 
                     //            KH(Pr-Pwf)                 Kw                    
                     // q = ___________________________ * (________)            
                     //     18.41*(ln(re/rw)-0.75+Stot)     MUw*Bw
                     case "water":
+                    {
+                        for (int i = 0; i < debitGainVM.Pr.Z.Count; i++)
                         {
-                            for (int i = 0; i < debitGainVM.Pr.Z.Count; i++)
+                            if (KHValues[i] != MAP_NULL_VALUE)
                             {
-                                if (KHValues[i] != 9999900)
-                                {
-                                    z.Add(KHValues[i] * (debitGainVM.Pr.Z[i] - debitGainVM.Pwf)
-                                        / (18.41 * (Math.Log(debitGainVM.Re / debitGainVM.Rw) - 0.75 + debitGainVM.Stot))
-                                        * (debitGainVM.KwInEachMapCell[i] / (debitGainVM.MUw * debitGainVM.Bw)));
-                                }
-                                else
-                                {
-                                    z.Add(9999900);
-                                }
+                                z.Add(KHValues[i] * (debitGainVM.Pr.Z[i] - debitGainVM.Pwf)
+                                      / (18.41 * (Math.Log(debitGainVM.Re / debitGainVM.Rw) - 0.75 + debitGainVM.Stot))
+                                      * (debitGainVM.KwInEachMapCell[i] / (debitGainVM.MUw * debitGainVM.Bw)));
                             }
-                            break;
+                            else
+                            {
+                                z.Add(MAP_NULL_VALUE);
+                            }
                         }
+
+                        break;
+                    }
                 }
 
 
-                var debitMapBitmap = ConvertToBitmap.GetMapBitmap(debitGainVM.Pr.BitmapSource.PixelWidth, debitGainVM.Pr.BitmapSource.PixelHeight, z, 9999900);
+                var debitMapBitmap = ConvertToBitmap.GetMapBitmap(debitGainVM.Pr.BitmapSource.PixelWidth,
+                    debitGainVM.Pr.BitmapSource.PixelHeight, z, 9999900);
 
-                var bitmapSource = Imaging.CreateBitmapSourceFromHBitmap(debitMapBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                var bitmapSource = Imaging.CreateBitmapSourceFromHBitmap(debitMapBitmap.GetHbitmap(), IntPtr.Zero,
+                    Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
 
                 var debitMapVM = new MapVM
                 {
@@ -144,8 +169,8 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                 for (double Sw = Scw; Sw <= 1 - Sor; Sw += 0.01)
                 {
                     W.Add((GetKrw(liquidDebitGainVM, Sw).Data * liquidDebitGainVM.MUo * liquidDebitGainVM.Bo)
-                        / (GetKro(liquidDebitGainVM, Sw).Data * liquidDebitGainVM.MUw * liquidDebitGainVM.Bw +
-                           GetKrw(liquidDebitGainVM, Sw).Data * liquidDebitGainVM.MUo * liquidDebitGainVM.Bo));
+                          / (GetKro(liquidDebitGainVM, Sw).Data * liquidDebitGainVM.MUw * liquidDebitGainVM.Bw +
+                             GetKrw(liquidDebitGainVM, Sw).Data * liquidDebitGainVM.MUo * liquidDebitGainVM.Bo));
                 }
 
                 return ResultResponse<List<double>>.GetSuccessResponse(W);
@@ -153,7 +178,8 @@ namespace BubbleChartOilWells.BusinessLogic.Services
             catch (Exception e)
             {
                 // TODO: write error to log
-                return ResultResponse<List<double>>.GetErrorResponse($@"Ошибка вычисления обводненности.{Environment.NewLine}
+                return ResultResponse<List<double>>.GetErrorResponse(
+                    $@"Ошибка вычисления обводненности.{Environment.NewLine}
                                                                             {e.Message}{Environment.NewLine}
                                                                             {e.StackTrace}");
             }
@@ -164,26 +190,30 @@ namespace BubbleChartOilWells.BusinessLogic.Services
             try
             {
                 var result = liquidDebitGainVM.Krwor * Math.Pow((Sw - liquidDebitGainVM.Scw)
-                    / (1 - liquidDebitGainVM.Scw - liquidDebitGainVM.Sor), liquidDebitGainVM.Nw);
+                                                                / (1 - liquidDebitGainVM.Scw - liquidDebitGainVM.Sor),
+                    liquidDebitGainVM.Nw);
 
-                return ResultResponse<double>.GetSuccessResponse(double.IsNaN(result) ? 9999900 : result);
+                return ResultResponse<double>.GetSuccessResponse(double.IsNaN(result) ? MAP_NULL_VALUE : result);
             }
             catch (Exception e)
             {
                 // TODO: write error to log
-                return ResultResponse<double>.GetErrorResponse($@"Ошибка вычисления значения ОФП по воде.{Environment.NewLine}
+                return ResultResponse<double>.GetErrorResponse(
+                    $@"Ошибка вычисления значения ОФП по воде.{Environment.NewLine}
                                                                             {e.Message}{Environment.NewLine}
                                                                             {e.StackTrace}");
             }
         }
+
         public ResultResponse<double> GetKro(DebitGainVM liquidDebitGainVM, double Sw)
         {
             try
             {
                 var result = liquidDebitGainVM.Krocw * Math.Pow((1 - Sw - liquidDebitGainVM.Sor)
-                    / (1 - liquidDebitGainVM.Scw - liquidDebitGainVM.Sor), liquidDebitGainVM.No);
+                                                                / (1 - liquidDebitGainVM.Scw - liquidDebitGainVM.Sor),
+                    liquidDebitGainVM.No);
 
-                return ResultResponse<double>.GetSuccessResponse(double.IsNaN(result) ? 9999900 : result);
+                return ResultResponse<double>.GetSuccessResponse(double.IsNaN(result) ? MAP_NULL_VALUE : result);
             }
             catch (Exception e)
             {

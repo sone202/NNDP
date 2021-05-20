@@ -253,8 +253,8 @@ namespace BubbleChartOilWells.BusinessLogic.Services
 
             var userMapVM = new MapVM
             {
-                cellWidth = mapWidth / pixelWidth,
-                cellHeight = mapHeight / pixelHeight,
+                CellWidth = mapWidth / pixelWidth,
+                CellHeight = mapHeight / pixelHeight,
                 Width = mapWidth,
                 Height = mapHeight,
                 LeftBottomCoordinate = new System.Windows.Point(xInversed.Min(), yInversed.Min()),

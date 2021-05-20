@@ -14,6 +14,7 @@ using LiveCharts.Wpf;
 using LiveCharts.Defaults;
 using System.Windows.Media;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using Newtonsoft.Json;
 
 namespace BubbleChartOilWells.ViewModels
 {
@@ -39,6 +40,7 @@ namespace BubbleChartOilWells.ViewModels
         private bool isUsingKH;
 
         private MapVM selectedMap;
+
         // TODO: refactor
         private List<string> selectedOilWell;
         private DebitGainVM debitGainVM;
@@ -57,6 +59,7 @@ namespace BubbleChartOilWells.ViewModels
         private AsyncCommand predictNeuralNetAsyncCommand;
         private AsyncCommand exportMapValuesAsyncCommand;
         private AsyncCommand saveMapAsyncCommand;
+        private AsyncCommand saveSessionAsyncCommand;
 
 
         public IEnumerable<OilWellVM> OilWellVMs { get; set; }
@@ -85,6 +88,7 @@ namespace BubbleChartOilWells.ViewModels
                 OnPropertyChanged(nameof(IsExcelImportEnabled));
             }
         }
+
         public bool IsMapImportEnabled
         {
             get => isMapImportEnabled;
@@ -95,6 +99,7 @@ namespace BubbleChartOilWells.ViewModels
                 OnPropertyChanged(nameof(IsMapImportEnabled));
             }
         }
+
         public bool IsProdMapChecked
         {
             get => isProdMapChecked;
@@ -111,11 +116,13 @@ namespace BubbleChartOilWells.ViewModels
                         DrawOilWellMap();
                     }
                 }
+
                 isProdMapChecked = value;
                 OnPropertyChanged(nameof(OilWellVMs));
                 OnPropertyChanged(nameof(IsProdMapChecked));
             }
         }
+
         public bool IsProdSumMapChecked
         {
             get => isProdSumMapChecked;
@@ -132,11 +139,13 @@ namespace BubbleChartOilWells.ViewModels
                         DrawOilWellMap();
                     }
                 }
+
                 isProdSumMapChecked = value;
                 OnPropertyChanged(nameof(OilWellVMs));
                 OnPropertyChanged(nameof(IsProdSumMapChecked));
             }
         }
+
         public bool IsBubblesChecked
         {
             get => isBubblesChecked;
@@ -150,6 +159,7 @@ namespace BubbleChartOilWells.ViewModels
                         {
                             DrawProdMap();
                         }
+
                         if (isProdSumMapChecked == true)
                         {
                             DrawProdSumMap();
@@ -160,11 +170,13 @@ namespace BubbleChartOilWells.ViewModels
                         DrawOilWellMap();
                     }
                 }
+
                 isBubblesChecked = value;
                 OnPropertyChanged(nameof(OilWellVMs));
                 OnPropertyChanged(nameof(IsBubblesChecked));
             }
         }
+
         public bool IsNeuralNetTrainResultsVisible
         {
             get => isNeuralNetTrainResultsVisibile;
@@ -174,6 +186,7 @@ namespace BubbleChartOilWells.ViewModels
                 OnPropertyChanged(nameof(IsNeuralNetTrainResultsVisible));
             }
         }
+
         public bool IsNeuralNetPredictionResultsVisible
         {
             get => isNeuralNetPredictionResultsVisible;
@@ -183,6 +196,7 @@ namespace BubbleChartOilWells.ViewModels
                 OnPropertyChanged(nameof(IsNeuralNetPredictionResultsVisible));
             }
         }
+
         public bool IsUsingKH
         {
             get => isUsingKH;
@@ -192,6 +206,7 @@ namespace BubbleChartOilWells.ViewModels
                 OnPropertyChanged(nameof(IsUsingKH));
             }
         }
+
         public MapVM SelectedMap
         {
             get => selectedMap;
@@ -201,6 +216,7 @@ namespace BubbleChartOilWells.ViewModels
                 OnPropertyChanged(nameof(SelectedMap));
             }
         }
+
         // TODO: refactor
         public List<string> SelectedOilWellPropertiesValues
         {
@@ -211,6 +227,7 @@ namespace BubbleChartOilWells.ViewModels
                 OnPropertyChanged(nameof(SelectedOilWellPropertiesValues));
             }
         }
+
         public DebitGainVM DebitGainVM
         {
             get => debitGainVM;
@@ -220,6 +237,7 @@ namespace BubbleChartOilWells.ViewModels
                 OnPropertyChanged(nameof(DebitGainVM));
             }
         }
+
         public NeuralNetVM NeuralNetVM
         {
             get => neuralNetVM;
@@ -231,20 +249,59 @@ namespace BubbleChartOilWells.ViewModels
         }
 
 
-        public AsyncCommand ImportOilWellsAsyncCommand => importOilWellsAsyncCommand ?? (importOilWellsAsyncCommand = new AsyncCommand(ImportOilWellsAsync));
-        public AsyncCommand GetOilWellsAsyncCommand => getOilWellsAsyncCommand ?? (getOilWellsAsyncCommand = new AsyncCommand(GetOilWellsAsync));
-        public AsyncCommand ImportIrapMapAsyncCommand => importIrapMapAsyncCommand ?? (importIrapMapAsyncCommand = new AsyncCommand(ImportIrapMapAsync));
-        public AsyncCommand ImportUserMapAsyncCommand => importUserMapAsyncCommand ?? (importUserMapAsyncCommand = new AsyncCommand(ImportUserMapAsync));
-        public AsyncCommand ImportUserMapContourAsyncCommand => importUserMapContourAsyncCommand ?? (importUserMapContourAsyncCommand = new AsyncCommand(ImportUserMapContourAsync));
-        public AsyncCommand<string> DrawDebitGainMapAsyncCommand => drawDebitGainMapAsyncCommand ?? (drawDebitGainMapAsyncCommand = new AsyncCommand<string>(mapType => DrawDebitGainMapAsync(mapType)));
-        public AsyncCommand CalculateDupuisAsyncCommand => calculateDupuisAsyncCommand ?? (calculateDupuisAsyncCommand = new AsyncCommand(CalculateDupuisAsync));
-        public AsyncCommand ImportTrainDataAsyncCommand => importTrainDataAsyncCommand ?? (importTrainDataAsyncCommand = new AsyncCommand(ImportTrainDataAsync));
-        public AsyncCommand ImportInitialDataAsyncCommand => importInitialDataAsyncCommand ?? (importInitialDataAsyncCommand = new AsyncCommand(ImportInitialDataAsync));
-        public AsyncCommand TrainNeuralNetAsyncCommand => trainNeuralNetAsyncCommand ?? (trainNeuralNetAsyncCommand = new AsyncCommand(TrainNeuralNetAsync));
-        public AsyncCommand PredictNeuralNetAsyncCommand => predictNeuralNetAsyncCommand ?? (predictNeuralNetAsyncCommand = new AsyncCommand(PredictWithNeuralNetAsync));
-        public AsyncCommand ExportMapValuesAsyncCommand => exportMapValuesAsyncCommand ?? (exportMapValuesAsyncCommand = new AsyncCommand(ExportMapToExcelAsync));
-        public AsyncCommand SaveMapAsyncCommand => saveMapAsyncCommand ?? (saveMapAsyncCommand = new AsyncCommand(SaveMapAsync));
+        public AsyncCommand ImportOilWellsAsyncCommand => importOilWellsAsyncCommand ??
+                                                          (importOilWellsAsyncCommand =
+                                                              new AsyncCommand(ImportOilWellsAsync));
 
+        public AsyncCommand GetOilWellsAsyncCommand => getOilWellsAsyncCommand ??
+                                                       (getOilWellsAsyncCommand = new AsyncCommand(GetOilWellsAsync));
+
+        public AsyncCommand ImportIrapMapAsyncCommand => importIrapMapAsyncCommand ??
+                                                         (importIrapMapAsyncCommand =
+                                                             new AsyncCommand(ImportIrapMapAsync));
+
+        public AsyncCommand ImportUserMapAsyncCommand => importUserMapAsyncCommand ??
+                                                         (importUserMapAsyncCommand =
+                                                             new AsyncCommand(ImportUserMapAsync));
+
+        public AsyncCommand ImportUserMapContourAsyncCommand => importUserMapContourAsyncCommand ??
+                                                                (importUserMapContourAsyncCommand =
+                                                                    new AsyncCommand(ImportUserMapContourAsync));
+
+        public AsyncCommand<string> DrawDebitGainMapAsyncCommand => drawDebitGainMapAsyncCommand ??
+                                                                    (drawDebitGainMapAsyncCommand =
+                                                                        new AsyncCommand<string>(mapType =>
+                                                                            DrawDebitGainMapAsync(mapType)));
+
+        public AsyncCommand CalculateDupuisAsyncCommand => calculateDupuisAsyncCommand ??
+                                                           (calculateDupuisAsyncCommand =
+                                                               new AsyncCommand(CalculateDupuisAsync));
+
+        public AsyncCommand ImportTrainDataAsyncCommand => importTrainDataAsyncCommand ??
+                                                           (importTrainDataAsyncCommand =
+                                                               new AsyncCommand(ImportTrainDataAsync));
+
+        public AsyncCommand ImportInitialDataAsyncCommand => importInitialDataAsyncCommand ??
+                                                             (importInitialDataAsyncCommand =
+                                                                 new AsyncCommand(ImportInitialDataAsync));
+
+        public AsyncCommand TrainNeuralNetAsyncCommand => trainNeuralNetAsyncCommand ??
+                                                          (trainNeuralNetAsyncCommand =
+                                                              new AsyncCommand(TrainNeuralNetAsync));
+
+        public AsyncCommand PredictNeuralNetAsyncCommand => predictNeuralNetAsyncCommand ??
+                                                            (predictNeuralNetAsyncCommand =
+                                                                new AsyncCommand(PredictWithNeuralNetAsync));
+
+        public AsyncCommand ExportMapValuesAsyncCommand => exportMapValuesAsyncCommand ??
+                                                           (exportMapValuesAsyncCommand =
+                                                               new AsyncCommand(ExportMapToExcelAsync));
+
+        public AsyncCommand SaveMapAsyncCommand =>
+            saveMapAsyncCommand ?? (saveMapAsyncCommand = new AsyncCommand(SaveMapAsync));
+
+        public AsyncCommand SaveSessionAsyncCommand =>
+            saveSessionAsyncCommand ?? (saveSessionAsyncCommand = new AsyncCommand(SaveSessionAsync));
 
         public MainVM()
         {
@@ -379,6 +436,7 @@ namespace BubbleChartOilWells.ViewModels
                             {
                                 SelectedMap.IsSelected = false;
                             }
+
                             SelectedMap = result.Data;
                             MapVMs.Add(SelectedMap);
                             OnPropertyChanged(nameof(MapVMs));
@@ -437,6 +495,7 @@ namespace BubbleChartOilWells.ViewModels
                             {
                                 SelectedMap.IsSelected = false;
                             }
+
                             SelectedMap = result.Data;
 
                             MapVMs.Add(SelectedMap);
@@ -533,7 +592,7 @@ namespace BubbleChartOilWells.ViewModels
                         (double)DebitGainVM.Ofp.Rows[i][2]));
 
                     Kro.Add(new ObservablePoint((double)DebitGainVM.Ofp.Rows[i][0],
-                       (double)DebitGainVM.Ofp.Rows[i][1]));
+                        (double)DebitGainVM.Ofp.Rows[i][1]));
                 }
 
                 OfpSeriesCollection = new SeriesCollection();
@@ -574,14 +633,14 @@ namespace BubbleChartOilWells.ViewModels
                 }
 
                 OfpSeriesCollection.Add(
-                   new LineSeries
-                   {
-                       Title = "Krw",
-                       Values = new ChartValues<ObservablePoint>(KrwCurve),
-                       Stroke = Brushes.Blue,
-                       Fill = Brushes.Transparent,
-                       PointGeometrySize = 0
-                   });
+                    new LineSeries
+                    {
+                        Title = "Krw",
+                        Values = new ChartValues<ObservablePoint>(KrwCurve),
+                        Stroke = Brushes.Blue,
+                        Fill = Brushes.Transparent,
+                        PointGeometrySize = 0
+                    });
 
                 OfpSeriesCollection.Add(
                     new LineSeries
@@ -651,7 +710,6 @@ namespace BubbleChartOilWells.ViewModels
                         MessageBox.Show(kroResult.ErrorMessage);
                         return;
                     }
-
                 }
             }
             catch (Exception e)
@@ -662,7 +720,9 @@ namespace BubbleChartOilWells.ViewModels
 
             IsReady = true;
         }
-        private double GetNw(List<ObservablePoint> tableValues, DebitGainVM debitGainVM, double nw = 0, bool flag = true, double minErr = 99999, double step = 0.1)
+
+        private double GetNw(List<ObservablePoint> tableValues, DebitGainVM debitGainVM, double nw = 0,
+            bool flag = true, double minErr = 99999, double step = 0.1)
         {
             var Krwor = debitGainVM.Krwor;
             var Scw = debitGainVM.Scw;
@@ -680,6 +740,7 @@ namespace BubbleChartOilWells.ViewModels
                     {
                         sum += Math.Pow(point.Y - Krwor * Math.Pow((point.X - Scw) / (1 - Scw - Sor), i), 2);
                     }
+
                     var err = sum / tableValuesCount;
 
                     if (minErr >= err)
@@ -707,6 +768,7 @@ namespace BubbleChartOilWells.ViewModels
                     {
                         sum += Math.Pow(point.Y - Krwor * Math.Pow((point.X - Scw) / (1 - Scw - Sor), i), 2);
                     }
+
                     var err = sum / tableValuesCount;
 
                     if (minErr >= err)
@@ -724,9 +786,12 @@ namespace BubbleChartOilWells.ViewModels
                     }
                 }
             }
+
             return nw;
         }
-        private double GetNo(List<ObservablePoint> tableValues, DebitGainVM debitGainVM, double no = 0, bool flag = true, double minErr = 99999, double step = 0.1)
+
+        private double GetNo(List<ObservablePoint> tableValues, DebitGainVM debitGainVM, double no = 0,
+            bool flag = true, double minErr = 99999, double step = 0.1)
         {
             var Krocw = debitGainVM.Krocw;
             var Scw = debitGainVM.Scw;
@@ -744,6 +809,7 @@ namespace BubbleChartOilWells.ViewModels
                     {
                         sum += Math.Pow(point.Y - Krocw * Math.Pow((1 - point.X - Sor) / (1 - Scw - Sor), i), 2);
                     }
+
                     var err = sum / tableValuesCount;
 
                     if (minErr >= err)
@@ -760,6 +826,7 @@ namespace BubbleChartOilWells.ViewModels
                         return no;
                     }
                 }
+
                 return no;
             }
             else
@@ -772,6 +839,7 @@ namespace BubbleChartOilWells.ViewModels
                     {
                         sum += Math.Pow(point.Y - Krocw * Math.Pow((1 - point.X - Sor) / (1 - Scw - Sor), i), 2);
                     }
+
                     var err = sum / tableValuesCount;
 
                     if (minErr >= err)
@@ -788,6 +856,7 @@ namespace BubbleChartOilWells.ViewModels
                         return no;
                     }
                 }
+
                 return no;
             }
         }
@@ -814,6 +883,7 @@ namespace BubbleChartOilWells.ViewModels
             {
                 await CalculateDupuisAsync();
             }
+
             await Task.Run(() =>
             {
                 var result = debitGainService.CreateDebitGainMap(DebitGainVM, mapType);
@@ -825,6 +895,7 @@ namespace BubbleChartOilWells.ViewModels
                         {
                             SelectedMap.IsSelected = false;
                         }
+
                         SelectedMap = result.Data;
 
                         MapVMs.Add(SelectedMap);
@@ -841,6 +912,7 @@ namespace BubbleChartOilWells.ViewModels
         }
 
         #region NeuralNet
+
         /// <summary>
         /// Import file for neuralnet training
         /// </summary>
@@ -920,6 +992,7 @@ namespace BubbleChartOilWells.ViewModels
                 IsReady = true;
                 return;
             }
+
             await Task.Run(() =>
             {
                 var result = neuralNetService.TrainNeuralNetwork(NeuralNetVM);
@@ -939,40 +1012,46 @@ namespace BubbleChartOilWells.ViewModels
             try
             {
                 #region cross-plots
+
                 CrossPlotTrainSeriesCollection = new SeriesCollection();
                 var crossPlotTrainPoints = new List<ObservablePoint>();
                 for (int i = 0; i < NeuralNetVM.TrainActual.Count; i++)
                 {
-                    crossPlotTrainPoints.Add(new ObservablePoint(NeuralNetVM.TrainPredicted[i], NeuralNetVM.TrainActual[i]));
+                    crossPlotTrainPoints.Add(new ObservablePoint(NeuralNetVM.TrainPredicted[i],
+                        NeuralNetVM.TrainActual[i]));
                 }
+
                 CrossPlotTrainSeriesCollection.Add(
-                       new ScatterSeries
-                       {
-                           Title = "Кросс-плот обучения",
-                           Values = new ChartValues<ObservablePoint>(crossPlotTrainPoints),
-                           Fill = (Brush)(new BrushConverter()).ConvertFromString("#786FA6"),
-                           MaxPointShapeDiameter = 4
-                       });
+                    new ScatterSeries
+                    {
+                        Title = "Кросс-плот обучения",
+                        Values = new ChartValues<ObservablePoint>(crossPlotTrainPoints),
+                        Fill = (Brush)(new BrushConverter()).ConvertFromString("#786FA6"),
+                        MaxPointShapeDiameter = 4
+                    });
 
                 CrossPlotTestSeriesCollection = new SeriesCollection();
                 var crossPlotTestPoints = new List<ObservablePoint>();
                 for (int i = 0; i < NeuralNetVM.TestActual.Count; i++)
                 {
-                    crossPlotTestPoints.Add(new ObservablePoint(NeuralNetVM.TestPredicted[i], NeuralNetVM.TestActual[i]));
+                    crossPlotTestPoints.Add(
+                        new ObservablePoint(NeuralNetVM.TestPredicted[i], NeuralNetVM.TestActual[i]));
                 }
+
                 CrossPlotTestSeriesCollection.Add(
-                       new ScatterSeries
-                       {
-                           Title = "Кросс-плот тестирования",
-                           Values = new ChartValues<ObservablePoint>(crossPlotTestPoints),
-                           Fill = (Brush)(new BrushConverter()).ConvertFromString("#E15F41"),
-                           MaxPointShapeDiameter = 4
-                       });
+                    new ScatterSeries
+                    {
+                        Title = "Кросс-плот тестирования",
+                        Values = new ChartValues<ObservablePoint>(crossPlotTestPoints),
+                        Fill = (Brush)(new BrushConverter()).ConvertFromString("#E15F41"),
+                        MaxPointShapeDiameter = 4
+                    });
 
                 OnPropertyChanged(nameof(CrossPlotTrainSeriesCollection));
                 OnPropertyChanged(nameof(CrossPlotTestSeriesCollection));
                 OnPropertyChanged(nameof(NeuralNetVM));
                 IsNeuralNetTrainResultsVisible = true;
+
                 #endregion
             }
             catch (Exception e)
@@ -1015,6 +1094,7 @@ namespace BubbleChartOilWells.ViewModels
                     IsReady = true;
                     return;
                 }
+
                 var mapResult = userMapService.DrawPredictedMap(neuralNetVM.PredictionFullResults);
                 if (mapResult.IsSuccess)
                 {
@@ -1024,6 +1104,7 @@ namespace BubbleChartOilWells.ViewModels
                         {
                             SelectedMap.IsSelected = false;
                         }
+
                         SelectedMap = mapResult.Data;
 
                         MapVMs.Add(SelectedMap);
@@ -1033,11 +1114,11 @@ namespace BubbleChartOilWells.ViewModels
                 {
                     MessageBox.Show(mapResult.ErrorMessage);
                 }
-
             });
 
             IsReady = true;
         }
+
         #endregion
 
         /// <summary>
@@ -1054,7 +1135,8 @@ namespace BubbleChartOilWells.ViewModels
             {
                 await Task.Run(() =>
                 {
-                    var result = exportMapValuesService.ExportMapValuesToExcel(MapVMs.Where(x => x.IsExporting == true), OilWellVMs, dialog.FileName + "\\mapExport.xlsx");
+                    var result = exportMapValuesService.ExportMapValuesToExcel(MapVMs.Where(x => x.IsExporting == true),
+                        OilWellVMs, dialog.FileName + "\\mapExport.xlsx");
                     if (!result.IsSuccess)
                     {
                         MessageBox.Show(result.ErrorMessage);
@@ -1082,7 +1164,8 @@ namespace BubbleChartOilWells.ViewModels
             {
                 await Task.Run(() =>
                 {
-                    var result = saveMapService.SaveAsIrapService(MapVMs.Where(x => x.IsExporting == true), dialog.FileName);
+                    var result =
+                        saveMapService.SaveAsIrapService(MapVMs.Where(x => x.IsExporting == true), dialog.FileName);
                     if (!result.IsSuccess)
                     {
                         MessageBox.Show(result.ErrorMessage);
@@ -1093,6 +1176,38 @@ namespace BubbleChartOilWells.ViewModels
             }
 
             MapVMs.Select(x => x.IsExporting = false);
+            IsReady = true;
+        }
+
+        /// <summary>
+        /// Saves uploaded files
+        /// </summary>
+        private async Task SaveSessionAsync()
+        {
+            IsReady = false;
+            var options = new JsonSerializerSettings()
+            {
+
+                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+                PreserveReferencesHandling = PreserveReferencesHandling.Objects
+            };
+
+            SaveFileDialog dialog = new SaveFileDialog
+            {
+                InitialDirectory = "Documents",
+                Filter = "(*.bcow)|*.bcow"
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                await Task.Run(() =>
+                {
+
+                });
+            }
+
+            //var jsonData = JsonConvert.SerializeObject(, options);
+            //File.WriteAllText(jsonFileName, jsonData);
             IsReady = true;
         }
 
@@ -1114,7 +1229,8 @@ namespace BubbleChartOilWells.ViewModels
 
         private void DrawProdSumMap()
         {
-            var maxLiquidProdSum = OilWellVMs.Max(x => x.Objectives.Sum(y => y.MonthlyObjectiveProduction.LiquidProdSum));
+            var maxLiquidProdSum =
+                OilWellVMs.Max(x => x.Objectives.Sum(y => y.MonthlyObjectiveProduction.LiquidProdSum));
 
             var multiplierCoefficient = 1;
             if (maxLiquidProdSum > 1000)
