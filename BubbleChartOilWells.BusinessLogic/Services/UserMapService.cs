@@ -43,9 +43,9 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                     var oilWellUserMapValueDto = new OilWellUserMapValueDto
                     {
                         OilWellName = row[4].ToString(),
-                        Value = double.Parse(row[row.ItemArray.Length - 1].ToString())
+                        Value = Double.Parse(row[row.ItemArray.Length - 1].ToString(), new NumberFormatInfo(){NumberDecimalSeparator = "."})
                     };
-
+;
                     oilWellUserMapValueDtos.Add(oilWellUserMapValueDto);
                 }
                 var oilWells = oilWellRepository.GetAll();

@@ -192,12 +192,13 @@
                                     </StackPanel>
                                 </StackPanel>
 
-                                <StackPanel Orientation="Horizontal">
+                                <WrapPanel Orientation="Horizontal">
                                     <DataGrid x:Name="TrainResultDataGrid"
                                           HorizontalAlignment="Left"
                                           ItemsSource="{Binding NeuralNetVM.TrainFullResults}"
                                           Width="auto"
-                                          CanUserResizeColumns="False"
+                                          MaxWidth="1600"
+                                          CanUserResizeColumns="True"
                                           CanUserReorderColumns="False"
                                           CanUserAddRows="False"
                                           Margin="5"
@@ -243,7 +244,7 @@
                                     </lvc:CartesianChart>
 
 
-                                </StackPanel>
+                                </WrapPanel>
                             </WrapPanel>
 
                             <!-- Test results-->
@@ -262,7 +263,7 @@
                                     </StackPanel>
                                 </StackPanel>
 
-                                <StackPanel Orientation="Horizontal">
+                                <WrapPanel Orientation="Horizontal">
                                     <DataGrid x:Name="TestResultDataGrid"
                                           HorizontalAlignment="Left"
                                           ItemsSource="{Binding NeuralNetVM.TestFullResults}"
@@ -312,7 +313,7 @@
                                         </lvc:CartesianChart.AxisY>
 
                                     </lvc:CartesianChart>
-                                </StackPanel>
+                                </WrapPanel>
 
                                 <ItemsControl ItemsSource="{Binding NeuralNetVM.ImportedDataHeaders}">
                                     <ItemsControl.ItemTemplate>

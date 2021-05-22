@@ -21,7 +21,8 @@ namespace BubbleChartOilWells.BusinessLogic.Services
             "normalize.R",
             "extended_neuralnet.R",
             "predict_neuralnet.R",
-            "split_data.R"
+            "split_data.R",
+            "create_formula.R"
         };
 
         private const int SKIP_COLUMNS_COUNT = 5;
@@ -47,14 +48,9 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                     engine.Evaluate($@"source(""{Path.GetFullPath("RFunctions/" + rFuncion).Replace(@"\", @"/")}"")");
                 }
 
-                // getting original headers
-                nnVM.ImportedDataHeaders = ConvertImportedDataHeaders(nnVM.TrainingDataFileName);
-
                 engine.Evaluate(
-                    $@"
-                    results <- extended_neuralnet(""{nnVM.TrainingDataFileName.Replace(@"\", @"/")}"",
+                    $@"results <- extended_neuralnet(""{nnVM.TrainingDataFileName.Replace(@"\", @"/")}"",
                                                         0.8,
-                                                        formula = {CreateNeuralNetFormula(nnVM.ImportedDataHeaders.Count, SKIP_COLUMNS_COUNT)},
                                                         {RArrayConverter(nnVM.Hidden)},
                                                         {nnVM.Threshold.ToString(System.Globalization.CultureInfo.InvariantCulture)},
                                                         {nnVM.Stepmax.ToString(System.Globalization.CultureInfo.InvariantCulture)},
@@ -85,7 +81,24 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                     NN <- results$NN
 
                     InitialTrainData <- results$InitialTrainData
-                    Error <- results$NN$result.matrix[1] ");
+                    Error <- results$NN$result.matrix[1] 
+                    Headers <- results$Headers");
+
+
+                // engine.SetSymbol("Headers", engine.CreateCharacterVector(nnVM.ImportedDataHeaders));
+                // var debugHeaders = engine.GetSymbol("Headers").AsVector();
+                //
+
+                Directory.CreateDirectory(Path.GetDirectoryName(nnVM.TrainingDataFileName) +
+                                          $"\\Results");
+                var trainResultsFileName = Path.GetDirectoryName(nnVM.TrainingDataFileName) +
+                                           $"\\Results\\TrainResults~{DateTime.Now.ToString("dd.MM.yyyy_HH.mm")}.csv";
+                var testResultsFileName = Path.GetDirectoryName(nnVM.TrainingDataFileName) +
+                                          $"\\Results\\TestResults~{DateTime.Now.ToString("dd.MM.yyyy_HH.mm")}.csv";
+                engine.Evaluate(
+                    $@"
+                    write.table(BindedTrainResults, row.names = FALSE, file = ""{trainResultsFileName.Replace(@"\", @"/")}"", fileEncoding = ""UTF-8"", sep = "";"", quote=FALSE)
+                    write.table(BindedTestResults, row.names = FALSE, file = ""{testResultsFileName.Replace(@"\", @"/")}"", fileEncoding = ""UTF-8"", sep = "";"", quote=FALSE)");
 
                 nnVM.TrainMAPE = engine.GetSymbol("TrainMAPE").AsNumeric().ToList()[0];
                 nnVM.TrainMAE = engine.GetSymbol("TrainMAE").AsNumeric().ToList()[0];
@@ -106,26 +119,14 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                 nnVM.InitialTrainData = engine.GetSymbol("InitialTrainData");
                 nnVM.BestNNIndex = engine.GetSymbol("BestNNIndex").AsNumeric().ToList()[0];
 
-                var bindedTrainResults = engine.GetSymbol("BindedTrainResults").AsDataFrame();
-                var bindedTestResults = engine.GetSymbol("BindedTestResults").AsDataFrame();
-                
-                nnVM.TrainFullResults = RDataFrameToDataTableConverter(bindedTrainResults, nnVM.ImportedDataHeaders);
-                nnVM.TestFullResults = RDataFrameToDataTableConverter(bindedTestResults, nnVM.ImportedDataHeaders);
-
-                ConvertImportedDataHeaders(nnVM.TrainingDataFileName, nnVM.ImportedDataHeaders);
-
-                WriteDataTableToCsv(
-                    Path.GetDirectoryName(nnVM.TrainingDataFileName) +
-                    $"\\TrainResults~{DateTime.Now.ToString("dd.MM.yyyy_HH.mm")}.csv", nnVM.TrainFullResults);
-                WriteDataTableToCsv(
-                    Path.GetDirectoryName(nnVM.TrainingDataFileName) +
-                    $"\\TestResults~{DateTime.Now.ToString("dd.MM.yyyy_HH.mm")}.csv", nnVM.TestFullResults);
+                nnVM.TrainFullResults = CsvToDataTable(trainResultsFileName);
+                nnVM.TestFullResults = CsvToDataTable(testResultsFileName);
 
                 return ResultResponse<NeuralNetVM>.GetSuccessResponse(nnVM);
             }
             catch (Exception e)
             {
-                ConvertImportedDataHeaders(nnVM.TrainingDataFileName, nnVM.ImportedDataHeaders);
+                // ConvertImportedDataHeaders(nnVM.TrainingDataFileName, nnVM.ImportedDataHeaders);
                 // TODO: write error to log
                 return ResultResponse<NeuralNetVM>.GetErrorResponse($@"Ошибка обучения нейросети.{Environment.NewLine}
                                                                     {e.Message}{Environment.NewLine}
@@ -133,61 +134,25 @@ namespace BubbleChartOilWells.BusinessLogic.Services
             }
         }
 
-        public void WriteDataTableToCsv(string fileName, DataTable dataTable)
-        {
-            try
-            {
-                using (var stream = new StreamWriter(fileName, false, System.Text.Encoding.GetEncoding("Windows-1251")))
-                {
-                    // writing columns
-                    var columns = dataTable.Columns;
-                    for (int i = 0; i < columns.Count - 1; i++)
-                    {
-                        stream.Write(columns[i].ColumnName + ";");
-                    }
-
-                    stream.WriteLine(columns[columns.Count - 1].ColumnName);
-
-                    // writing data
-                    foreach (DataRow row in dataTable.Rows)
-                    {
-                        for (int i = 0; i < columns.Count - 1; i++)
-                        {
-                            stream.Write(row[i] + ";");
-                        }
-
-                        stream.WriteLine(row[columns.Count - 1]);
-                    }
-
-                    stream.Close();
-                }
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-        }
-
         public ResultResponse<NeuralNetVM> PredictLiquidDebitGain(NeuralNetVM nnVM)
         {
-            var predictionDataHeaders = new List<string>();
             try
             {
-                predictionDataHeaders = ConvertImportedDataHeaders(nnVM.PredictDataFileName);
-
                 // connecting libraries
                 engine.Evaluate($@"source(""{Path.GetFullPath("RFunctions/libraries.R").Replace(@"\", @"/")}"")");
 
                 // defining functions
-                engine.Evaluate(
-                    $@"source(""{Path.GetFullPath("RFunctions/predict_neuralnet.R").Replace(@"\", @"/")}"")");
+                foreach (var rFuncion in rFunctions)
+                {
+                    engine.Evaluate($@"source(""{Path.GetFullPath("RFunctions/" + rFuncion).Replace(@"\", @"/")}"")");
+                }
+
 
                 engine.SetSymbol("NN", nnVM.NN as SymbolicExpression);
                 engine.SetSymbol("TrainData", nnVM.InitialTrainData as SymbolicExpression);
                 engine.SetSymbol("BestNNIndex", engine.CreateNumeric(nnVM.BestNNIndex));
 
                 // setting directory for files
-                engine.Evaluate($@"setwd(""{Path.GetDirectoryName(nnVM.PredictDataFileName).Replace(@"\", @"/")}"")");
                 engine.Evaluate(
                     $@"results <- predict_neuralnet(""{nnVM.PredictDataFileName.Replace(@"\", @"/")}"",
                                                     TrainData,
@@ -196,21 +161,18 @@ namespace BubbleChartOilWells.BusinessLogic.Services
 
                 engine.Evaluate($@"BindedPredictionResults <- results$BindedPredictionResults");
 
+                var predictionResultsFileName = Path.GetDirectoryName(nnVM.PredictDataFileName) +
+                                                $"\\Results\\PredictionResults~{DateTime.Now.ToString("dd.MM.yyyy_HH.mm")}.csv";
+                engine.Evaluate(
+                    $@"
+                    write.table(BindedPredictionResults, row.names = FALSE, file = ""{predictionResultsFileName.Replace(@"\", @"/")}"", fileEncoding = ""UTF-8"", sep = "";"", quote=FALSE)");
 
-                var PredictionResult = engine.GetSymbol("BindedPredictionResults").AsDataFrame();
-                nnVM.PredictionFullResults = RDataFrameToDataTableConverter(PredictionResult, nnVM.ImportedDataHeaders);
-
-                ConvertImportedDataHeaders(nnVM.PredictDataFileName, predictionDataHeaders);
-
-                WriteDataTableToCsv(
-                    Path.GetDirectoryName(nnVM.PredictDataFileName) +
-                    $"\\PredictionResults~{DateTime.Now.ToString("dd.MM.yyyy_HH.mm")}.csv", nnVM.PredictionFullResults);
+                nnVM.PredictionFullResults = CsvToDataTable(predictionResultsFileName);
 
                 return ResultResponse<NeuralNetVM>.GetSuccessResponse(nnVM);
             }
             catch (Exception e)
             {
-                ConvertImportedDataHeaders(nnVM.PredictDataFileName, predictionDataHeaders);
                 return ResultResponse<NeuralNetVM>.GetErrorResponse(
                     $@"Ошибка вычисления прироста дебита жидкости.{Environment.NewLine}
                                                               {e.Message}{Environment.NewLine}
@@ -218,89 +180,40 @@ namespace BubbleChartOilWells.BusinessLogic.Services
             }
         }
 
-        private List<string> ConvertImportedDataHeaders(string fileName, List<string> targetHeaders = null)
-        {
-            var headers = new List<string>();
-            //using (var stream = new StreamReader(fileName, System.Text.Encoding.GetEncoding("Windows-1251")))
-            using (var stream = new StreamReader(fileName))
-            {
-                var line = stream.ReadLine();
-                headers = line.Split(';').ToList();
 
-                stream.Close();
-            }
-
-            if (targetHeaders == null)
-            {
-                targetHeaders = new List<string>();
-                for (int j = 0; j < headers.Count; j++)
-                {
-                    targetHeaders.Add($@"x{j}");
-                }
-            }
-
-            //var lines = File.ReadAllLines(fileName, System.Text.Encoding.GetEncoding("Windows-1251")).ToList();
-            //using (var stream = new StreamWriter(fileName, false, System.Text.Encoding.GetEncoding("Windows-1251")))
-            var lines = File.ReadAllLines(fileName).ToList();
-            using (var stream = new StreamWriter(fileName, false))
-            {
-                for (int i = 0; i < lines.Count; i++)
-                {
-                    if (i == 0)
-                    {
-                        for (int j = 0; j < headers.Count - 1; j++)
-                        {
-                            stream.Write(targetHeaders[j] + ";");
-                        }
-
-                        stream.WriteLine(targetHeaders.Last());
-                    }
-                    else
-                    {
-                        stream.WriteLine(lines[i]);
-                    }
-                }
-
-                stream.Close();
-            }
-
-            return headers;
-        }
-
-        private string CreateNeuralNetFormula(int headerCount, int skipColumnsCount)
-        {
-            var result = $@"x{headerCount - 1} ~ ";
-
-            headerCount -= skipColumnsCount;
-            for (int i = 0; i < headerCount - 1; i++)
-            {
-                if (i == headerCount - 2)
-                    result += $@"x{i + skipColumnsCount}";
-                else
-                    result += $@"x{i + skipColumnsCount} + ";
-            }
-
-            return result;
-        }
-
-        private DataTable RDataFrameToDataTableConverter(DataFrame dataFrame, List<string> fileHeaders)
+        public DataTable CsvToDataTable(string fileName)
         {
             var dataTable = new DataTable();
-            for (int i = 0; i < dataFrame.ColumnCount - 1; ++i)
+
+            using (var stream = new StreamReader(fileName, System.Text.Encoding.GetEncoding("UTF-8")))
             {
-                dataTable.Columns.Add(fileHeaders[i]);
-            }
-            dataTable.Columns.Add(dataFrame.ColumnNames.Last());
-            
-            for (int i = 0; i < dataFrame.RowCount; i++)
-            {
-                DataRow newRow = dataTable.Rows.Add();
-                for (int j = 0; j < dataFrame.ColumnCount; j++)
+                var headers = stream.ReadLine().Split(';').ToList();
+                headers.ForEach(x => dataTable.Columns.Add(x));
+                for (int i = 0; i < dataTable.Columns.Count; i++)
                 {
-                    newRow[j] = (dataFrame[i, j].GetType() == typeof(double))
-                        ? Math.Round((double) dataFrame[i, j], 4)
-                        : dataFrame[i, j];
+                    dataTable.Columns[i].DataType = i < 5 ? typeof(string) : typeof(Double);
                 }
+
+
+                while (!stream.EndOfStream)
+                {
+                    var line = stream.ReadLine().Split(';').ToList();
+
+                    DataRow newRow = dataTable.Rows.Add();
+                    for (int j = 0; j < line.Count; j++)
+                    {
+                        try
+                        {
+                            newRow[j] = Double.Parse(line[j], new NumberFormatInfo() {NumberDecimalSeparator = "."});
+                        }
+                        catch
+                        {
+                            newRow[j] = line[j];
+                        }
+                    }
+                }
+
+                stream.Close();
             }
 
             return dataTable;
