@@ -60,6 +60,7 @@ namespace BubbleChartOilWells.Contracts.Models.ViewModels
 
         //Если сосед- true
         private bool isNeighbour = false;
+        private bool isMainCircle = false;
         public bool IsNeighbour
         {
             get => isNeighbour;
@@ -74,6 +75,21 @@ namespace BubbleChartOilWells.Contracts.Models.ViewModels
                 OnPropertyChanged(nameof(IsNeighbour));
             }
         }
+
+        public bool IsMainCircle
+        {
+            get => isMainCircle;
+            set
+            {
+                if (value == false && isMainCircle != false)
+                {
+                    oilWellView.Children.RemoveAt(0);
+                }
+                isMainCircle = value;
+                OnPropertyChanged(nameof(IsMainCircle));
+            }
+        }
+        
 
         // TODO: Need refactoring
         [JsonIgnore] private Canvas oilWellView;
@@ -350,10 +366,17 @@ namespace BubbleChartOilWells.Contracts.Models.ViewModels
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        public void SelectIfInRadius(OilWellVM oilWellVm, double R)
+        public double GetRadius(double radius)
         {
-            if (X >= oilWellVm.X - R && X <= oilWellVm.X + R && Y >= oilWellVm.Y - R && Y <= oilWellVm.Y + R)
+            return radius;
+        }
+
+        public void SelectIfInRadius(OilWellVM oilWellVm, OilWellVM oilWell,  double R)
+        {
+            double dx = oilWell.X - oilWellVm.X;
+            double dy = oilWell.Y - oilWellVm.Y;
+
+            if (Math.Pow(dx,2) + Math.Pow(dy,2) <= Math.Pow(R,2))
             {
                 IsNeighbour = true;
 
@@ -368,8 +391,26 @@ namespace BubbleChartOilWells.Contracts.Models.ViewModels
                     Fill = Brushes.Transparent,
                     Stroke = Brushes.Red,
                     StrokeThickness = 2
-                });
-            }
+                });               
+            }            
         }
+        public void DrawMainCircle(double radius = 500)
+        {
+            isMainCircle = true;
+            
+            OilWellView.Children.Insert(0, new Path
+            {
+                Data = new EllipseGeometry
+                {
+                    RadiusX = radius,
+                    RadiusY = radius
+                },
+                Fill = Brushes.Transparent,
+                Stroke = Brushes.Red,
+                StrokeThickness = 2
+            });
+        }
+
+       
     }
 }

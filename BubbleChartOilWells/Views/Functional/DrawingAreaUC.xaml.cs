@@ -15,16 +15,20 @@ using System.Windows.Shapes;
 using BubbleChartOilWells.BusinessLogic.Mappers;
 using BubbleChartOilWells.Contracts.Models.ViewModels;
 using BubbleChartOilWells.ViewModels;
+using LiveCharts;
 using LiveCharts.Wpf;
 using Newtonsoft.Json;
 
 namespace BubbleChartOilWells.Views.Functional
 {
+    
     /// <summary>
     /// Interaction logic for DrawingAreaUC.xaml
     /// </summary>
     public partial class DrawingAreaUC : UserControl
     {
+        static double radius = 500;
+
         private List<double> xLabels;
         private List<double> yLabels;
         private readonly double marginBottom;
@@ -35,6 +39,9 @@ namespace BubbleChartOilWells.Views.Functional
         private readonly int yN = 27;
         private Point renderOffset = new Point(0, 0);
         private bool isDataUploaded = false;
+
+        public SeriesCollection SwSeriesCollection { get; set; }
+        public List<string> SwLabels { get; set; }
 
         public DrawingAreaUC()
         {
@@ -187,22 +194,94 @@ namespace BubbleChartOilWells.Views.Functional
                 parseJson = parseJson.Replace(":", ": ");
 
                 (DataContext as MainVM).SelectedOilWell = parseJson.Split(',').ToList();
+                var selectedOilWell = OilWellVM.SelectedOilWell;
+                
+
 
                 if (OilWellVM.SelectedOilWell != null)
                 {
                     (DataContext as MainVM).OilWellVMs.ToList().ForEach(x => x.IsNeighbour = false);
-                        
-                    var selectedOilWell = OilWellVM.SelectedOilWell;
+                    (DataContext as MainVM).OilWellVMs.ToList().ForEach(x => x.IsMainCircle = false);
+                    OilWellVM.SelectedOilWell.DrawMainCircle(radius);
+                    
                     //var monthlyObjectiveProductionDto = new List<MonthlyObjectiveProductionExcelDto>();
 
                     foreach (var oilWell in (DataContext as MainVM).OilWellVMs)
                     {
                         if (oilWell != selectedOilWell)
                         {
-                            oilWell.SelectIfInRadius(selectedOilWell, 500);
+                            oilWell.SelectIfInRadius(selectedOilWell, oilWell, radius);
                         }
                     }
                 }
+
+                OilWellVM current  = null;
+                //List<OilWellVM> current = new List<OilWellVM>();
+                List<string> objectNamesOfHoles = new List<string>();
+
+                //вдруг у скважины будет несколько объектов, чтобы сделать график по нескольким объектам одной скважины
+                foreach (var oilWell in (DataContext as MainVM).OilWellVMs)
+                {
+                    if (selectedOilWell.X == oilWell.X && selectedOilWell.Y == oilWell.Y)
+                    {
+                        current = oilWell;
+
+                        foreach (var objective in oilWell.Objectives)
+                        {
+                            if (objectNamesOfHoles.Count == 0)
+                            {
+                                objectNamesOfHoles.Add(objective.Name);
+                            }
+                            foreach (var objectHoles in objectNamesOfHoles)
+                            {
+                                if (objectHoles != objective.Name)
+                                {
+                                    objectNamesOfHoles.Add(objective.Name);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                SwSeriesCollection = new SeriesCollection();
+
+                /*foreach (var datesAndDebitOils in temp.Objectives)
+                {
+                    var point = new LineSeries
+                    {
+                        Values = new ChartValues<DateModel>
+                        {
+                            new DateModel
+                            {
+                                DateTime = datesAndDebitOils.MonthlyObjectiveProduction.Date,
+                                Value = datesAndDebitOils.MonthlyObjectiveProduction.OilDebit
+                            },
+                        },
+                        Fill = Brushes.Transparent,
+                    };
+                    SwSeriesCollection.Add(point);
+                    
+                }*/
+
+                //TODO: построить график Скважины по его Objectives.MonthlyObjectiveProduction(Date и OilDebit)
+                //В current.Objectives хранятся все значения OilDebit и Date
+                foreach (var datesAndDebitOil in current.Objectives)
+                {
+                    SwSeriesCollection.Add(
+                        new LineSeries
+                        {
+                            Title = "Krw",
+                            Values = new ChartValues<double> { datesAndDebitOil.MonthlyObjectiveProduction.OilDebit},
+                            Stroke = (Brush)(new BrushConverter()).ConvertFromString("#E15F41"),
+                            Fill = Brushes.Transparent,
+                            PointGeometrySize = 0
+                        });
+                    
+                    //SwSeriesCollection.Add(point);
+                }
+                //PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+                //OnPropertyChanged(nameof(SwSeriesCollection));
+                //DataContext = this;
             }
         }
 
@@ -308,6 +387,16 @@ namespace BubbleChartOilWells.Views.Functional
                 else
                     SetMap();
             }
+        }
+        public void ChangeRadius(double r)
+        {
+            radius = r;        
+            //OilWellVM.SelectedOilWell.
+        }
+        public class DateModel
+        {
+            public DateTime DateTime { get; set; }
+            public double Value { get; set; }
         }
     }
 }

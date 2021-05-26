@@ -16,6 +16,7 @@ using System.Windows.Media;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using ExcelDataReader;
 using System.Data;
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace BubbleChartOilWells.ViewModels
 {
@@ -59,6 +60,7 @@ namespace BubbleChartOilWells.ViewModels
         private AsyncCommand predictNeuralNetAsyncCommand;
         private AsyncCommand resetNeuralNetAsyncCommand;
         private AsyncCommand exportMapValuesAsyncCommand;
+        private AsyncCommand reportOfNeighHolesToExcel;
 
         public string fileNames;
         //запись первого и второго листа Excel
@@ -66,6 +68,7 @@ namespace BubbleChartOilWells.ViewModels
         List<object> dataList_2 = new List<object>();
 
         IExcelDataReader edr;
+        double radius = 500;
 
 
 
@@ -268,6 +271,7 @@ namespace BubbleChartOilWells.ViewModels
         public AsyncCommand PredictNeuralNetAsyncCommand => predictNeuralNetAsyncCommand ?? (predictNeuralNetAsyncCommand = new AsyncCommand(CalculateNeuralNetAsync));
         public AsyncCommand ResetNeuralNetAsyncCommand => resetNeuralNetAsyncCommand ?? (resetNeuralNetAsyncCommand = new AsyncCommand(ResetNeuralNetAsync));
         public AsyncCommand ExportMapValuesAsyncCommand => exportMapValuesAsyncCommand ?? (exportMapValuesAsyncCommand = new AsyncCommand(ExportMapValuesAsync));
+        //public AsyncCommand ReportOfNeighHolesToExcel => reportOfNeighHolesToExcel ?? (reportOfNeighHolesToExcel  = new AsyncCommand(GetReportToExcel));
 
 
 
@@ -337,6 +341,11 @@ namespace BubbleChartOilWells.ViewModels
 
 
             IsExcelImportEnabled = true;
+        }
+
+        private async Task GetReportToExcel()
+        {
+            oilWellService.ReportOfHeighbourHoles(radius);
         }
 
         /// <summary>
@@ -1012,9 +1021,30 @@ namespace BubbleChartOilWells.ViewModels
             }
         }
 
-        
+        public void OutputToExcel()
+        {
 
-            private List<object> readFile_excel_list_1(string fileNames)
+            //OilWellVMs = (IEnumerable<OilWellVM>)OilWellVMs.GroupBy(x => new { x.Region, x.Field, x.Area, x.X, x.Y, x.Objectives});
+            oilWellService.ReportOfHeighbourHoles(radius);
+          
+        }
+        private bool SelectIfInRadius(OilWellVM oilWellVm, OilWellVM oilWell, double R)
+        {
+            radius = R;
+            double dx = oilWell.X - oilWellVm.X;
+            double dy = oilWell.Y - oilWellVm.Y;
+            
+
+            return (Math.Pow(dx, 2) + Math.Pow(dy, 2) <= Math.Pow(R, 2));
+        }   
+        private void SetRadius(double r)
+        {
+            radius = r;
+        }
+        
+               
+
+        private List<object> readFile_excel_list_1(string fileNames)
             {
                 var extension = fileNames.Substring(fileNames.LastIndexOf('.'));
                 // Создаем поток для чтения.

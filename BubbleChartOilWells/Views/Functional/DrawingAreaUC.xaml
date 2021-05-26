@@ -148,16 +148,16 @@
                                     Grid.Row="2"
                                     LegendLocation="Right"
                                     MinWidth="500"
-                                    MinHeight="250"
+                                    MinHeight="150"
                                     Margin="10,10,10,0">
 
                     <lvc:CartesianChart.AxisX>
-                        <lvc:Axis Title="Водонасыщенность"
+                        <lvc:Axis Title="Время"
                                   Labels="{Binding SwLabels}" />
                     </lvc:CartesianChart.AxisX>
 
                     <lvc:CartesianChart.AxisY>
-                        <lvc:Axis Title="Относительная проницаемость"
+                        <lvc:Axis Title="Дебит нефти"
                                   MinValue="0"
                                   MaxValue="1" />
 

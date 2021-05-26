@@ -7,6 +7,7 @@
         xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Platform"
         xmlns:cs="clr-namespace:BubbleChartOilWells"
         xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+        xmlns:materialDesign ="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:controls="clr-namespace:BubbleChartOilWells.Views.Functional"
         mc:Ignorable="d"
         MinHeight="600"
@@ -115,16 +116,12 @@
                               IsEnabled="{Binding}"
                               Template="{StaticResource VsMenuSub}" />
                 </MenuItem>
-                <MenuItem x:Name="Menu"
-                    Header="Настройки"
+                <MenuItem x:Name="Reports"
+                    Header="Отчет"
                     Template="{StaticResource VsMenuTop}">
-                    <MenuItem Command="{Binding}"
+                    <MenuItem Command="{Binding ReportOfNeighHolesToExcel}"
                               x:Name="SearchNear"
-                              Header="Определение соседей"
-                              Template="{StaticResource VsMenuSub}"
-                              Click="SearchNearHole_new"/>
-                    <MenuItem Command="{Binding}"
-                              Header="Изменить радиус"
+                              Header="Вывод ближ. сосед."
                               Template="{StaticResource VsMenuSub}"/>
                 </MenuItem>
                           
@@ -374,6 +371,16 @@
                             Visibility="{Binding IsChecked, ElementName=SettingsCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <TextBlock Background="White">Settings</TextBlock>
                     </Border>
+                    <Border Grid.Row="1">
+                        <StackPanel>
+                            <Grid Margin="0,20,0,0">
+                                <TextBlock Text="Изменить радиус" HorizontalAlignment="Left" FontSize="10"/>
+                                <TextBox x:Name="inputRadius" PreviewTextInput="InputRadius" PreviewKeyDown="TextBox_PreviewKeyDown" HorizontalAlignment="Right" FontSize="10" Width="100"/>
+                            </Grid>
+
+                        </StackPanel>
+                    </Border>
+
                     <Border x:Name="SelectedOilWellPanel"
                             Grid.Row="2"
                             Margin="0,0,2,0"
