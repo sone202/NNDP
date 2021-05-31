@@ -63,6 +63,7 @@
     <Reference Include="System.Security.Principal.Windows, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Security.Principal.Windows.5.0.0\lib\net461\System.Security.Principal.Windows.dll</HintPath>
     </Reference>
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -73,13 +74,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Mappers\AutoMapperConfigurator.cs" />
+    <Compile Include="Mappers\ConfigureProfiles\DebitGainProfile.cs" />
+    <Compile Include="Mappers\ConfigureProfiles\MapProfile.cs" />
     <Compile Include="Mappers\ConfigureProfiles\OilWellProfile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\ExportMapValuesService.cs" />
+    <Compile Include="Services\ExportOilWellsMapGridService.cs" />
     <Compile Include="Services\IrapMapService.cs" />
     <Compile Include="Services\NeuralNetService.cs" />
     <Compile Include="Services\OilWellService.cs" />
     <Compile Include="Services\SaveMapService.cs" />
+    <Compile Include="Services\SessionService.cs" />
     <Compile Include="Services\UserMapService.cs" />
     <Compile Include="Services\DebitGainService.cs" />
     <Compile Include="Utils\ConvertToColor.cs" />

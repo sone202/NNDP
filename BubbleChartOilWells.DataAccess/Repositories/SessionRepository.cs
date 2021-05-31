@@ -5,39 +5,32 @@ using Newtonsoft.Json;
 
 namespace BubbleChartOilWells.DataAccess.Repositories
 {
-    public class MapRepository
+    public class SessionRepository
     {
         private readonly string jsonFileName;
 
-        public MapRepository(string jsonFileName)
+        public SessionRepository(string jsonFileName)
         {
             this.jsonFileName = jsonFileName;
         }
 
-        public void BulkAdd(List<Map> maps)
+        public void BulkAdd(Session session)
         {
             var options = new JsonSerializerSettings()
             {
-
                 ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects
             };
             
-            var jsonData = JsonConvert.SerializeObject(maps, options);
+            var jsonData = JsonConvert.SerializeObject(session, options);
             File.WriteAllText(jsonFileName, jsonData);
         }
 
-        public List<OilWell> GetAll()
+        public Session GetAll()
         {
-            //var jsonData = string.Empty;
-            //using(var streamReader = new StreamReader(jsonFileName))
-            //{
-            //    jsonData = streamReader.ReadToEnd();
-            //    streamReader.Close();
-            //}
             var jsonData = File.ReadAllText(jsonFileName);
-            var maps = JsonConvert.DeserializeObject<List<OilWell>>(jsonData);
-            return maps;
+            var session = JsonConvert.DeserializeObject<Session>(jsonData);
+            return session;
         }
     }
 }

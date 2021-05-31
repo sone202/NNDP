@@ -50,7 +50,7 @@ namespace BubbleChartOilWells.BusinessLogic.Services
 
                 engine.Evaluate(
                     $@"results <- extended_neuralnet(""{nnVM.TrainingDataFileName.Replace(@"\", @"/")}"",
-                                                        0.8,
+                                                        0.9,
                                                         {RArrayConverter(nnVM.Hidden)},
                                                         {nnVM.Threshold.ToString(System.Globalization.CultureInfo.InvariantCulture)},
                                                         {nnVM.Stepmax.ToString(System.Globalization.CultureInfo.InvariantCulture)},
@@ -180,7 +180,6 @@ namespace BubbleChartOilWells.BusinessLogic.Services
             }
         }
 
-
         public DataTable CsvToDataTable(string fileName)
         {
             var dataTable = new DataTable();
@@ -188,12 +187,13 @@ namespace BubbleChartOilWells.BusinessLogic.Services
             using (var stream = new StreamReader(fileName, System.Text.Encoding.GetEncoding("UTF-8")))
             {
                 var headers = stream.ReadLine().Split(';').ToList();
-                headers.ForEach(x => dataTable.Columns.Add(x));
+                headers.ForEach(x => dataTable.Columns.Add(x.Replace(".", " ")));
+                
+                
                 for (int i = 0; i < dataTable.Columns.Count; i++)
                 {
-                    dataTable.Columns[i].DataType = i < 5 ? typeof(string) : typeof(Double);
+                    dataTable.Columns[i].DataType = i < 5 ? typeof(string) : typeof(Decimal);
                 }
-
 
                 while (!stream.EndOfStream)
                 {
@@ -204,7 +204,11 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                     {
                         try
                         {
-                            newRow[j] = Double.Parse(line[j], new NumberFormatInfo() {NumberDecimalSeparator = "."});
+                            if (j < 5) throw new Exception();
+
+                            var parsedValue = Decimal.Parse(line[j],
+                                new NumberFormatInfo() {NumberDecimalSeparator = "."});
+                            newRow[j] = Math.Round(parsedValue, 2);
                         }
                         catch
                         {

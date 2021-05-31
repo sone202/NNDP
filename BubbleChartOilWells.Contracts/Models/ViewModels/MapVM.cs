@@ -11,6 +11,8 @@ namespace BubbleChartOilWells.Contracts.Models.ViewModels
 
         public double CellWidth { get; set; }
         public double CellHeight { get; set; }
+        public int PixelWidth { get; set; }
+        public int PixelHeight { get; set; }
         public string Name { get; set; }
         public double Width { get; set; }
         public double Height { get; set; }
@@ -28,7 +30,7 @@ namespace BubbleChartOilWells.Contracts.Models.ViewModels
         public Point LeftBottomCoordinate { get; set; }
         public BitmapSource BitmapSource { get; set; }
 
-        public string Objective { get; set; }
+        public ObjectiveVM Objective { get; set; }
 
         // TODO: refactor
         public event PropertyChangedEventHandler PropertyChanged;

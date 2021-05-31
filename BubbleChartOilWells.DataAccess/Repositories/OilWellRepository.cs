@@ -18,7 +18,6 @@ namespace BubbleChartOilWells.DataAccess.Repositories
         {
             var options = new JsonSerializerSettings()
             {
-
                 ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects
             };
@@ -29,12 +28,6 @@ namespace BubbleChartOilWells.DataAccess.Repositories
 
         public List<OilWell> GetAll()
         {
-            //var jsonData = string.Empty;
-            //using(var streamReader = new StreamReader(jsonFileName))
-            //{
-            //    jsonData = streamReader.ReadToEnd();
-            //    streamReader.Close();
-            //}
             var jsonData = File.ReadAllText(jsonFileName);
             var oilWells = JsonConvert.DeserializeObject<List<OilWell>>(jsonData);
             return oilWells;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -54,6 +55,7 @@ namespace BubbleChartOilWells.Views.Functional
             for (int i = 0; i < X_LABELS_COUNT; i++)
             {
                 if (i != 0)
+                {
                     AxesCanvas.Children.Add(new Line
                     {
                         X1 = i * GAP + marginLeft,
@@ -61,18 +63,20 @@ namespace BubbleChartOilWells.Views.Functional
                         X2 = i * GAP + marginLeft,
                         Y2 = marginBottom,
 
-                        Stroke = Brushes.Gray,
+                        Stroke = (Brush)(new BrushConverter().ConvertFrom("#596275")),
                         StrokeThickness = 1
                     });
+                }
+
                 xAxisLabels.Add(i * GAP);
                 XAxisLabelsItemsControl.Items.Add(i * GAP);
-
             }
 
             // Oy point lines
             for (int i = 0; i < Y_LABELS_COUNT; i++)
             {
                 if (i != 0)
+                {
                     AxesCanvas.Children.Add(new Line
                     {
                         X1 = marginLeft - GAUGE_LENGTH,
@@ -80,30 +84,39 @@ namespace BubbleChartOilWells.Views.Functional
                         X2 = marginLeft,
                         Y2 = i * GAP + marginBottom,
 
-                        Stroke = Brushes.Gray,
+                        Stroke = (Brush)(new BrushConverter().ConvertFrom("#596275")),
                         StrokeThickness = 1
                     });
+                }
+
                 yAxisLabels.Insert(0, i * GAP);
                 YAxisLabelsItemsControl.Items.Insert(0, i * GAP);
             }
+
             #endregion
         }
 
         public void SetMap()
         {
-            // setting transform
-            MapRectangle.RenderTransform = new TranslateTransform(
-                 (DataContext as MainVM).SelectedMap.LeftBottomCoordinate.X - renderOffset.X,
-                 (DataContext as MainVM).SelectedMap.LeftBottomCoordinate.Y - renderOffset.Y);
+            if (MapRectangle != null)
+            {
+                //setting transform
+                MapRectangle.RenderTransform = new TranslateTransform(
+                    (DataContext as MainVM).SelectedMap.LeftBottomCoordinate.X - renderOffset.X,
+                    (DataContext as MainVM).SelectedMap.LeftBottomCoordinate.Y - renderOffset.Y);
+            }
         }
 
         public void SetOilWells()
         {
-            foreach (Canvas oilWell in DrawItemsControl.Items)
+            if (DrawItemsControl.Items.Count != 0)
             {
-                oilWell.RenderTransform = new TranslateTransform(
-                    oilWell.RenderTransform.Value.OffsetX - renderOffset.X,
-                    oilWell.RenderTransform.Value.OffsetY - renderOffset.Y);
+                foreach (Canvas oilWell in DrawItemsControl.Items)
+                {
+                    oilWell.RenderTransform = new TranslateTransform(
+                        oilWell.RenderTransform.Value.OffsetX - renderOffset.X,
+                        oilWell.RenderTransform.Value.OffsetY - renderOffset.Y);
+                }
             }
         }
 
@@ -114,60 +127,50 @@ namespace BubbleChartOilWells.Views.Functional
             // first time oilWells import
             if (DrawItemsControl.Items.Count != 0)
             {
-                renderOffset.X = DrawItemsControl.Items.Cast<Canvas>().Sum(x => x.RenderTransform.Value.OffsetX) / DrawItemsControl.Items.Count;
-                renderOffset.Y = DrawItemsControl.Items.Cast<Canvas>().Sum(y => y.RenderTransform.Value.OffsetY) / DrawItemsControl.Items.Count;
-
-                foreach (Canvas oilWell in DrawItemsControl.Items)
+                if (renderOffset.X == 0 && renderOffset.Y == 0)
                 {
-                    oilWell.RenderTransform = new TranslateTransform(
-                        oilWell.RenderTransform.Value.OffsetX - renderOffset.X,
-                        oilWell.RenderTransform.Value.OffsetY - renderOffset.Y);
+                    renderOffset.X = DrawItemsControl.Items.Cast<Canvas>().Sum(x => x.RenderTransform.Value.OffsetX) /
+                                     DrawItemsControl.Items.Count;
+                    renderOffset.Y = DrawItemsControl.Items.Cast<Canvas>().Sum(y => y.RenderTransform.Value.OffsetY) /
+                                     DrawItemsControl.Items.Count;
                 }
+
+                SetOilWells();
             }
 
             // first time map import
             if ((DataContext as MainVM).SelectedMap != null)
             {
-                renderOffset = (DataContext as MainVM).SelectedMap.LeftBottomCoordinate;
-                renderOffset.X -= OFFSET;
-                renderOffset.Y -= OFFSET;
+                if (renderOffset.X == 0 && renderOffset.Y == 0)
+                {
+                    renderOffset = (DataContext as MainVM).SelectedMap.LeftBottomCoordinate;
+                }
 
-                //setting transform
-                MapRectangle.RenderTransform = new TranslateTransform(OFFSET, OFFSET);
+                SetMap();
             }
 
-            // labels update
-            for (int i = 0; i < XAxisLabelsItemsControl.Items.Count; i++)
-                XAxisLabelsItemsControl.Items[i] = xAxisLabels[i] += renderOffset.X;
-            for (int i = 0; i < YAxisLabelsItemsControl.Items.Count; i++)
-                YAxisLabelsItemsControl.Items[i] = yAxisLabels[i] += renderOffset.Y;
+            UpdateLabels(renderOffset.X, renderOffset.Y);
         }
 
         public void MoveTo(object sender, MouseButtonEventArgs e)
         {
+            var localOffsetX = MapRectangle.RenderTransform.Value.OffsetX;
+            var localOffsetY = MapRectangle.RenderTransform.Value.OffsetY;
 
-            for (int i = 0; i < XAxisLabelsItemsControl.Items.Count; i++)
-                XAxisLabelsItemsControl.Items[i] = xAxisLabels[i] += MapRectangle.RenderTransform.Value.OffsetX;
-            for (int i = 0; i < YAxisLabelsItemsControl.Items.Count; i++)
-                YAxisLabelsItemsControl.Items[i] = yAxisLabels[i] += MapRectangle.RenderTransform.Value.OffsetY;
+            renderOffset.X += localOffsetX;
+            renderOffset.Y += localOffsetY;
 
-            if (MapRectangle != null)
-            {
-                renderOffset.X += MapRectangle.RenderTransform.Value.OffsetX;
-                renderOffset.Y += MapRectangle.RenderTransform.Value.OffsetY;
-                SetMap();
-            }
+            SetMap();
+            SetOilWells();
 
-            if (DrawItemsControl.Items.Count != 0)
-            {
-                SetOilWells();
-            }
+            UpdateLabels(localOffsetX, localOffsetY);
         }
 
         #region Moving
 
         private Point mouseDownPoint;
         private Point mouseUpPoint;
+
         private void CanvasMouseDown(object sender, MouseButtonEventArgs e)
         {
             mouseDownPoint = e.GetPosition(sender as UIElement);
@@ -175,13 +178,13 @@ namespace BubbleChartOilWells.Views.Functional
             // TODO: delete
             if (Keyboard.IsKeyDown(Key.LeftCtrl))
             {
-                var parseJson = $"{ JsonConvert.SerializeObject(OilWellVM.SelectedOilWell, Formatting.None)}";
+                var parseJson = $"{JsonConvert.SerializeObject(OilWellVM.SelectedOilWell, Formatting.None)}";
                 parseJson = parseJson.Replace("{", "").Replace("}", "");
                 parseJson = parseJson.Replace("[", "").Replace("]", "");
                 parseJson = parseJson.Replace("\"", "").Replace("\"", "");
                 parseJson = parseJson.Replace(":", ": ");
 
-                (DataContext as MainVM).SelectedOilWellPropertiesValues = parseJson.Split(',').ToList();
+                (DataContext as MainVM).SelectedOilWellPropertyValues = parseJson.Split(',').ToList();
             }
         }
 
@@ -198,8 +201,8 @@ namespace BubbleChartOilWells.Views.Functional
                         if (oilWell != null)
                         {
                             oilWell.RenderTransform = new TranslateTransform(
-                                  oilWell.RenderTransform.Value.OffsetX + mouseUpPoint.X - mouseDownPoint.X,
-                                  oilWell.RenderTransform.Value.OffsetY + mouseUpPoint.Y - mouseDownPoint.Y);
+                                oilWell.RenderTransform.Value.OffsetX + mouseUpPoint.X - mouseDownPoint.X,
+                                oilWell.RenderTransform.Value.OffsetY + mouseUpPoint.Y - mouseDownPoint.Y);
                         }
                     }
                 }
@@ -207,49 +210,66 @@ namespace BubbleChartOilWells.Views.Functional
                 if (MapRectangle != null)
                 {
                     MapRectangle.RenderTransform = new TranslateTransform(
-                                MapRectangle.RenderTransform.Value.OffsetX + mouseUpPoint.X - mouseDownPoint.X,
-                                MapRectangle.RenderTransform.Value.OffsetY + mouseUpPoint.Y - mouseDownPoint.Y);
+                        MapRectangle.RenderTransform.Value.OffsetX + mouseUpPoint.X - mouseDownPoint.X,
+                        MapRectangle.RenderTransform.Value.OffsetY + mouseUpPoint.Y - mouseDownPoint.Y);
                 }
 
                 renderOffset.X -= mouseUpPoint.X - mouseDownPoint.X;
                 renderOffset.Y -= mouseUpPoint.Y - mouseDownPoint.Y;
 
-                for (int i = 0; i < XAxisLabelsItemsControl.Items.Count; i++)
-                    XAxisLabelsItemsControl.Items[i] = xAxisLabels[i] -= (mouseUpPoint.X - mouseDownPoint.X);
-                for (int i = 0; i < YAxisLabelsItemsControl.Items.Count; i++)
-                    YAxisLabelsItemsControl.Items[i] = yAxisLabels[i] -= (mouseUpPoint.Y - mouseDownPoint.Y);
+                UpdateLabels((mouseDownPoint.X - mouseUpPoint.X),
+                    (mouseDownPoint.Y - mouseUpPoint.Y));
 
                 mouseDownPoint = mouseUpPoint;
             }
         }
+
         #endregion
 
+        private void UpdateLabels(double offsetX, double offsetY)
+        {
+            for (int i = 0; i < XAxisLabelsItemsControl.Items.Count; i++)
+            {
+                xAxisLabels[i] += offsetX;
+                XAxisLabelsItemsControl.Items[i] = xAxisLabels[i];
+            }
+
+            for (int i = 0; i < YAxisLabelsItemsControl.Items.Count; i++)
+            {
+                yAxisLabels[i] += offsetY;
+                YAxisLabelsItemsControl.Items[i] = yAxisLabels[i];
+            }
+        }
+
         #region Scaling
+
         private void CanvasMouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (Keyboard.IsKeyDown(Key.LeftCtrl))
             {
-                if (e.Delta > 0)
+                if (isDataUploaded)
                 {
-                    foreach (var oilWellVM in (DataContext as MainVM).OilWellVMs)
+                    if (e.Delta > 0)
                     {
-                        var oilWellView = oilWellVM.OilWellView;
+                        foreach (var oilWellVM in (DataContext as MainVM).OilWellVMs)
+                        {
+                            var oilWellView = oilWellVM.OilWellView;
 
-                        oilWellView.LayoutTransform = new ScaleTransform(
-                            oilWellView.LayoutTransform.Value.M11 * MULTIPLIER,
-                            oilWellView.LayoutTransform.Value.M22 * MULTIPLIER);
+                            oilWellView.LayoutTransform = new ScaleTransform(
+                                oilWellView.LayoutTransform.Value.M11 * MULTIPLIER,
+                                oilWellView.LayoutTransform.Value.M22 * MULTIPLIER);
+                        }
                     }
-
-                }
-                else
-                {
-                    foreach (var oilWellVM in (DataContext as MainVM).OilWellVMs)
+                    else
                     {
-                        var oilWellView = oilWellVM.OilWellView;
+                        foreach (var oilWellVM in (DataContext as MainVM).OilWellVMs)
+                        {
+                            var oilWellView = oilWellVM.OilWellView;
 
-                        oilWellView.LayoutTransform = new ScaleTransform(
-                            oilWellView.LayoutTransform.Value.M11 / MULTIPLIER,
-                            oilWellView.LayoutTransform.Value.M22 / MULTIPLIER);
+                            oilWellView.LayoutTransform = new ScaleTransform(
+                                oilWellView.LayoutTransform.Value.M11 / MULTIPLIER,
+                                oilWellView.LayoutTransform.Value.M22 / MULTIPLIER);
+                        }
                     }
                 }
             }
@@ -278,13 +298,16 @@ namespace BubbleChartOilWells.Views.Functional
                     xAxisLabels[i] = xAxisLabels[0] + i * GAP / canvas.LayoutTransform.Value.M11;
                     XAxisLabelsItemsControl.Items[i] = xAxisLabels[i];
                 }
+
                 for (int i = Y_LABELS_COUNT - 2; i >= 0; i--)
                 {
-                    yAxisLabels[i] = yAxisLabels[Y_LABELS_COUNT - 1] + (Y_LABELS_COUNT - 1 - i) * GAP / -canvas.LayoutTransform.Value.M22;
+                    yAxisLabels[i] = yAxisLabels[Y_LABELS_COUNT - 1] +
+                                     (Y_LABELS_COUNT - 1 - i) * GAP / -canvas.LayoutTransform.Value.M22;
                     YAxisLabelsItemsControl.Items[i] = yAxisLabels[i];
                 }
             }
         }
+
         #endregion
 
         public void OilWellMapChecked(object sender, RoutedEventArgs e)

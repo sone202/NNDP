@@ -30,7 +30,7 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                 using (var reader = new StreamReader(fileName))
                 {
                     var firstRow = reader.ReadLine()?.Split(' ').Select(x => Convert.ToDouble(x, CultureInfo.InvariantCulture));
-                    irapMapDto.CountPerColumn = firstRow.ElementAt(1);
+                    irapMapDto.PixelHeight = Convert.ToInt32(firstRow.ElementAt(1));
                     irapMapDto.CellWidth = firstRow.ElementAt(2);
                     irapMapDto.CellHeight = firstRow.ElementAt(3);
 
@@ -41,18 +41,15 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                     irapMapDto.MaxY = secondRow.ElementAt(3);
 
                     var thirdRow = reader.ReadLine().Split(' ').Select(x => Convert.ToDouble(x, CultureInfo.InvariantCulture));
-                    irapMapDto.CountPerRow = thirdRow.ElementAt(0);
+                    irapMapDto.PixelWidth = Convert.ToInt32(thirdRow.ElementAt(0));
 
                     reader.ReadLine();
 
                     var zValues = reader.ReadToEnd().Replace(Environment.NewLine, string.Empty).Split(' ').Where(x => x != "");
-                    irapMapDto.ZValues = zValues.Select(x => Convert.ToDouble(x, CultureInfo.InvariantCulture)).ToList();
+                    irapMapDto.Z = zValues.Select(x => Convert.ToDouble(x, CultureInfo.InvariantCulture)).ToList();
                 }
 
-                var pictureWidth = Convert.ToInt32(irapMapDto.CountPerRow);
-                var pictureHeight = Convert.ToInt32(irapMapDto.ZValues.Count / irapMapDto.CountPerRow);
-
-                var bitmap = ConvertToBitmap.GetMapBitmap(pictureWidth, pictureHeight, irapMapDto.ZValues, 9999900);
+                var bitmap = ConvertToBitmap.GetMapBitmap(irapMapDto.PixelWidth, irapMapDto.PixelHeight, irapMapDto.Z, 9999900);
 
                 var bitmapSource = Imaging.CreateBitmapSourceFromHBitmap(bitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
                 bitmapSource.Freeze();
@@ -62,10 +59,12 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                     Name = Path.GetFileNameWithoutExtension(fileName),
                     Width = irapMapDto.MaxX - irapMapDto.MinX,
                     Height = irapMapDto.MaxY - irapMapDto.MinY,
+                    PixelWidth = irapMapDto.PixelWidth,
+                    PixelHeight = irapMapDto.PixelHeight,
                     IsSelected = true,
                     LeftBottomCoordinate = new System.Windows.Point(irapMapDto.MinX, irapMapDto.MinY),
                     BitmapSource = bitmapSource,
-                    Z = irapMapDto.ZValues
+                    Z = irapMapDto.Z
                 };
 
                 return ResultResponse<MapVM>.GetSuccessResponse(mapVM);

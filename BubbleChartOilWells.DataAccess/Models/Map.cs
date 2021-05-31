@@ -8,14 +8,14 @@ namespace BubbleChartOilWells.DataAccess.Models
     {
         public double CellWidth { get; set; }
         public double CellHeight { get; set; }
+        public int PixelWidth { get; set; }
+        public int PixelHeight { get; set; }
         public string Name { get; set; }
         public double Width { get; set; }
         public double Height { get; set; }
         public List<double> Z { get; set; }
         public bool IsSelected { get; set; }
-        public bool IsExporting { get; set; }
         public Point LeftBottomCoordinate { get; set; }
-        public BitmapSource BitmapSource { get; set; }
-        public string Objective { get; set; }
+        public Objective Objective { get; set; }
     }
 }

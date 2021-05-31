@@ -145,8 +145,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Views\Functional\CalculationsUC.xaml.cs">
-      <DependentUpon>CalculationsUC.xaml</DependentUpon>
+    <Compile Include="ViewModels\DebitGainVM.cs" />
+    <Compile Include="ViewModels\DrawingAreaVM.cs" />
+    <Compile Include="ViewModels\ExitConfirmationVM.cs" />
+    <Compile Include="ViewModels\NeuralNetVM.cs" />
+    <Compile Include="ViewModels\SaveMapVM.cs" />
+    <Compile Include="Views\Functional\DebitGainUC.xaml.cs">
+      <DependentUpon>DebitGainUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Functional\DrawingAreaUC.xaml.cs">
       <DependentUpon>DrawingAreaUC.xaml</DependentUpon>
@@ -154,8 +159,8 @@
     <Compile Include="Views\Functional\ExitConfirmationWindow.xaml.cs">
       <DependentUpon>ExitConfirmationWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Functional\ExportOilMapValuesWindow.xaml.cs">
-      <DependentUpon>ExportOilMapValuesWindow.xaml</DependentUpon>
+    <Compile Include="Views\Functional\ExportOilWellsMapGridValuesWindow.xaml.cs">
+      <DependentUpon>ExportOilWellsMapGridValuesWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Functional\NeuralNetUC.xaml.cs">
       <DependentUpon>NeuralNetUC.xaml</DependentUpon>
@@ -170,7 +175,7 @@
     <Compile Include="Views\Resource\GenericResource\Converters\EnumerableToBooleanConverter.cs" />
     <Compile Include="Views\Resource\GenericResource\Converters\OilWellVMsToCanvasConverter.cs" />
     <Compile Include="Views\Resource\GenericResource\Converters\NumberToAxisValueConverter.cs" />
-    <Page Include="Views\Functional\CalculationsUC.xaml">
+    <Page Include="Views\Functional\DebitGainUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -179,7 +184,7 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Functional\ExitConfirmationWindow.xaml" />
-    <Page Include="Views\Functional\ExportOilMapValuesWindow.xaml">
+    <Page Include="Views\Functional\ExportOilWellsMapGridValuesWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

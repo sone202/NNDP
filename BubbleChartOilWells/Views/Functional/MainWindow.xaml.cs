@@ -39,10 +39,8 @@ namespace BubbleChartOilWells
 
         private void MapVMsItemsControlSizeChanged(object sender, SizeChangedEventArgs e) => DrawingAreaUserControl.MapVMsItemsControlSizeChanged(sender, e);
 
-        public void MapChecked(object sender, RoutedEventArgs e)
-        {
-            DrawingAreaUserControl.MapChecked(sender, e);
-        }
+        public void MapChecked(object sender, RoutedEventArgs e) => DrawingAreaUserControl.MapChecked(sender, e);
+            
         public void MoveTo(object sender, MouseButtonEventArgs e) => DrawingAreaUserControl.MoveTo(sender, e);
 
         private void ExportOilWellMapValuesButtonClick(object sender, RoutedEventArgs e)

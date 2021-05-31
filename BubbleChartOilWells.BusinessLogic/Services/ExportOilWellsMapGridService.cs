@@ -388,6 +388,7 @@ namespace BubbleChartOilWells.BusinessLogic.Services
 
     }
 
+    // TODO: refactor
     public class OilWellExcel
     {
         public string Field { get; set; }

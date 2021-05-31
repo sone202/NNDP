@@ -3,10 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-        xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Platform"
-        xmlns:cs="clr-namespace:BubbleChartOilWells"
-        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         xmlns:controls="clr-namespace:BubbleChartOilWells.Views.Functional"
         mc:Ignorable="d"
         MinHeight="600"
@@ -76,11 +72,17 @@
                 <MenuItem x:Name="FileImport"
                           Header="_Файл"
                           Template="{StaticResource VsMenuTop}">
+                    <MenuItem Command="{Binding OpenSessionAsyncCommand}"
+                              Header="Открыть сессию"
+                              IsEnabled="{Binding IsReady}"
+                              Template="{StaticResource VsMenuSub}"/>
+                    
+                    <Separator Template="{StaticResource VsMenuSep}"/>
                     <MenuItem Command="{Binding ImportOilWellsAsyncCommand}"
                               Header="Импортировать Excel"
                               IsEnabled="{Binding IsExcelImportEnabled}"
                               Template="{StaticResource VsMenuSub}" />
-                    <MenuItem Command="{Binding GetOilWellsAsyncCommand}"
+                    <MenuItem Command="{Binding ImportJsonOilWellsAsyncCommand}"
                               Header="Открыть последний"
                               IsEnabled="{Binding IsExcelImportEnabled}"
                               Template="{StaticResource VsMenuSub}" />
@@ -162,13 +164,15 @@
                         <Image.Style>
                             <Style TargetType="Image">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                 Value="Maximized">
+                                    <DataTrigger
+                                        Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        Value="Maximized">
                                         <Setter Property="Source"
                                                 Value="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/restore.png" />
                                     </DataTrigger>
-                                    <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                 Value="Normal">
+                                    <DataTrigger
+                                        Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        Value="Normal">
                                         <Setter Property="Source"
                                                 Value="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/maximize.png" />
                                     </DataTrigger>
@@ -231,52 +235,60 @@
                 <!--#endregion-->
 
                 <!--#region NeuralNet-->
-                <Border  Grid.Column="3"
-                         Grid.Row="1"
-                         Background="White"
-                         Margin="0,0,2,0"
-                         Style="{StaticResource ControlBorder}"
-                         Visibility="{Binding IsChecked, ElementName=NeuralnetRadioButton, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Border Grid.Column="3"
+                        Grid.Row="1"
+                        Background="White"
+                        Margin="0,0,2,0"
+                        Style="{StaticResource ControlBorder}"
+                        Visibility="{Binding IsChecked, ElementName=NeuralnetRadioButton, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <controls:NeuralNetUC x:Name="NeuralNetUserControl" />
                 </Border>
                 <!--#endregion-->
 
                 <!--#region ToolBar-->
-                <Border  Grid.Column="4"
-                         Grid.Row="1"
-                         Style="{StaticResource ControlBorder}"
-                         Margin="0,0,0,0">
+                <Border Grid.Column="4"
+                        Grid.Row="1"
+                        Style="{StaticResource ControlBorder}"
+                        Margin="0,0,0,0">
                     <ToolBarTray Background="{StaticResource ToolBarBackgroundBrush}"
                                  Orientation="Vertical">
                         <ToolBar Background="Transparent">
 
                             <CheckBox x:Name="NavigationCheckBox"
                                       IsChecked="True">
-                                <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/tree.png"
-                                       Height="22" />
+                                <Image
+                                    Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/tree.png"
+                                    Height="22" />
                             </CheckBox>
                             <CheckBox x:Name="SettingsCheckBox"
                                       IsChecked="True">
-                                <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/settings.png"
-                                       Height="22" />
+                                <Image
+                                    Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/settings.png"
+                                    Height="22" />
                             </CheckBox>
 
                             <Separator Background="{StaticResource ToolBarSeparatorBrush}" />
                             <RadioButton x:Name="CalculateRadioButton"
-                                         GroupName="UserControls">
-                                <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/calculate.png"
-                                       Height="22" />
+                                         GroupName="UserControls"
+                                         ToolTip="Расчет по Дюпюи">
+                                <Image
+                                    Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/calculate.png"
+                                    Height="22" />
                             </RadioButton>
                             <RadioButton x:Name="NeuralnetRadioButton"
-                                         GroupName="UserControls">
-                                <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/neuralnet.png"
-                                       Height="22" />
+                                         GroupName="UserControls"
+                                         ToolTip="Нейронная сеть">
+                                <Image
+                                    Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/neuralnet.png"
+                                    Height="22" />
                             </RadioButton>
                             <RadioButton x:Name="BubbleChartRadioButton"
                                          GroupName="UserControls"
-                                         IsChecked="True">
-                                <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/bubble_chart.png"
-                                       Height="22" />
+                                         IsChecked="True"
+                                         ToolTip="Карты">
+                                <Image
+                                    Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/bubble_chart.png"
+                                    Height="22" />
 
                             </RadioButton>
 
@@ -299,8 +311,9 @@
                                       Click="OilWellMapChecked"
                                       IsChecked="{Binding IsBubblesChecked}"
                                       IsEnabled="False">
-                                <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/pie_chart.png"
-                                       Height="22" />
+                                <Image
+                                    Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/pie_chart.png"
+                                    Height="22" />
                             </CheckBox>
 
                         </ToolBar>
@@ -308,7 +321,7 @@
                 </Border>
                 <!--#endregion-->
 
-                <!--#region ToolsWindows-->
+                <!--#region ToolWindows-->
                 <Grid Grid.Column="1"
                       Grid.Row="1"
                       Grid.ColumnSpan="2">
@@ -341,12 +354,16 @@
                                              Checked="OilWellMapChecked"
                                              Visibility="Collapsed"
                                              GroupName="OilWellMap"
-                                             IsChecked="{Binding IsProdMapChecked}">Карта текущих отборов</RadioButton>
+                                             IsChecked="{Binding IsProdMapChecked}">
+                                    Карта текущих отборов
+                                </RadioButton>
                                 <RadioButton x:Name="ProdSumMapRadioButton"
                                              Checked="OilWellMapChecked"
                                              GroupName="OilWellMap"
                                              Visibility="Collapsed"
-                                             IsChecked="{Binding IsProdSumMapChecked}">Карта накопленных отборов</RadioButton>
+                                             IsChecked="{Binding IsProdSumMapChecked}">
+                                    Карта накопленных отборов
+                                </RadioButton>
                             </TreeViewItem>
                             <TreeViewItem Header="Карты"
                                           IsExpanded="{Binding MapVMs, Converter={StaticResource ItemsCountToBooleanConverter}}">
@@ -391,8 +408,7 @@
                             Visibility="{Binding IsChecked, ElementName=SettingsCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <ListView Background="White"
                                   BorderThickness="0"
-                                  ItemsSource="{Binding SelectedOilWellPropertiesValues}">
-                        </ListView>
+                                  ItemsSource="{Binding SelectedOilWellPropertyValues}" />
                     </Border>
                 </Grid>
                 <!--#endregion-->

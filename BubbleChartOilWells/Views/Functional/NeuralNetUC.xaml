@@ -207,8 +207,6 @@
                                             <Style TargetType="{x:Type DataGridColumnHeader}">
                                                 <Setter Property="MinWidth"
                                                     Value="50" />
-                                                <Setter Property="MaxWidth"
-                                                    Value="150" />
                                             </Style>
                                         </DataGrid.ColumnHeaderStyle>
                                         <DataGrid.RowHeaderStyle>
@@ -217,10 +215,8 @@
                                                     Value="{Binding Converter={StaticResource DataGridRowIndexConverter}, ConverterParameter=TrainResultDataGrid}" />
                                                 <Setter Property="MinWidth"
                                                         Value="40" />
-                                                <Setter Property="MaxWidth"
-                                                        Value="150" />
                                                 <Setter Property="HorizontalAlignment"
-                                                    Value="Stretch" />
+                                                        Value="right" />
                                             </Style>
                                         </DataGrid.RowHeaderStyle>
                                     </DataGrid>

@@ -36,20 +36,6 @@
                         <ScaleTransform ScaleX="1"
                                         ScaleY="-1" />
                     </Canvas.LayoutTransform>
-                    <!-- Axis X line--><!--
-                    <Line X1="80"
-                          Y1="50"
-                          X2="3000"
-                          Y2="50"
-                          Stroke="Gray"
-                          StrokeThickness="1" />
-                    --><!-- Axis Y line--><!--
-                    <Line X1="80"
-                          Y1="50"
-                          X2="80"
-                          Y2="2000"
-                          Stroke="Gray"
-                          StrokeThickness="1" />-->
                 </Canvas>
 
                 <!-- Axis X labels-->

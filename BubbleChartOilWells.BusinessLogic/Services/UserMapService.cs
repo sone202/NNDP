@@ -7,11 +7,14 @@ using RDotNet;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
@@ -31,8 +34,8 @@ namespace BubbleChartOilWells.BusinessLogic.Services
             engine = REngine.GetInstance();
             // TODO: logger
         }
-
-        public ResultResponse<MapVM> DrawPredictedMap(DataTable predictedDataFrame)
+      
+        public ResultResponse<MapVM> GetPredictedMap(DataTable predictedDataFrame)
         {
             try
             {
@@ -56,18 +59,29 @@ namespace BubbleChartOilWells.BusinessLogic.Services
 
                 foreach (var oilWellUserMapValueDto in oilWellUserMapValueDtos)
                 {
-                    var oilWell = oilWells.First(x => x.Name == oilWellUserMapValueDto.OilWellName);
+                    try
+                    {
+                        var oilWell = oilWells.First(x => x.Name == oilWellUserMapValueDto.OilWellName);
 
-                    xList.Add(oilWell.X);
-                    yList.Add(oilWell.Y);
-                    zList.Add(oilWellUserMapValueDto.Value);
+                        xList.Add(oilWell.X);
+                        yList.Add(oilWell.Y);
+                        zList.Add(oilWellUserMapValueDto.Value);
+                    }
+                    catch{}
                 }
 
+                if (xList.Count < 3)
+                {
+                    throw new Exception("Недостаточно загруженных скважин для построения карты");
+                }
+                
+                // TODO: delete
+                MessageBox.Show($@"Найдено {zList.Count} из {oilWellUserMapValueDtos.Count}");
+                
                 var predictedMapVM = GetKrigedMap(xList, yList, zList);
                 predictedMapVM.Name = $@"PredictedMap~{DateTime.Now}";
                 predictedMapVM.IsSelected = true;
                 predictedMapVM.BitmapSource.Freeze();
-
 
                 return ResultResponse<MapVM>.GetSuccessResponse(predictedMapVM);
             }
@@ -94,11 +108,12 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                         var row = reader.ReadLine().Split(new char[] { ' ', '\t' });
 
                         var dotSeparatorValue = Convert.ToDouble(row[1], NumberFormatInfo.InvariantInfo);
-                        var commaSeparatorValue = Convert.ToDouble(row[1], new NumberFormatInfo { NumberDecimalSeparator = "," });
+                        //var commaSeparatorValue = Convert.ToDouble(row[1], new NumberFormatInfo { NumberDecimalSeparator = "," });
                         var oilWellUserMapValueDto = new OilWellUserMapValueDto
                         {
                             OilWellName = row[0],
-                            Value = (dotSeparatorValue > commaSeparatorValue) ? commaSeparatorValue : dotSeparatorValue
+                            //Value = (dotSeparatorValue > commaSeparatorValue) ? commaSeparatorValue : dotSeparatorValue
+                            Value = dotSeparatorValue
                         };
                         oilWellUserMapValueDtos.Add(oilWellUserMapValueDto);
                     }
@@ -113,13 +128,21 @@ namespace BubbleChartOilWells.BusinessLogic.Services
 
                 foreach (var oilWellUserMapValueDto in oilWellUserMapValueDtos)
                 {
-                    var oilWell = oilWells.First(x => x.Name == oilWellUserMapValueDto.OilWellName);
-
-                    xList.Add(oilWell.X);
-                    yList.Add(oilWell.Y);
-                    zList.Add(oilWellUserMapValueDto.Value);
+                    try
+                    {
+                        var oilWell = oilWells.First(x => x.Name == oilWellUserMapValueDto.OilWellName);
+                        xList.Add(oilWell.X);
+                        yList.Add(oilWell.Y);
+                        zList.Add(oilWellUserMapValueDto.Value);
+                    }
+                    catch {}
                 }
-
+                
+                if (xList.Count < 3)
+                {
+                    throw new Exception("Недостаточно загруженных скважин для построения карты");
+                }
+                
                 var userMapVM = GetKrigedMap(xList, yList, zList);
                 userMapVM.Name = Path.GetFileNameWithoutExtension(fileName);
                 userMapVM.IsSelected = true;
@@ -136,7 +159,7 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                                                                 {e.StackTrace}");
             }
         }
-
+        
         public ResultResponse<List<ContourFragmentVM>> ImportUserMapContour(string fileName)
         {
             try
@@ -201,7 +224,7 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                 engine = REngine.GetInstance();
             }
 
-            engine.Evaluate(@"if (!require(""kriging"")) install.packages(""neuralnet"", dependencies = TRUE)");
+            engine.Evaluate(@"if (!require(""kriging"")) install.packages(""kriging"", dependencies = TRUE)");
             engine.Evaluate(@$"library(kriging)");
 
             engine.SetSymbol("x", engine.CreateNumericVector(X));
@@ -213,53 +236,39 @@ namespace BubbleChartOilWells.BusinessLogic.Services
 
             engine.Evaluate("kriged <- kriging(x, y, z, model, lags, pixels)");
             //engine.Evaluate("image(kriged, xlim = extendrange(x), ylim = extendrange(y))");
-            engine.Evaluate("resultX <- kriged$map[[1]]");
-            engine.Evaluate("resultY <- kriged$map[[2]]");
-            engine.Evaluate("resultZ <- kriged$map[[3]]");
+            engine.Evaluate("resultX <- kriged$map$x");
+            engine.Evaluate("resultY <- kriged$map$y");
+            engine.Evaluate("resultZ <- kriged$map$pred");
 
-            var krigedZ = engine.GetSymbol("resultZ").AsNumeric().ToList();
-            var krigedX = engine.GetSymbol("resultX").AsNumeric().ToList();
-            var krigedY = engine.GetSymbol("resultY").AsNumeric().ToList();
+            var xKriged = engine.GetSymbol("resultX").AsNumeric().ToList();
+            var yKriged = engine.GetSymbol("resultY").AsNumeric().ToList();
+            var zKriged = engine.GetSymbol("resultZ").AsNumeric().ToList();
 
-            var pixelWidth = krigedY.Count(y => y == krigedY.First());
-            var pixelHeight = krigedX.Count(x => x == krigedX.First());
+            var pixelWidth = yKriged.Count(y => y == yKriged.First());
+            var pixelHeight = xKriged.Count(x => x == xKriged.First());
 
-            var xInversed = new List<double>();
+            var zInversed = new List<double>();
             for (int i = 0; i < pixelHeight; i++)
             {
-                for (int j = i; j < krigedZ.Count; j += pixelWidth)
+                for (int j = i; j < zKriged.Count; j += pixelHeight)
                 {
-                    xInversed.Add(krigedX[j]);
+                    zInversed.Add(zKriged[j]);
                 }
             }
-
-            var yInversed = new List<double>();
-            var zInversed = new List<double>();
-            for (int i = 0; i < pixelWidth; i++)
-            {
-                for (int j = i; j < krigedZ.Count; j += pixelHeight)
-                {
-                    yInversed.Add(krigedY[j]);
-                    zInversed.Add(krigedZ[j]);
-                }
-            }
-
-            var mapWidth = xInversed.Max() - xInversed.Min();
-            var mapHeight = yInversed.Max() - yInversed.Min();
-
+            
+            var mapWidth = xKriged.Max() - xKriged.Min();
+            var mapHeight = yKriged.Max() - yKriged.Min();
             var userMapBitmap = ConvertToBitmap.GetMapBitmap(pixelWidth, pixelHeight, zInversed);
-
-            var bitmapSource = Imaging.CreateBitmapSourceFromHBitmap(userMapBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
 
             var userMapVM = new MapVM
             {
-                CellWidth = mapWidth / pixelWidth,
-                CellHeight = mapHeight / pixelHeight,
+                CellWidth = mapWidth / pixelHeight,
+                CellHeight = mapHeight / pixelWidth,
                 Width = mapWidth,
                 Height = mapHeight,
-                LeftBottomCoordinate = new System.Windows.Point(xInversed.Min(), yInversed.Min()),
+                LeftBottomCoordinate = new System.Windows.Point(xKriged.Min(), yKriged.Min()),
                 Z = zInversed,
-                BitmapSource = bitmapSource
+                BitmapSource = Imaging.CreateBitmapSourceFromHBitmap(userMapBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions())
             };
 
             return userMapVM;

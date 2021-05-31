@@ -140,7 +140,8 @@ namespace BubbleChartOilWells.BusinessLogic.Services
 
                 var debitMapVM = new MapVM
                 {
-                    Name = $@"{mapType}Map~{DateTime.Now}",
+                    // Name = $@"{mapType}Map~{DateTime.Now}",
+                    Name = $@"{mapType}",
                     Width = debitGainVM.Pr.Width,
                     Height = debitGainVM.Pr.Height,
                     LeftBottomCoordinate = debitGainVM.Pr.LeftBottomCoordinate,
