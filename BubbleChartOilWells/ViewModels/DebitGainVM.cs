@@ -79,6 +79,7 @@ namespace BubbleChartOilWells.ViewModels
 
             try
             {
+                
                 if (DebitGainVM.Sw == null)
                 {
                     MessageBox.Show("Выберите карту Sw");
@@ -88,18 +89,18 @@ namespace BubbleChartOilWells.ViewModels
                 }
 
                 // getting data from datagrid 
-                var Krw = new List<ObservablePoint>(); // офп воды
-                var Kro = new List<ObservablePoint>(); // офп нефти
+                var krw = new List<ObservablePoint>(); // офп воды
+                var kro = new List<ObservablePoint>(); // офп нефти
                 var waterSaturation = new List<double>(); // водонасыщенность
 
                 for (int i = 0; i < DebitGainVM.Ofp.Rows.Count; i++)
                 {
-                    waterSaturation.Add((double) DebitGainVM.Ofp.Rows[i][0]);
+                    waterSaturation.Add((double)DebitGainVM.Ofp.Rows[i][0]);
 
-                    Krw.Add(new ObservablePoint((double) DebitGainVM.Ofp.Rows[i][0],
-                        (double) DebitGainVM.Ofp.Rows[i][2]));
+                    krw.Add(new ObservablePoint((double)DebitGainVM.Ofp.Rows[i][0],
+                        Double.Parse(DebitGainVM.Ofp.Rows[i][2].ToString())));
 
-                    Kro.Add(new ObservablePoint((double) DebitGainVM.Ofp.Rows[i][0],
+                    kro.Add(new ObservablePoint((double) DebitGainVM.Ofp.Rows[i][0],
                         (double) DebitGainVM.Ofp.Rows[i][1]));
                 }
 
@@ -109,7 +110,7 @@ namespace BubbleChartOilWells.ViewModels
                     new ScatterSeries
                     {
                         Title = "Krw",
-                        Values = new ChartValues<ObservablePoint>(Krw),
+                        Values = new ChartValues<ObservablePoint>(krw),
                         Fill = Brushes.Blue
                     });
 
@@ -117,7 +118,7 @@ namespace BubbleChartOilWells.ViewModels
                     new ScatterSeries
                     {
                         Title = "Kro",
-                        Values = new ChartValues<ObservablePoint>(Kro),
+                        Values = new ChartValues<ObservablePoint>(kro),
                         Fill = Brushes.Brown
                     });
 
@@ -125,14 +126,14 @@ namespace BubbleChartOilWells.ViewModels
                 var KrwCurve = new List<ObservablePoint>();
                 var KroCurve = new List<ObservablePoint>();
 
-                debitGainVM.Scw = Krw.Where(x => x.Y == Krw.Min(z => z.Y)).Last().X;
-                debitGainVM.Sor = 1 - Kro.Where(x => x.Y == Kro.Min(z => z.Y)).First().X;
+                debitGainVM.Scw = krw.Where(x => x.Y == krw.Min(z => z.Y)).Last().X;
+                debitGainVM.Sor = 1 - kro.Where(x => x.Y == kro.Min(z => z.Y)).First().X;
 
-                debitGainVM.Krwor = Krw.Where(x => x.X == (1 - debitGainVM.Sor)).Last().Y;
-                debitGainVM.Krocw = Kro.Where(x => x.X == debitGainVM.Scw).First().Y;
+                debitGainVM.Krwor = krw.Where(x => Convert.ToDecimal(x.X) == Convert.ToDecimal(1 - debitGainVM.Sor)).Last().Y;
+                debitGainVM.Krocw = kro.Where(x => Convert.ToDecimal(x.X) == Convert.ToDecimal(debitGainVM.Scw)).First().Y;
 
-                debitGainVM.Nw = GetNw(Krw, debitGainVM);
-                debitGainVM.No = GetNo(Kro, debitGainVM);
+                debitGainVM.Nw = GetNw(krw, debitGainVM);
+                debitGainVM.No = GetNo(kro, debitGainVM);
 
                 for (double i = debitGainVM.Scw; i <= 1 - debitGainVM.Sor; i += 0.01)
                 {
@@ -236,7 +237,7 @@ namespace BubbleChartOilWells.ViewModels
             var Krwor = debitGainVM.Krwor;
             var Scw = debitGainVM.Scw;
             var Sor = debitGainVM.Sor;
-            var threshold = 0.005;
+            var threshold = 0.01;
             var tableValuesCount = tableValues.Count;
 
             if (flag == true)
@@ -305,7 +306,7 @@ namespace BubbleChartOilWells.ViewModels
             var Krocw = debitGainVM.Krocw;
             var Scw = debitGainVM.Scw;
             var Sor = debitGainVM.Sor;
-            var threshold = 0.005;
+            var threshold = 0.01;
             var tableValuesCount = tableValues.Count;
 
             if (flag == true)

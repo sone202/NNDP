@@ -132,10 +132,10 @@ namespace BubbleChartOilWells.Contracts.Models.ViewModels
 
         public void Reset()
         {
-            Hidden = new int[] { 8, 8 };
+            Hidden = new int[] { 16, 16 };
             Threshold = 0.01;
             Stepmax = 10000000;
-            Rep = 5;
+            Rep = 25;
             LearningRate = 0.001;
             Algorithm = "backprop";
             ErrorFunction = "sse";

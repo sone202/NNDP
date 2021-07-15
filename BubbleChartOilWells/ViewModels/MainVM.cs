@@ -25,7 +25,7 @@ namespace BubbleChartOilWells.ViewModels
         private readonly OilWellService oilWellService;
         private readonly IrapMapService irapMapService;
         private readonly UserMapService userMapService;
-        private readonly ExportMapValuesService exportMapValuesService;
+        private readonly ExportOilWellsMapGridService exportOilWellsMapGridService;
 
         private bool isReady;
         private bool isExcelImportEnabled;
@@ -214,7 +214,7 @@ namespace BubbleChartOilWells.ViewModels
             userMapService = new UserMapService(jsonOilWellsFileName);
             debitGainService = new DebitGainService();
             neuralNetService = new NeuralNetService();
-            exportMapValuesService = new ExportMapValuesService();
+            exportOilWellsMapGridService = new ExportOilWellsMapGridService();
             saveMapService = new SaveMapService();
             sessionService = new SessionService();
 
@@ -327,7 +327,12 @@ namespace BubbleChartOilWells.ViewModels
 
 
                 var fileNames = openFileForm.ShowDialog() == true ? openFileForm.FileNames : null;
-
+                if (fileNames == null)
+                {
+                    IsMapImportEnabled = true;
+                    return;
+                }
+    
 
                 foreach (var fileName in fileNames)
                 {
@@ -365,7 +370,7 @@ namespace BubbleChartOilWells.ViewModels
 
                 while (!reader.EndOfStream)
                 {
-                    var row = reader.ReadLine().Split(new char[] {' ', '\t'});
+                    var row = reader.ReadLine().Split(new char[] {' ', '\t', ';'});
                     OilWellVMs.First(x => x.Name == row[0]).Select();
                 }
 
@@ -386,14 +391,15 @@ namespace BubbleChartOilWells.ViewModels
                 var isJsonExists = File.Exists(jsonOilWellsFileName);
                 if (!isJsonExists)
                 {
-                    MessageBox.Show("Сохраненные данные отсутствуют. Необходимо импортировать excel файл.");
+                    // MessageBox.Show("Сохраненные данные отсутствуют. Необходимо импортировать excel файл.");
+                    MessageBox.Show("Сохраненные данные отсутствуют. Иди в жопу.");
                     return;
                 }
 
                 var openFileForm = new OpenFileDialog
                 {
-                    InitialDirectory = "\\Documents",
-                    Filter = "Карта (*.txt)|*.txt",
+                    InitialDirectory = "Documents",
+                    Filter = "Карта (*.txt, *.csv) | *.txt; *.csv",
                     FilterIndex = 1,
                     Multiselect = true,
                     RestoreDirectory = true
@@ -402,9 +408,10 @@ namespace BubbleChartOilWells.ViewModels
                 var fileNames = openFileForm.ShowDialog() == true ? openFileForm.FileNames : null;
                 if (fileNames == null)
                 {
+                    IsMapImportEnabled = true;
                     return;
                 }
-
+                
                 foreach (var fileName in fileNames)
                 {
                     var result = userMapService.ImportUserMap(fileName);
@@ -499,7 +506,7 @@ namespace BubbleChartOilWells.ViewModels
             {
                 await Task.Run(() =>
                 {
-                    var result = exportMapValuesService.ExportMapValuesToExcel(MapVMs.Where(x => x.IsExporting == true),
+                    var result = exportOilWellsMapGridService.ExportMapValuesToExcel(MapVMs.Where(x => x.IsExporting == true),
                         OilWellVMs, dialog.FileName + "\\mapExport.xlsx");
                     if (!result.IsSuccess)
                     {

@@ -16,7 +16,7 @@ using System.Windows;
 
 namespace BubbleChartOilWells.BusinessLogic.Services
 {
-    public class ExportMapValuesService
+    public class ExportOilWellsMapGridService
     {
         public ResultResponse<string> ExportMapValuesToExcel(IEnumerable<MapVM> mapVMs, IEnumerable<OilWellVM> oilWellVMs, string fileName, string sheetName = "Sheet1")
         {

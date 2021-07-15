@@ -28,7 +28,15 @@ namespace BubbleChartOilWells.Views.Resource.GenericResource.Converters
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var str = value.ToString();
-            var result = Array.ConvertAll(str.Split(new string[] { ", " }, StringSplitOptions.None), x => int.Parse(x));
+            var result = new [] {16, 16};
+            try
+            {
+                result = Array.ConvertAll(str.Split(new string[] {", "}, StringSplitOptions.None), x => int.Parse(x));
+            }
+            catch
+            {
+                MessageBox.Show("Введенные данные неверные, количество нейронов изменено не будет");
+            }
 
             return result;
         }

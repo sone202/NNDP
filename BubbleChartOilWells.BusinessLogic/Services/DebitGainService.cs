@@ -65,14 +65,13 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                                 //       * (debitGainVM.KoInEachMapCell[i] / (debitGainVM.MUo * debitGainVM.Bo) +
                                 //          debitGainVM.KwInEachMapCell[i] / (debitGainVM.MUw * debitGainVM.Bw)));
                                 //
-                                
+
                                 // TODO: refactor
                                 // water + oil
-                                
+
                                 z.Add(KHValues[i] * (debitGainVM.Pr.Z[i] - debitGainVM.Pwf)
                                       / (18.41 * (Math.Log(debitGainVM.Re / debitGainVM.Rw) - 0.75 + debitGainVM.Stot))
                                       * (debitGainVM.KwInEachMapCell[i] / (debitGainVM.MUw * debitGainVM.Bw))
-                                      
                                       + KHValues[i] * (debitGainVM.Pr.Z[i] - debitGainVM.Pwf)
                                       / (18.41 * (Math.Log(debitGainVM.Re / debitGainVM.Rw) - 0.75 + debitGainVM.Stot))
                                       * (debitGainVM.KoInEachMapCell[i] / (debitGainVM.MUo * debitGainVM.Bo)));
@@ -199,8 +198,7 @@ namespace BubbleChartOilWells.BusinessLogic.Services
             catch (Exception e)
             {
                 // TODO: write error to log
-                return ResultResponse<double>.GetErrorResponse(
-                    $@"Ошибка вычисления значения ОФП по воде.{Environment.NewLine}
+                return ResultResponse<double>.GetErrorResponse($@"Ошибка вычисления значения ОФП по воде.{Environment.NewLine}
                                                                             {e.Message}{Environment.NewLine}
                                                                             {e.StackTrace}");
             }

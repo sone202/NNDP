@@ -56,7 +56,6 @@
     <Compile Include="Models\Dto\NeuralNetDto.cs" />
     <Compile Include="Models\Dto\OilWellExcelDto.cs" />
     <Compile Include="Models\Dto\MonthlyObjectiveProductionExcelDto.cs" />
-    <Compile Include="Enums.cs" />
     <Compile Include="Models\Dto\OilWellUserMapValueDto.cs" />
     <Compile Include="Models\ViewModels\ContourFragmentVM.cs" />
     <Compile Include="Models\ViewModels\MapVM.cs" />
@@ -68,6 +67,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Resources\OilWellStatuses.cs" />
     <Compile Include="ResultResponse.cs" />
     <Compile Include="Models\ViewModels\MonthlyObjectiveProductionVM.cs" />
     <Compile Include="Models\ViewModels\ObjectiveVM.cs" />

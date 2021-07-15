@@ -106,9 +106,6 @@
     <None Include="RFunctions\predict_neuralnet.R">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="RFunctions\split_data.R">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BubbleChartOilWells.Contracts\BubbleChartOilWells.Contracts.csproj">

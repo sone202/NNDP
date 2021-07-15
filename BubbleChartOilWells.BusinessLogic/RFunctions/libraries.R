@@ -2,7 +2,11 @@
 
 if (!require("installr")) install.packages("installr", dependencies = TRUE);
 library(installr)
-install.Rtools(check = TRUE, check_r_update = TRUE, GUI = FALSE);
+
+if(!require("pkgbuild")) install.packages("pkgbuild", dependencies = TRUE);
+library(pkgbuild)
+
+if (!has_rtools()) install.Rtools(check = TRUE, check_r_update = TRUE, GUI = FALSE);
 
 if (!require("devtools")) install.packages("devtools", dependencies = TRUE);
 library(devtools)

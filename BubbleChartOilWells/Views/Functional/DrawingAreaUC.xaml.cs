@@ -1,19 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
-using BubbleChartOilWells.BusinessLogic.Mappers;
 using BubbleChartOilWells.Contracts.Models.ViewModels;
 using BubbleChartOilWells.ViewModels;
 using Newtonsoft.Json;
@@ -23,7 +14,7 @@ namespace BubbleChartOilWells.Views.Functional
     /// <summary>
     /// Interaction logic for DrawingAreaUC.xaml
     /// </summary>
-    public partial class DrawingAreaUC : UserControl
+    public partial class DrawingAreaUC
     {
         private const int GAP = 50;
         private const int X_LABELS_COUNT = 50;

@@ -21,11 +21,8 @@ namespace BubbleChartOilWells.BusinessLogic.Services
             "normalize.R",
             "extended_neuralnet.R",
             "predict_neuralnet.R",
-            "split_data.R",
             "create_formula.R"
         };
-
-        private const int SKIP_COLUMNS_COUNT = 5;
 
         public NeuralNetService()
         {
@@ -42,6 +39,7 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                 // connecting libraries
                 engine.Evaluate($@"source(""{Path.GetFullPath("RFunctions/libraries.R").Replace(@"\", @"/")}"")");
 
+                
                 // defining functions
                 foreach (var rFuncion in rFunctions)
                 {
@@ -50,7 +48,7 @@ namespace BubbleChartOilWells.BusinessLogic.Services
 
                 engine.Evaluate(
                     $@"results <- extended_neuralnet(""{nnVM.TrainingDataFileName.Replace(@"\", @"/")}"",
-                                                        0.9,
+                                                        0.8,
                                                         {RArrayConverter(nnVM.Hidden)},
                                                         {nnVM.Threshold.ToString(System.Globalization.CultureInfo.InvariantCulture)},
                                                         {nnVM.Stepmax.ToString(System.Globalization.CultureInfo.InvariantCulture)},
@@ -84,17 +82,12 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                     Error <- results$NN$result.matrix[1] 
                     Headers <- results$Headers");
 
-
-                // engine.SetSymbol("Headers", engine.CreateCharacterVector(nnVM.ImportedDataHeaders));
-                // var debugHeaders = engine.GetSymbol("Headers").AsVector();
-                //
-
-                Directory.CreateDirectory(Path.GetDirectoryName(nnVM.TrainingDataFileName) +
-                                          $"\\Results");
+                
+                Directory.CreateDirectory(Path.GetDirectoryName(nnVM.TrainingDataFileName) + "\\Results");
                 var trainResultsFileName = Path.GetDirectoryName(nnVM.TrainingDataFileName) +
-                                           $"\\Results\\TrainResults~{DateTime.Now.ToString("dd.MM.yyyy_HH.mm")}.csv";
+                                           $"\\Results\\{Path.GetFileNameWithoutExtension(nnVM.TrainingDataFileName)}_TrainResults~{DateTime.Now.ToString("dd.MM.yyyy_HH.mm")}.csv";
                 var testResultsFileName = Path.GetDirectoryName(nnVM.TrainingDataFileName) +
-                                          $"\\Results\\TestResults~{DateTime.Now.ToString("dd.MM.yyyy_HH.mm")}.csv";
+                                          $"\\Results\\{Path.GetFileNameWithoutExtension(nnVM.TrainingDataFileName)}_TestResults~{DateTime.Now.ToString("dd.MM.yyyy_HH.mm")}.csv";
                 engine.Evaluate(
                     $@"
                     write.table(BindedTrainResults, row.names = FALSE, file = ""{trainResultsFileName.Replace(@"\", @"/")}"", fileEncoding = ""UTF-8"", sep = "";"", quote=FALSE)
@@ -161,8 +154,9 @@ namespace BubbleChartOilWells.BusinessLogic.Services
 
                 engine.Evaluate($@"BindedPredictionResults <- results$BindedPredictionResults");
 
+                Directory.CreateDirectory(Path.GetDirectoryName(nnVM.PredictDataFileName) + "\\Results");
                 var predictionResultsFileName = Path.GetDirectoryName(nnVM.PredictDataFileName) +
-                                                $"\\Results\\PredictionResults~{DateTime.Now.ToString("dd.MM.yyyy_HH.mm")}.csv";
+                                                $"\\Results\\{Path.GetFileNameWithoutExtension(nnVM.PredictDataFileName)}_PredictionResults~{DateTime.Now.ToString("dd.MM.yyyy_HH.mm")}.csv";
                 engine.Evaluate(
                     $@"
                     write.table(BindedPredictionResults, row.names = FALSE, file = ""{predictionResultsFileName.Replace(@"\", @"/")}"", fileEncoding = ""UTF-8"", sep = "";"", quote=FALSE)");
@@ -175,8 +169,8 @@ namespace BubbleChartOilWells.BusinessLogic.Services
             {
                 return ResultResponse<NeuralNetVM>.GetErrorResponse(
                     $@"Ошибка вычисления прироста дебита жидкости.{Environment.NewLine}
-                                                              {e.Message}{Environment.NewLine}
-                                                              {e.StackTrace}");
+{e.Message}{Environment.NewLine}
+{e.StackTrace}");
             }
         }
 
@@ -186,10 +180,9 @@ namespace BubbleChartOilWells.BusinessLogic.Services
 
             using (var stream = new StreamReader(fileName, System.Text.Encoding.GetEncoding("UTF-8")))
             {
-                var headers = stream.ReadLine().Split(';').ToList();
+                var headers = stream.ReadLine()?.Split(';').ToList();
                 headers.ForEach(x => dataTable.Columns.Add(x.Replace(".", " ")));
-                
-                
+
                 for (int i = 0; i < dataTable.Columns.Count; i++)
                 {
                     dataTable.Columns[i].DataType = i < 5 ? typeof(string) : typeof(Decimal);
@@ -197,22 +190,27 @@ namespace BubbleChartOilWells.BusinessLogic.Services
 
                 while (!stream.EndOfStream)
                 {
-                    var line = stream.ReadLine().Split(';').ToList();
+                    var line = stream.ReadLine()?.Split(';').ToList();
 
                     DataRow newRow = dataTable.Rows.Add();
                     for (int j = 0; j < line.Count; j++)
                     {
                         try
                         {
-                            if (j < 5) throw new Exception();
-
-                            var parsedValue = Decimal.Parse(line[j],
-                                new NumberFormatInfo() {NumberDecimalSeparator = "."});
-                            newRow[j] = Math.Round(parsedValue, 2);
+                            if (j < 5)
+                            {
+                                newRow[j] = line[j];
+                            }
+                            else
+                            {
+                                var parsedValue = Decimal.Parse(line[j],
+                                    new NumberFormatInfo() {NumberDecimalSeparator = "."});
+                                newRow[j] = Math.Round(parsedValue, 2);
+                            }
                         }
                         catch
                         {
-                            newRow[j] = line[j];
+                            newRow[j] = EToNormal(line[j]);
                         }
                     }
                 }
@@ -220,7 +218,27 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                 stream.Close();
             }
 
+
             return dataTable;
+        }
+
+        private decimal EToNormal(string number)
+        {
+            var numberParts = number.Split('e');
+            var num = double.Parse(numberParts[0]);
+            var numPower = int.Parse(numberParts[1].Substring(1));
+            var multiplier = Math.Pow(num, numPower);
+
+            if (numberParts[1][0] == '-')
+            {
+                num /= multiplier;
+            }
+            else
+            {
+                num *= multiplier;
+            }
+
+            return Convert.ToDecimal(num);
         }
 
         private string RArrayConverter(int[] array)

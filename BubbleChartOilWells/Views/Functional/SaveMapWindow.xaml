@@ -92,7 +92,7 @@
                             Margin="10, 0, 10, 10"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Bottom"
-                            Content="Экспортировать"
+                            Content="Сохранить"
                             Command="{Binding SaveMapAsyncCommand}"
                             Padding="10,5" />
                 </Grid>

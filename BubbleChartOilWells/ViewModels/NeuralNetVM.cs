@@ -3,19 +3,13 @@ using BubbleChartOilWells.BusinessLogic.Services;
 using BubbleChartOilWells.Contracts.Models.ViewModels;
 using Microsoft.Win32;
 using System;
-using System.Collections;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Linq;
-using System.IO;
 using System.Collections.Generic;
 using LiveCharts;
 using LiveCharts.Wpf;
 using LiveCharts.Defaults;
 using System.Windows.Media;
-using Microsoft.WindowsAPICodePack.Dialogs;
-using Newtonsoft.Json;
 
 namespace BubbleChartOilWells.ViewModels
 {
@@ -138,7 +132,7 @@ namespace BubbleChartOilWells.ViewModels
             {
                 var openFileForm = new OpenFileDialog
                 {
-                    InitialDirectory = "c:\\documents",
+                    InitialDirectory = "",
                     Filter = "csv (*.csv)|*.csv",
                     FilterIndex = 1,
                     RestoreDirectory = true
@@ -276,25 +270,25 @@ namespace BubbleChartOilWells.ViewModels
                     return;
                 }
 
-                var mapResult = userMapService.GetPredictedMap(neuralNetVM.PredictionFullResults);
-                if (mapResult.IsSuccess)
-                {
-                    Application.Current.Dispatcher.Invoke(new Action(() =>
-                    {
-                        if (SelectedMap != null)
-                        {
-                            SelectedMap.IsSelected = false;
-                        }
-
-                        SelectedMap = mapResult.Data;
-
-                        MapVMs.Add(SelectedMap);
-                    }));
-                }
-                else
-                {
-                    MessageBox.Show(mapResult.ErrorMessage);
-                }
+                // var mapResult = userMapService.GetPredictedMap(neuralNetVM.PredictionFullResults);
+                // if (mapResult.IsSuccess)
+                // {
+                //     Application.Current.Dispatcher.Invoke(new Action(() =>
+                //     {
+                //         if (SelectedMap != null)
+                //         {
+                //             SelectedMap.IsSelected = false;
+                //         }
+                //
+                //         SelectedMap = mapResult.Data;
+                //
+                //         MapVMs.Add(SelectedMap);
+                //     }));
+                // }
+                // else
+                // {
+                //     MessageBox.Show(mapResult.ErrorMessage);
+                // }
             });
 
             IsReady = true;

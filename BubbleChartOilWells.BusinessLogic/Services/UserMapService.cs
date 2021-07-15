@@ -34,7 +34,7 @@ namespace BubbleChartOilWells.BusinessLogic.Services
             engine = REngine.GetInstance();
             // TODO: logger
         }
-      
+
         public ResultResponse<MapVM> GetPredictedMap(DataTable predictedDataFrame)
         {
             try
@@ -46,11 +46,11 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                     var oilWellUserMapValueDto = new OilWellUserMapValueDto
                     {
                         OilWellName = row[4].ToString(),
-                        Value = Double.Parse(row[row.ItemArray.Length - 1].ToString(), new NumberFormatInfo(){NumberDecimalSeparator = "."})
+                        Value = Convert.ToDouble((decimal) row[row.ItemArray.Length - 1])
                     };
-;
                     oilWellUserMapValueDtos.Add(oilWellUserMapValueDto);
                 }
+
                 var oilWells = oilWellRepository.GetAll();
 
                 var xList = new List<double>();
@@ -67,17 +67,19 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                         yList.Add(oilWell.Y);
                         zList.Add(oilWellUserMapValueDto.Value);
                     }
-                    catch{}
+                    catch
+                    {
+                    }
                 }
 
                 if (xList.Count < 3)
                 {
                     throw new Exception("Недостаточно загруженных скважин для построения карты");
                 }
-                
+
                 // TODO: delete
                 MessageBox.Show($@"Найдено {zList.Count} из {oilWellUserMapValueDtos.Count}");
-                
+
                 var predictedMapVM = GetKrigedMap(xList, yList, zList);
                 predictedMapVM.Name = $@"PredictedMap~{DateTime.Now}";
                 predictedMapVM.IsSelected = true;
@@ -88,11 +90,13 @@ namespace BubbleChartOilWells.BusinessLogic.Services
             catch (Exception e)
             {
                 // TODO: write error to log
-                return ResultResponse<MapVM>.GetErrorResponse(@$"Ошибка импортирования пользовательской карты.{Environment.NewLine}
+                return ResultResponse<MapVM>.GetErrorResponse(
+                    @$"Ошибка импортирования пользовательской карты.{Environment.NewLine}
                                                                 {e.Message}{Environment.NewLine}
                                                                 {e.StackTrace}");
             }
         }
+
         public ResultResponse<MapVM> ImportUserMap(string fileName)
         {
             try
@@ -105,7 +109,7 @@ namespace BubbleChartOilWells.BusinessLogic.Services
 
                     while (!reader.EndOfStream)
                     {
-                        var row = reader.ReadLine().Split(new char[] { ' ', '\t' });
+                        var row = reader.ReadLine().Split(new char[] {' ', '\t', ';'});
 
                         var dotSeparatorValue = Convert.ToDouble(row[1], NumberFormatInfo.InvariantInfo);
                         //var commaSeparatorValue = Convert.ToDouble(row[1], new NumberFormatInfo { NumberDecimalSeparator = "," });
@@ -117,6 +121,7 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                         };
                         oilWellUserMapValueDtos.Add(oilWellUserMapValueDto);
                     }
+
                     reader.Close();
                 }
 
@@ -135,14 +140,16 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                         yList.Add(oilWell.Y);
                         zList.Add(oilWellUserMapValueDto.Value);
                     }
-                    catch {}
+                    catch
+                    {
+                    }
                 }
-                
+
                 if (xList.Count < 3)
                 {
                     throw new Exception("Недостаточно загруженных скважин для построения карты");
                 }
-                
+
                 var userMapVM = GetKrigedMap(xList, yList, zList);
                 userMapVM.Name = Path.GetFileNameWithoutExtension(fileName);
                 userMapVM.IsSelected = true;
@@ -154,12 +161,13 @@ namespace BubbleChartOilWells.BusinessLogic.Services
             catch (Exception e)
             {
                 // TODO: write error to log
-                return ResultResponse<MapVM>.GetErrorResponse(@$"Ошибка импортирования пользовательской карты.{Environment.NewLine}
+                return ResultResponse<MapVM>.GetErrorResponse(
+                    @$"Ошибка импортирования пользовательской карты.{Environment.NewLine}
                                                                 {e.Message}{Environment.NewLine}
                                                                 {e.StackTrace}");
             }
         }
-        
+
         public ResultResponse<List<ContourFragmentVM>> ImportUserMapContour(string fileName)
         {
             try
@@ -209,7 +217,8 @@ namespace BubbleChartOilWells.BusinessLogic.Services
             catch (Exception e)
             {
                 // TODO: write error to log
-                return ResultResponse<List<ContourFragmentVM>>.GetErrorResponse("Ошибка импортирования контура пользовательской карты.");
+                return ResultResponse<List<ContourFragmentVM>>.GetErrorResponse(
+                    "Ошибка импортирования контура пользовательской карты.");
             }
         }
 
@@ -218,8 +227,8 @@ namespace BubbleChartOilWells.BusinessLogic.Services
             var lags = 10;
             var pixels = 400;
             var model = "spherical";
-            
-            if(!engine.IsRunning)
+
+            if (!engine.IsRunning)
             {
                 engine = REngine.GetInstance();
             }
@@ -255,7 +264,7 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                     zInversed.Add(zKriged[j]);
                 }
             }
-            
+
             var mapWidth = xKriged.Max() - xKriged.Min();
             var mapHeight = yKriged.Max() - yKriged.Min();
             var userMapBitmap = ConvertToBitmap.GetMapBitmap(pixelWidth, pixelHeight, zInversed);
@@ -268,7 +277,8 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                 Height = mapHeight,
                 LeftBottomCoordinate = new System.Windows.Point(xKriged.Min(), yKriged.Min()),
                 Z = zInversed,
-                BitmapSource = Imaging.CreateBitmapSourceFromHBitmap(userMapBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions())
+                BitmapSource = Imaging.CreateBitmapSourceFromHBitmap(userMapBitmap.GetHbitmap(), IntPtr.Zero,
+                    Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions())
             };
 
             return userMapVM;

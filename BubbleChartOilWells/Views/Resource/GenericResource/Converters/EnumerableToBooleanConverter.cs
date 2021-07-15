@@ -15,7 +15,7 @@ namespace BubbleChartOilWells.Views.Resource.GenericResource.Converters
             if (value == null || !(value is IEnumerable<object>))
                 return false;
 
-            return (value as IEnumerable<object>).Count() != 0 ? true : false;
+            return (value as IEnumerable<object>).Count() != 0;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

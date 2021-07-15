@@ -17,7 +17,7 @@ namespace BubbleChartOilWells.Views.Resource.GenericResource.Converters
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            System.Diagnostics.Trace.TraceError("StringFormatConverter: does not support TwoWay or OneWayToSource bindings.");
+            System.Diagnostics.Trace.TraceError("FilepathToFilenameConverter: does not support TwoWay or OneWayToSource bindings.");
             return DependencyProperty.UnsetValue;
         }
     }

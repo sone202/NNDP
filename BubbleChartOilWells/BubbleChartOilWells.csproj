@@ -55,6 +55,9 @@
   <PropertyGroup>
     <StartupObject>BubbleChartOilWells.App</StartupObject>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>logo_unfilled %281%29.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AsyncAwaitBestPractices, Version=1.0.0.0, Culture=neutral, PublicKeyToken=532360cfd341384d, processorArchitecture=MSIL">
       <HintPath>..\packages\AsyncAwaitBestPractices.5.0.2\lib\netstandard2.0\AsyncAwaitBestPractices.dll</HintPath>
@@ -146,7 +149,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ViewModels\DebitGainVM.cs" />
-    <Compile Include="ViewModels\DrawingAreaVM.cs" />
     <Compile Include="ViewModels\ExitConfirmationVM.cs" />
     <Compile Include="ViewModels\NeuralNetVM.cs" />
     <Compile Include="ViewModels\SaveMapVM.cs" />
@@ -159,8 +161,8 @@
     <Compile Include="Views\Functional\ExitConfirmationWindow.xaml.cs">
       <DependentUpon>ExitConfirmationWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Functional\ExportOilWellsMapGridValuesWindow.xaml.cs">
-      <DependentUpon>ExportOilWellsMapGridValuesWindow.xaml</DependentUpon>
+    <Compile Include="Views\Functional\ExportOilWellsMapGridWindow.xaml.cs">
+      <DependentUpon>ExportOilWellsMapGridWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Functional\NeuralNetUC.xaml.cs">
       <DependentUpon>NeuralNetUC.xaml</DependentUpon>
@@ -184,7 +186,7 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Functional\ExitConfirmationWindow.xaml" />
-    <Page Include="Views\Functional\ExportOilWellsMapGridValuesWindow.xaml">
+    <Page Include="Views\Functional\ExportOilWellsMapGridWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -327,6 +329,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Views\Resource\GenericResource\Icons\danger.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="logo_unfilled.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="logo_unfilled %281%29.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

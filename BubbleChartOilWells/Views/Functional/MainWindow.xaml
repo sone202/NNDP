@@ -75,9 +75,9 @@
                     <MenuItem Command="{Binding OpenSessionAsyncCommand}"
                               Header="Открыть сессию"
                               IsEnabled="{Binding IsReady}"
-                              Template="{StaticResource VsMenuSub}"/>
-                    
-                    <Separator Template="{StaticResource VsMenuSep}"/>
+                              Template="{StaticResource VsMenuSub}" />
+
+                    <Separator Template="{StaticResource VsMenuSep}" />
                     <MenuItem Command="{Binding ImportOilWellsAsyncCommand}"
                               Header="Импортировать Excel"
                               IsEnabled="{Binding IsExcelImportEnabled}"
@@ -328,8 +328,10 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
                         <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
+                        <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
+
+
                     <Border x:Name="NavigationPanel"
                             Grid.Row="0"
                             Margin="0,0,2,2"
@@ -394,15 +396,17 @@
                             </TreeViewItem>
                         </TreeView>
                     </Border>
-                    <Border x:Name="SettingsPanel"
-                            Grid.Row="1"
-                            Margin="0,0,2,2"
-                            Style="{StaticResource ControlBorder}"
-                            Visibility="{Binding IsChecked, ElementName=SettingsCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}">
-                        <TextBlock Background="White">Settings</TextBlock>
-                    </Border>
+
+                    <!-- <Border x:Name="SettingsPanel" -->
+                    <!--         DockPanel.Dock="Top" -->
+                    <!--         Margin="0,0,2,2" -->
+                    <!--         Style="{StaticResource ControlBorder}" -->
+                    <!--         Visibility="{Binding IsChecked, ElementName=SettingsCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}"> -->
+                    <!--     <TextBlock Background="White">Settings</TextBlock> -->
+                    <!-- </Border> -->
+
                     <Border x:Name="SelectedOilWellPanel"
-                            Grid.Row="2"
+                            Grid.Row="1"
                             Margin="0,0,2,0"
                             Style="{StaticResource ControlBorder}"
                             Visibility="{Binding IsChecked, ElementName=SettingsCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -410,81 +414,83 @@
                                   BorderThickness="0"
                                   ItemsSource="{Binding SelectedOilWellPropertyValues}" />
                     </Border>
+                    </Grid>
+                    <!--#endregion-->
+
                 </Grid>
+
+                <!--#region Status Bar-->
+                <StatusBar Grid.Column="0"
+                           Grid.ColumnSpan="3"
+                           Grid.Row="2"
+                           Background="{StaticResource StatusBarReadyBrush}"
+                           Padding="0">
+
+                    <StatusBarItem x:Name="ReadyStatusBarItem"
+                                   Background="{StaticResource StatusBarReadyBrush}"
+                                   Padding="0"
+                                   Visibility="{Binding IsReady, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="5,0">
+                            <Image
+                                Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/ready.png"
+                                Height="14" />
+                            <Label Content="Ready"
+                                   Foreground="White" />
+                        </StackPanel>
+                    </StatusBarItem>
+
+                    <StatusBarItem x:Name="LoadingStatusBarItem"
+                                   Background="{StaticResource StatusBarLoadingBrush}"
+                                   Padding="0"
+                                   Visibility="{Binding IsReady, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=false}">
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="5,0">
+                            <Image
+                                Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/loading.png"
+                                Height="14">
+                                <Image.RenderTransform>
+                                    <RotateTransform x:Name="RotationIcon"
+                                                     CenterX="7"
+                                                     CenterY="7" />
+                                </Image.RenderTransform>
+                                <Image.Triggers>
+                                    <EventTrigger RoutedEvent="Image.Loaded">
+                                        <BeginStoryboard>
+                                            <Storyboard RepeatBehavior="Forever">
+                                                <DoubleAnimation Storyboard.TargetName="RotationIcon"
+                                                                 Storyboard.TargetProperty="Angle"
+                                                                 By="360"
+                                                                 Duration="0:0:1" />
+
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LoadingLabel"
+                                                                               Storyboard.TargetProperty="Content"
+                                                                               Duration="00:00:01.6"
+                                                                               RepeatBehavior="Forever">
+                                                    <DiscreteObjectKeyFrame KeyTime="00:00:00.0"
+                                                                            Value="Loading" />
+                                                    <DiscreteObjectKeyFrame KeyTime="00:00:00.4"
+                                                                            Value="Loading." />
+                                                    <DiscreteObjectKeyFrame KeyTime="00:00:00.8"
+                                                                            Value="Loading.." />
+                                                    <DiscreteObjectKeyFrame KeyTime="00:00:01.2"
+                                                                            Value="Loading..." />
+                                                </ObjectAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Image.Triggers>
+                            </Image>
+                            <Label x:Name="LoadingLabel"
+                                   Foreground="White" />
+                        </StackPanel>
+                    </StatusBarItem>
+                </StatusBar>
                 <!--#endregion-->
-
             </Grid>
-
-            <!--#region Status Bar-->
-            <StatusBar Grid.Column="0"
-                       Grid.ColumnSpan="3"
-                       Grid.Row="2"
-                       Background="{StaticResource StatusBarReadyBrush}"
-                       Padding="0">
-
-                <StatusBarItem x:Name="ReadyStatusBarItem"
-                               Background="{StaticResource StatusBarReadyBrush}"
-                               Padding="0"
-                               Visibility="{Binding IsReady, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <StackPanel Orientation="Horizontal"
-                                Margin="5,0">
-                        <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/ready.png"
-                               Height="14" />
-                        <Label Content="Ready"
-                               Foreground="White" />
-                    </StackPanel>
-                </StatusBarItem>
-
-                <StatusBarItem x:Name="LoadingStatusBarItem"
-                               Background="{StaticResource StatusBarLoadingBrush}"
-                               Padding="0"
-                               Visibility="{Binding IsReady, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=false}">
-                    <StackPanel Orientation="Horizontal"
-                                Margin="5,0">
-                        <Image Source="/BubbleChartOilWells;component/Views/Resource/GenericResource/Icons/loading.png"
-                               Height="14">
-                            <Image.RenderTransform>
-                                <RotateTransform x:Name="RotationIcon"
-                                                 CenterX="7"
-                                                 CenterY="7" />
-                            </Image.RenderTransform>
-                            <Image.Triggers>
-                                <EventTrigger RoutedEvent="Image.Loaded">
-                                    <BeginStoryboard>
-                                        <Storyboard RepeatBehavior="Forever">
-                                            <DoubleAnimation Storyboard.TargetName="RotationIcon"
-                                                             Storyboard.TargetProperty="Angle"
-                                                             By="360"
-                                                             Duration="0:0:1" />
-
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LoadingLabel"
-                                                                           Storyboard.TargetProperty="Content"
-                                                                           Duration="00:00:01.6"
-                                                                           RepeatBehavior="Forever">
-                                                <DiscreteObjectKeyFrame KeyTime="00:00:00.0"
-                                                                        Value="Loading" />
-                                                <DiscreteObjectKeyFrame KeyTime="00:00:00.4"
-                                                                        Value="Loading." />
-                                                <DiscreteObjectKeyFrame KeyTime="00:00:00.8"
-                                                                        Value="Loading.." />
-                                                <DiscreteObjectKeyFrame KeyTime="00:00:01.2"
-                                                                        Value="Loading..." />
-                                            </ObjectAnimationUsingKeyFrames>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
-                            </Image.Triggers>
-                        </Image>
-                        <Label x:Name="LoadingLabel"
-                               Foreground="White" />
-                    </StackPanel>
-                </StatusBarItem>
-            </StatusBar>
-            <!--#endregion-->
-        </Grid>
     </Border>
 </Window>
