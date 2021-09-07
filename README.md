@@ -24,4 +24,14 @@
 
 Пример работы нейронной сети: 
 
+*Результаты тестирования:*
+![Screenshot 1](Screenshots/Screenshot_1.png)
 
+*Результаты прогнозирования:*
+![Screenshot 2](Screenshots/Screenshot_2.png)
+
+Отображение инормации о скважинах и карт геолого-промысловых параметров:
+![Screenshot 3](Screenshots/Screenshot_3.png)
+
+Область построения карт потенциальных дебитов по формуле дюпюи:
+![Screenshot 4](Screenshots/Screenshot_4.png)
