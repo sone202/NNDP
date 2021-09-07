@@ -270,25 +270,25 @@ namespace BubbleChartOilWells.ViewModels
                     return;
                 }
 
-                // var mapResult = userMapService.GetPredictedMap(neuralNetVM.PredictionFullResults);
-                // if (mapResult.IsSuccess)
-                // {
-                //     Application.Current.Dispatcher.Invoke(new Action(() =>
-                //     {
-                //         if (SelectedMap != null)
-                //         {
-                //             SelectedMap.IsSelected = false;
-                //         }
-                //
-                //         SelectedMap = mapResult.Data;
-                //
-                //         MapVMs.Add(SelectedMap);
-                //     }));
-                // }
-                // else
-                // {
-                //     MessageBox.Show(mapResult.ErrorMessage);
-                // }
+                var mapResult = userMapService.GetPredictedMap(neuralNetVM.PredictionFullResults);
+                if (mapResult.IsSuccess)
+                {
+                    Application.Current.Dispatcher.Invoke(new Action(() =>
+                    {
+                        if (SelectedMap != null)
+                        {
+                            SelectedMap.IsSelected = false;
+                        }
+
+                        SelectedMap = mapResult.Data;
+
+                        MapVMs.Add(SelectedMap);
+                    }));
+                }
+                else
+                {
+                    MessageBox.Show(mapResult.ErrorMessage);
+                }
             });
 
             IsReady = true;

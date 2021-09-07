@@ -78,10 +78,10 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                 }
 
                 // TODO: delete
-                MessageBox.Show($@"Найдено {zList.Count} из {oilWellUserMapValueDtos.Count}");
+                //MessageBox.Show($@"Найдено {zList.Count} из {oilWellUserMapValueDtos.Count}");
 
                 var predictedMapVM = GetKrigedMap(xList, yList, zList);
-                predictedMapVM.Name = $@"PredictedMap~{DateTime.Now}";
+                predictedMapVM.Name = $@"PredictedDebitMap~{DateTime.Now}";
                 predictedMapVM.IsSelected = true;
                 predictedMapVM.BitmapSource.Freeze();
 
@@ -224,7 +224,7 @@ namespace BubbleChartOilWells.BusinessLogic.Services
 
         private MapVM GetKrigedMap(List<double> X, List<double> Y, List<double> Z)
         {
-            var lags = 10;
+            var lags = 3;
             var pixels = 400;
             var model = "spherical";
 
@@ -242,6 +242,7 @@ namespace BubbleChartOilWells.BusinessLogic.Services
             engine.SetSymbol("lags", engine.CreateNumeric(lags));
             engine.SetSymbol("pixels", engine.CreateNumeric(pixels));
             engine.SetSymbol("model", engine.CreateCharacter(model));
+            
 
             engine.Evaluate("kriged <- kriging(x, y, z, model, lags, pixels)");
             //engine.Evaluate("image(kriged, xlim = extendrange(x), ylim = extendrange(y))");

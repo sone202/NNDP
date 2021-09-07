@@ -15,7 +15,7 @@ extended_neuralnet <- function(filepath,
   # импорт данных из csv-файла
   imported_data <- read.csv(filepath, sep = ";", header = TRUE, encoding = "UTF-8")
   imported_data <- as.data.frame(imported_data)
-  
+
   # копия данных
   full_data <- imported_data
 
@@ -34,7 +34,7 @@ extended_neuralnet <- function(filepath,
   imported_data.test <- imported_data.test[, 6:(Q_COL_INDEX + 5)]
 
   imported_data <- imported_data[, 6:(Q_COL_INDEX + 5)]
-  
+
   # получаем заголовки и формируем формулу
   headers <- colnames(imported_data)
   formula <- create_formula(headers)
@@ -44,18 +44,36 @@ extended_neuralnet <- function(filepath,
   test <- as.data.frame(normalize(imported_data.test, imported_data))
 
   # обучение нейронной сети
-  #set.seed(seed)
-  NN <- neuralnet(formula = formula(formula),
-                  data = train,
-                  hidden = hidden,
-                  threshold = threshold,
-                  stepmax = stepmax,
-                  rep = rep,
-                  learningrate = learningrate,
-                  #algorithm = algorithm,
-                  err.fct = errorFunc,
-                  act.fct = actFunc,
-                  linear.output = TRUE)
+
+  NN <- NULL
+  if (algorithm == "backprop")
+  {
+    NN <- neuralnet(formula = formula(formula),
+                    data = train,
+                    hidden = hidden,
+                    threshold = threshold,
+                    stepmax = stepmax,
+                    rep = rep,
+                    learningrate = learningrate,
+                    #algorithm = algorithm,
+                    err.fct = errorFunc,
+                    act.fct = actFunc,
+                    linear.output = TRUE)
+  }
+  else
+  {
+    NN <- neuralnet(formula = formula(formula),
+                    data = train,
+                    hidden = hidden,
+                    threshold = threshold,
+                    stepmax = stepmax,
+                    rep = rep,
+                    #learningrate = learningrate,
+                    algorithm = algorithm,
+                    err.fct = errorFunc,
+                    act.fct = actFunc,
+                    linear.output = TRUE)
+  }
 
   # лучшая нейронная сеть
   best.nn.number <- which.min(NN$result.matrix[1,])
@@ -79,7 +97,6 @@ extended_neuralnet <- function(filepath,
   NN_train_MAE <- sum(abs(actual_train - predicted_train)) / nrow(actual_train)
   NN_train_MAE <- round(NN_train_MAE, 2)
 
-  
 
   #--------------------ТЕСТИРОВАНИЕ----------------------------------------------------------
   NN.test <- predict(NN, test[, 1:(Q_COL_INDEX - 1)], rep = best.nn.number)
@@ -98,7 +115,7 @@ extended_neuralnet <- function(filepath,
   # определение MAE
   NN_test_MAE <- sum(abs(actual_test - predicted_test)) / nrow(actual_test)
   NN_test_MAE <- round(NN_test_MAE, 2)
-  
+
   results <- list("TrainMAPE" = NN_train_MAPE,
                   "TrainMAE" = NN_train_MAE,
                   "TrainSSE" = NN_train_SSE,
@@ -113,7 +130,7 @@ extended_neuralnet <- function(filepath,
                   "BindedTestResults" = binded_test_results,
                   "BestNNIndex" = best.nn.number,
                   "NN" = NN,
-                  "Headers"  = headers)
-  
+                  "Headers" = headers)
+
   return(results)
 }

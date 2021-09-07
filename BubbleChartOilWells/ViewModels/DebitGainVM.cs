@@ -68,7 +68,7 @@ namespace BubbleChartOilWells.ViewModels
         public SeriesCollection OfpSeriesCollection { get; set; }
 
         // methods
-        
+
         /// <summary>
         /// Calculates Krw and Kro with Dupui formula
         /// </summary>
@@ -79,7 +79,6 @@ namespace BubbleChartOilWells.ViewModels
 
             try
             {
-                
                 if (DebitGainVM.Sw == null)
                 {
                     MessageBox.Show("Выберите карту Sw");
@@ -95,10 +94,10 @@ namespace BubbleChartOilWells.ViewModels
 
                 for (int i = 0; i < DebitGainVM.Ofp.Rows.Count; i++)
                 {
-                    waterSaturation.Add((double)DebitGainVM.Ofp.Rows[i][0]);
+                    waterSaturation.Add((double) DebitGainVM.Ofp.Rows[i][0]);
 
-                    krw.Add(new ObservablePoint((double)DebitGainVM.Ofp.Rows[i][0],
-                        Double.Parse(DebitGainVM.Ofp.Rows[i][2].ToString())));
+                    krw.Add(new ObservablePoint((double) DebitGainVM.Ofp.Rows[i][0],
+                        (double) DebitGainVM.Ofp.Rows[i][2]));
 
                     kro.Add(new ObservablePoint((double) DebitGainVM.Ofp.Rows[i][0],
                         (double) DebitGainVM.Ofp.Rows[i][1]));

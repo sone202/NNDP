@@ -72,6 +72,7 @@ namespace BubbleChartOilWells.BusinessLogic.Services
                                 z.Add(KHValues[i] * (debitGainVM.Pr.Z[i] - debitGainVM.Pwf)
                                       / (18.41 * (Math.Log(debitGainVM.Re / debitGainVM.Rw) - 0.75 + debitGainVM.Stot))
                                       * (debitGainVM.KwInEachMapCell[i] / (debitGainVM.MUw * debitGainVM.Bw))
+                                      
                                       + KHValues[i] * (debitGainVM.Pr.Z[i] - debitGainVM.Pwf)
                                       / (18.41 * (Math.Log(debitGainVM.Re / debitGainVM.Rw) - 0.75 + debitGainVM.Stot))
                                       * (debitGainVM.KoInEachMapCell[i] / (debitGainVM.MUo * debitGainVM.Bo)));
