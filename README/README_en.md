@@ -25,14 +25,18 @@ User can change the following parameters of NN:
 NN part of the program: 
 
 *Training/Testing results:*
+
 ![Screenshot 1](Screenshots/Screenshot_1.png)
 
 *Prediction results:*
+
 ![Screenshot 2](Screenshots/Screenshot_2.png)
 
 
 Information about wells and maps of geological parameters:
+
 ![Screenshot 3](Screenshots/Screenshot_3.png)
 
 Dupuit–Thiem equation part of the program:
+
 ![Screenshot 4](Screenshots/Screenshot_4.png)
